@@ -1,0 +1,47 @@
+1.断点下载如何实现
+    1.添加下载任务时对数据进行校验
+        检查任务在不在下载列表中，在就不重复添加任务
+        检查下载信息在不在数据库中，在同时是暂停状态，且本地有zip文件就继续从断点位置下载，否则重新下载
+    2.从断点位置下载
+        下载时添加http的请求头header
+            range = "bytes=" + dbOfdownloadBean.getDownloadLocation() + "-";
+        OkHttp添加header：
+            addHeader("Range","bytes="+start+"-"+end)
+        Retrofit
+            @Streaming
+            @GET
+            Observable<ResponseBody> download(@Header("Range") String range,@Url String url);
+
+    3.断点时如何保存数据
+        1.Retrofit返回数据流对应的ResponseBody,我们通过ResponseBody创建对应的下载信息Bean对象
+            将要下载的数据流长度+已经下载好的数据流长度就是该文件的总长度
+            bean.setTotal(responseBody.contentLength+downloadedContentLength)
+        2.通过该ResponseBody写文件
+            accessFile = new RandomAccessFile(file,"rwd")
+            while(len = is.read(buf) != -1){
+                if(mIsPaused){
+                    accessFile.write(buf, 0, len);
+                    targetDownLoadBean.setDownloadLocation(targetDownLoadBean.getDownloadLocation()+len);
+                    retrun;
+                }
+            }
+
+
+2.Retrofit下载时如何拦截链回调进度
+    通过自定义OkHttp拦截器ProgressInterceptor
+        1.添加拦截链
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new ProgressInterceptor())
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .build();
+        2.从拦截链中添加自定义数据
+           public class ProgressInterceptor{
+                public Response intercept(Chain chain){
+                    Response response = chain.proced(chain.request())
+                    return response.newBuilder()
+                                .body(new ProgressBody(response.body(),response.request().url().toString()))
+                                .build();
+                }
+           }
+
+        3.

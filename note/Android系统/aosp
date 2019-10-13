@@ -1,0 +1,233 @@
+https://blog.csdn.net/dl6655/article/details/78869501
+http://wuxiaolong.me/categories/AOSP/
+http://liuwangshu.cn/tags/AOSP%E5%9F%BA%E7%A1%80/
+https://blog.csdn.net/adomwon/article/details/87485122
+https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
+
+Ctrl+Alt+t打开终端
+1.Ubuntu切换到root
+    su root
+    su认证失败时，重新设置下密码
+        1 me@ubuntu:~$ sudo passwd
+        2 密码：<--- 输入安装时那个用户的密码
+        3 输入新的 UNIX 密码：<--- 新的Root用户密码
+        4 重新输入新的 UNIX 密码：<--- 重复新的Root用户密码
+        5 passwd：已成功更新密码
+        6 me@ubuntu:~$ su
+        7 密码：<--输入重置的新密码
+        8 root@ubuntu:/home/me#         #已经进入root用户
+
+    切换回普通用户 su pm5678
+		
+2.安装增强工具,设置共享文件夹
+    多次设置后发现vm版本和ubuntu版本不匹配会容易出现安装增强工具失败
+        亲测VM6.0.8+Ubuntu16.0.4可用
+    安装成功后,提示没有权限,执行命令将用户加入到vboxs组
+    cd /media/sf_ubuntu16_share
+    提示没有权限,执行命令将用户加入到vboxs组,然后重启
+            sudo adduser your_username vboxsf
+3.更换apt源
+    1.源文件备份
+        sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    2.编辑源列表文件
+        sudo vim /etc/apt/sources.list
+        修改文件权限
+            chmod 777 file
+        或者修改源列表文件
+            sudo gedit /etc/apt/sources.list
+
+    3.运行
+        sudo apt-get update
+
+    中科大源列表文件
+        deb http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+        deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+        deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+        deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+        deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+        deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+        deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+        deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+        deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+        deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+
+        deb http://dk.archive.ubuntu.com/ubuntu/ xenial main
+        deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
+    根据Ubuntu版本的不同，需要添加不同的源
+        具体根据这个网址操作，https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+4.下载repo工具
+    安装git
+        sudo apt-get install git
+    无法获取锁
+        sudo rm /var/cache/apt/archives/lock
+        sudo rm /var/lib/dpkg/lock
+    创建bin，并加入到path中
+        mkdir ~/bin
+        PATH=~/bin:$PATH
+    安装curl
+        sudo apt-get install curl
+    下载repo并设置权限
+        curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+    安装python
+        sudo apt-get install python
+5.下载源码
+    1.建立工作目录
+        mkdir aosp
+        cd aosp
+    2.repo的运行过程中会尝试访问官方的git源更新自己，如果想使用tuna的镜像源进行更新，可以将如下内容复制到你的~/.bashrc里
+        REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
+    3.设置身份，添加邮箱和用户名
+        git config --global user.email "piratemorgen@gmail.com"
+        git config --global user.name "piratemorgen"
+    4.初始化仓库并指定版本
+        repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest
+        指定版本
+        repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-9.0.0_r8
+        如何查询指定版本列表和支持的设备
+        https://source.android.google.cn/source/build-numbers.html#source-code-tags-and-builds
+
+    5.同步源码
+        repo sync
+    6.如果没有指定版本，如何知道下载好的 AOSP 是什么版本？
+        找到build/make/core/version_defaults.mk文件打开，搜索PLATFORM_SDK_VERSION，找到了 PLATFORM_SDK_VERSION := 28，从 SDK 版本可以知道 AOSP 版本是 9.0，我下载的就是最新的
+    7.下载源码达几十个G,容易中途失败，也可以使用官方的先下载压缩包，断点续传方式
+        https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
+6.编译系统源码(整编)
+    1.安装1604版本的编译环境,不同版本的编译环境可能不同,最终会导致源码整编失败
+        sudo apt-get install libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-dev g++-multilib
+        sudo apt-get install -y git flex bison gperf build-essential libncurses5-dev:i386
+        sudo apt-get install tofrodos python-markdown libxml2-utils xsltproc zlib1g-dev:i386
+        sudo apt-get install dpkg-dev libsdl1.2-dev libesd0-dev
+        sudo apt-get install git-core gnupg flex bison gperf build-essential
+        sudo apt-get install zip curl zlib1g-dev gcc-multilib g++-multilib
+        sudo apt-get install libc6-dev-i386
+        sudo apt-get install lib32ncurses5-dev x11proto-core-dev libx11-dev
+        sudo apt-get install libgl1-mesa-dev libxml2-utils xsltproc unzip m4
+        sudo apt-get install lib32z-dev ccache
+    2.进入下载好的源码目录，使用 build目录中的envsetup.sh 脚本初始化环境，这个脚本会引入其他的执行脚本
+        source build/envsetup.sh
+        // 编译前删除build文件夹A
+        make clobber
+    3.选择编译目标,lunch命令是envsetup.sh里定义的一个命令，用来让用户选择编译目标
+        lunch
+        lunch aosp_x86-eng
+
+        编译目标的格式组成为BUILD-BUILDTYPE，比如aosp_arm-eng的BUILD为aosp_arm，BUILDTYPE为eng
+        BUILDTYPE 指的是编译类型，有以下三种：
+            user：用来正式发布到市场的版本，权限受限，如没有 root 权限，不能 dedug，adb默认处于停用状态。
+            userdebug：在user版本的基础上开放了 root 权限和 debug 权限，adb默认处于启用状态。一般用于调试真机。
+            eng：开发工程师的版本，拥有最大的权限(root等)，具有额外调试工具的开发配置。一般用于模拟器。
+            如果你没有Nexus设备，只想编译完后运行在模拟器查看，那么BUILD可以选择aosp_x86，BUILDTYPE选择eng，Which would you like? [aosp_arm-eng]后面直接输入对应序号5就可以。
+    4.开始编译,-j后面的参数一般天cpu核心数的两倍
+        make -j4
+        编译前要配置好当前虚拟机的内存和CPU核心数，以主机为基准
+        如我主机是16G内存+4核CPU，我配置的虚拟机参数是8G内存+4核CPU
+7.系统app单编
+    source build/envsetup.sh
+    lunch
+    lunch aosp_x86-eng          #选择指定的lunch类型
+    cd packages/apps/Settings   #选择要编译的app
+    mm                          #编译当前目录下的模块，不编译依赖模块
+
+    如果你修改了源码，想查看生成的APK文件，有两种方式：
+        通过adb push或者adb install 来安装APK。
+        使用make snod命令，重新生成 system.img，运行模拟器查看
+8.运行模拟器
+    source build/envsetup.sh
+    lunch aosp_x86-eng
+    emulator
+9.完整卸载wine
+    1、终端中执行sudo apt-get remove wine1.3（wine1.3是你安装wine时的软件包命，如果你当时之间apt-get wine来安装的就直接输入apt-get install remove wine）
+    2、删除wine的目录文件：sudo rm -r /home/username/.wine（username是你的用户名）
+    3、卸载残留的软件包：sudo apt-get autoremove
+    4、清理wine模拟运行的windows程序:sudo rm -r /home/username/.local/share/applications
+    5、清理残余的windows程序:sudo rm -r /home/username/.config/menus/applications-merged/wine*
+常见错误
+    1.安装增强工具失败,未能成功加载光驱到虚拟电脑
+        Building the main Guest Additions module [失败]
+        需要先安装gcc，再安装两个kernel，否则kernel无法完全编译
+            su
+            yum gcc make gcc-c++
+            yum install kernel-headers kernel-devel
+                安装kernel时报错没有已启用的仓库，执行以下程序
+                    apt-get install net-tools
+        然后更新
+            yum update
+        如果还未成功尝试更新VirtualBox版本
+            亲测VM6.0.8+Ubuntu16.0.4可用
+    2.Unable to init server 无法连接 拒绝连接
+        这是因为Xserver默认情况下不允许别的用户的图形程序的图形显示在当前屏幕上. 如果需要别的用户的图形显示在当前屏幕上, 则应以当前登陆的用户, 也就是切换身份前的用户执行如下命令。
+        xhost +
+        通过执行这条命令，就授予了其它用户访问当前屏幕的权限，于是就可以以另外的用户运行需要运行的程序了
+    3.su gedit /etc/apt/sources.list保错无法连接,拒绝连接
+        先执行su root后再执行 gedit ....
+    4.curl : Depends: libcurl3-gnutls (= 7.47.0-1ubuntu2.12) but 7.58.0-2ubuntu3.6 is to be installed
+
+        sudo apt-get purge  libcurl3-gnutls
+        sudo apt-get install curl
+
+        sudo apt-get purge vim-common
+        sudo apt-get install vim
+
+    5.安装增强功能后,如果界面有VBoxClient (seamless): failed to start. Stage错误
+    ubuntu18.04安装增强功能之后，如果没有取消3D加速，重启后则会进入不了页面,可执行
+        sudo apt-get install gcc make perl
+        cd /media/$USER/<...>
+        sudo ./VBoxLinuxAdditions.run
+        sudo reboot
+    6.共享文件夹配置好后,还需要将用户加到权限组中才可以使用
+        cd /media/sf_ubuntu16_share
+        提示没有权限,执行命令将用户加入到vboxs组
+        sudo adduser your_username vboxsf
+
+    7.源码整编的时候，ubuntu的版本和编译的版本是有对应关系的
+        尝试用ubuntu16编译android9.0报错
+        fs_config_generator.py does not exist
+        重新试一遍又报错很多module already defined
+        repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-7.1.1_r46
+
+    8.源码整编时out of memory
+        # There is insufficient memory for the Java Runtime Environment to continue.
+        # Native memory allocation (mmap) failed to map 16384 bytes for committing reserved memory.
+        # Possible reasons:
+        #   The system is out of physical RAM or swap space
+        #   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+        # Possible solutions:
+        #   Reduce memory load on the system
+        #   Increase physical memory or swap space
+        #   Check if swap backing store is full
+        #   Decrease Java heap size (-Xmx/-Xms)
+        #   Decrease number of Java threads
+        #   Decrease Java thread stack sizes (-Xss)
+        #   Set larger code cache with -XX:ReservedCodeCacheSize=
+        #   JVM is running with Unscaled Compressed Oops mode in which the Java heap is
+        #     placed in the first 4GB address space. The Java Heap base address is the
+        #     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+        #     to set the Java Heap base and to place the Java Heap above 4GB virtual address.
+        # This output file may be truncated or incomplete.
+        #
+        #  Out of Memory Error (os_linux.cpp:2647), pid=21077, tid=21079
+        #
+        # JRE version: OpenJDK Runtime Environment (9.0+181) (build 9+181-android5636401)
+        # Java VM: OpenJDK 64-Bit Server VM (9+181-android5636401, mixed mode, tiered, compressed oops, g1 gc, linux-amd64)
+        # Core dump will be written. Default location: Core dumps may be processed with "/usr/share/apport/apport %p %s %c %d %P" (or dumping to /home/pm5678/aosp/core.21077)
+
+        尝试方法如下
+            1.将/proc/sys/vm/max_map_count的初始值由65530提高到1000000
+            2.扩展分区
+                free -m              #查看swap空间
+                df -h /dev/zero      #此/dev/zero一共就1.9G所以添加swap空间不可以超过1.9G
+                mkdir -p swap        #新建swap分区空间
+                cd swap              #新增分区空间
+                dd if=/dev/zero of=swapfile bs=1M count=3072
+                mkswap swapfile      #创建交换文件
+                sudo swapon swapfile #激活
+                free -m              #验证
+                gedit /etc/fstab
+                /swap/swapfile swap swapdefaults 0 0   #把这一行配置加入到fstab文件内容下方设置开机启动
+
+                其他操作
+                    a) 停用：swapoff swapfile
+                    b) 删除：rm –rf swapfile
+                    c) 删除随即启动swap:vi /etc/fstab

@@ -1,0 +1,279 @@
+http://liuwangshu.cn/tags/Android-Jetpack/
+https://www.jianshu.com/p/74e3b8ff1722
+https://www.jianshu.com/p/2fc41a310f79
+https://developer.android.google.cn/topic/libraries/architecture
+1.Jetpack介绍
+    1.1.简介
+        Jetpack并不是一个框架或组件，它是一套库、工具和指南的集合
+        2017年Google推出了Android Architecture Compenent(AAC)，它包括了LifeCycle、LiveData、ViewModel、Room
+        2018年Google I/O大会用AndroidX替代了Android Support Library,并在AAC基础上发布了Android Jetpack
+
+    1.2.Architecture架构组件
+         Architecture指的是架构组件，帮助开发者设计稳健、可测试且易维护的应用。架构组件可以说是对应用开发帮助最大的组件，本系列也是围绕着架构组件进行讲解
+         Databiding:以声明的方法将可观察的数据绑定到界面元素，通常和ViewModel配合使用
+         Lifecycle:用于管理Activity和fragment的生命周期
+         LiveData:在底层数据库更改时通知视图,它是一个可观察的数据持有者,与常规observable不同,LiveData是生命周期感知的
+         ViewModel:以生命周期的方式管理界面相关的数据，通常和Databinding配合使用
+         Room：友好、流畅的访问SQLite数据库，它在SQLite基础上提供了一个抽象层，允许更强大的数据库访问
+         Navigation：处理应用内导航
+         WorkManager: 管理Android的后台的作业，即使应用程序退出或设备重新启动也可以运行可延迟的异步任务
+
+    1.3.Foundationy(基础组件)
+        基础组件提供横向功能，例如向后兼容性、测试、安全、Kotlin 语言支持，并包括多个多个平台开发的组件。
+        Android KTX：优化了供Kotlin使用的Jetpack和Android平台API。帮助开发者以更简洁、更愉悦、更惯用的方式使用Kotlin进行Android开发。
+        AppCompat：帮助较低版本的Android系统进行兼容。
+        Auto: 开发Android Auto应用的组件，提供了适用于所有车辆的标准化界面和用户交互。
+        检测：从AndroidStudio中快速检测基于Kotlin或Java的代码。
+        多Dex处理：为具有多个Dex文件应用提供支持。
+        安全：安全的读写加密文件和共享偏好设置。
+        测试：用于单元和运行时界面测试的Android 测试框架。
+        TV: 构建可让用户在大屏幕上体验沉浸式内容的应用。
+        Wear OS:开发Wear应用的组件。
+
+    1.4.Behavior（行为组件）
+        行为组件可帮助开发者的应用与标准Android服务（如通知、权限、分享）相集成。
+        CameraX：帮助开发简化相机应用的开发工作。它提供一致且易于使用的界面，适用于大多数Android。 设备，并可向后兼容至Android 5.0（API 21）。
+        DownloadManager：处理长时间运行的HTTP下载的系统服务。
+        媒体和播放：用于媒体播放和路由（包括Google Cast）的向后兼容API。
+        通知：提供向后兼容的通知API，支持Wear和Auto。
+        权限：用于检查和请求应用权限的兼容性API。
+        设置：创建交互式设置，建议使用AndroidX Preference Library库将用户可配置设置集成到应用中。
+        分享操作：可以更轻松地实现友好的用户分享操作。
+        切片：切片是一种UI模板，创建可在应用外部显示应用数据的灵活界面元素。
+    1.5.UI（界面组件）
+      Animation and Transition：该框架包含用于常见效果的内置动画，并允许开发者创建自定义动画和生命周期回调。
+      Emoji Compatibility：即便用户没有更新Android系统也可以获取最新的表情符号。
+      Fragment：组件化界面的基本单位。
+      布局：用XML中声明UI元素或者在代码中实例化UI元素。
+      调色板:从调色板中提取出有用的信息。
+2.Jetpack架构组件基本使用
+    1.应用中引用jetpack相关组件
+        //project.gradle配置
+            allprojects {
+                  repositories {
+                      google()
+                      maven { url 'https://jitpack.io' }
+                      maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+                      jcenter{url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+                      //jcenter()
+                  }
+             }
+         //app.gradle配置
+            dataBinding {
+                    enabled true
+            }
+         //gradle.properties中配置
+            android.useAndroidX=true
+            # Automatically convert third-party libraries to use AndroidX
+            android.enableJetifier=true
+
+    2.lifecycle的使用和原理
+        作用:lifecycle用于帮助开发者管理Activity和Fragment的声明周期
+        依赖:implementation "android.arch.lifecycle:extensions:1.1.1"
+        使用:如直接在Activity中使用如下
+            getLifecycle().addObserver(new MyObserver());
+            public class MyObserver implements LifecycleObserver{
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                void onResume(){
+                    Log.d(TAG, "Lifecycle call onResume");
+                }
+                @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                void onPause(){
+                    Log.d(TAG, "Lifecycle call onPause");
+                }
+            }
+        原理：
+
+    3.LiveData使用和原理
+        使用
+        http://liuwangshu.cn/application/jetpack/4-livedata-use.html
+        LiveData是一个可观察的数据持有者,和常规的Observable不同,LiveData是具有生命周期感知的
+        LiveData的数据源一般是ViewModel,也可以是其他可以更新LiveData的组件,当数据更新后,LiveData就会通知它的所有处于Active状态的观察者(Activity在onpause和onDestroy后不会再收到通知)
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:"+s);
+                }
+            });
+            mutableLiveData.postValue("Android进阶三部曲");
+        原理：
+
+    4.什么是ViewModel
+        2015年Google I/O大会发布了MVVM的支持库DataBingding,Databinding遭到了开发者的诟病
+      主要是绑定数据时如果出现了问题很难排查
+        2017年Google I/O大会,Google推出了ViewModel组件，来规范ViewModel层
+        ViewModel是以感知生命周期的形式来存储和管理视图相关的数据，主要有以下特点
+            1.支持大量数据；当Activity被销毁时，我们可以使用onSaveInstanceState()方法恢复其数据，这种方法仅适用于恢复少量的支持序列化、反序列化的数据，不适用于大量数据，如用户列表或位图。而ViewModel不仅支持大量数据，还不需要序列化、反序列化操作。
+            2.UI和数据分离；Activity/Fragment（视图控制器）主要用于显示视图数据，如果它们也负责数据库或者网络加载数据等操作，那么一旦逻辑过多，会导致视图控制器臃肿，ViewModel可以更容易，更有效的将视图数据相关逻辑和视图控制器分离开来。
+            3.避免内存泄漏；视图控制器经常需要一些时间才可能返回的异步调用，视图控制器需要管理这些调用，在合适的时候清理它们，以确保它们的生命周期不会大于自身，避免内存泄漏。而ViewModel恰恰可以避免内存泄漏的发生。
+
+        使用
+          1.自定义ViewModel
+               public class MyViewModel extends ViewModel {
+                   private MutableLiveData<String> name;
+                   public LiveData<String> getName() {
+                       if (name == null) {
+                           name = new MutableLiveData<String>();
+                           addName();
+                       }
+                       return name;
+                   }
+                   private void addName() {
+                       name.setValue("Android进阶解密");
+                   }
+               }
+          2.Activity中使用ViewModel
+            MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
+            model.getName().observe(this,new Observer<String>{
+                @Override
+                public void onChange(@Nullable String s){
+                    Log.d(TAG, "畅销书："+s);
+                }
+            })
+          通过ViewModelProviders就可以获得MyViewModel的实例，然后配合LiveData就可以观察Name的变化
+
+    5.Databing
+        https://blog.csdn.net/LVXIANGAN/article/details/90176401
+        介绍
+            Databing是谷歌官方发布的一种支持库，借助该库，可以使用声明式的语言(而非程序化的)
+        将布局中界面组件绑定到应用中的数据源
+            优点：避免写findViewById；界面动态绑定数据；自动判空
+            缺点:增加调试难度；编译出的apk文件会增加类数量和方法数量
+
+        1使用入门
+            要求4.0以上系统，AndroidStudio 1.5以上版本
+            1.AndroidStudio gradle脚本中声明
+                android{
+                    ...
+                    dataBinding{
+                        enabled = true
+                    }
+                }
+            1.在布局文件中用layout作为根标签
+                其中name定义的是要使用的变量名,type可以是绑定类的全路径，也可以导入包名
+                 如果存在import类名相同时，可以使用alias指定别名
+                 通过@{}或@={}的方式进行引用，其中@={}的方式表示双向绑定
+                 <data>
+                     <import type="leavesc.hello.databindingsamples.model.User" />
+                     <import
+                         alias="TempUser"
+                         type="leavesc.hello.databindingsamples.model2.User" />
+                     <variable
+                         name="user"
+                         type="User" />
+                     <variable
+                         name="tempUserInfo"
+                         type="TempUser" />
+                      //处理点击事件
+                     <variable name="task" type="com.android.example.Task" />
+                     <variable name="presenter" type="com.android.example.Presenter" />
+                     <TextView android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="@{user.firstName, default=my_default}"/>
+
+                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent">
+                         <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                         android:onClick="@{() -> presenter.onSaveClick(task)}" />
+                      </LinearLayout>
+                 </data>
+            2.Activity中通过DataBindingUtil设置布局文件，省略原先的setContent方法
+                其中ActivityMainBinding是根据布局文件名自动生成的，且会生成对应的方法；也可以通过以下方式自定义ViewDataBiding的实例名
+
+                    <data class="CustomBinding">
+                ActivityMainBinding binding = DataBinDing.setContentView(this,R.layout.activity_main)
+                User user = new User("abcd","1234");
+                bingding.setUserInfo(user);
+                //处理点击事件
+                public class Presenter {
+                    public void onSaveClick(Task task){}
+                }
+
+
+             在Fragment或Adapter中可以这样用
+                ListItemBinding binding = ListItemBinding.inflate(layoutInflater, viewGroup, false);
+                // or
+                ListItemBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item, viewGroup, false);
+            3.绑定表达式
+                空合并运算符
+                    android:text="@{user.displayName ?? user.lastName}"
+                    android:text="@{user.displayName != null ? user.displayName : user.lastName}"
+                集合
+                    <data>
+                        <import type="android.util.SparseArray"/>
+                        <import type="java.util.Map"/>
+                        <import type="java.util.List"/>
+                        <variable name="list" type="List&lt;String>"/>
+                        <variable name="sparse" type="SparseArray&lt;String>"/>
+                        <variable name="map" type="Map&lt;String, String>"/>
+                        <variable name="index" type="int"/>
+                        <variable name="key" type="String"/>
+                    </data>
+                    android:text="@{list[index]}"
+                    android:text="@{sparse[index]}"
+                    android:text="@{map[key]}"
+              Databinding不支持include作为merge标签的直接子元素
+
+        2.使用可观察的数据对象(AS3.1以上版本允许使用LiveData通知UI)
+            Observable objects(BaseObservable)
+            Observable fields
+            Observable collections
+        3.绑定适配器
+        4.将布局视图绑定到架构组件(architecture中的LiveData和ViewModel)
+            Databinding和ViewModel可以无缝协作，ViewModel可以显示布局观察到的数据并对其更改做出反应
+            将ViewModel组件与数据绑定库一起使用，可以将UI逻辑移出布局并移入到组件中，这更易于测试
+            Databinding可以确保需要时将视图和数据源绑定和解除绑定，具体实现包含以下步骤
+                1.获取ViewModel组件
+                    UserModel userModel = ViewModelProviders.of(getActivity()).get(UserModel.class)
+                2.获取绑定类实例
+                    UserBinding binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+                3.将ViewModel实例作为一个属性分配给Databing实例
+                    bingding.viewmodel = userModel
+                4.在布局中，使用绑定表达式将ViewModel组件的属性和方法分配给相应的视图
+                    <CheckBox
+                        android:id="@+id/rememberMeCheckBox"
+                        android:checked="@{viewmodel.rememberMe}"
+                        android:onCheckedChanged="@{() -> viewmodel.rememberMeChanged()}" />
+
+            使用Observable ViewModel可以更好地控制绑定适配器，类似于使用LiveData,但这种方式允许我们自定义方法
+                /**
+                 * A ViewModel that is also an Observable,
+                 * to be used with the Data Binding Library.
+                 */
+                class ObservableViewModel extends ViewModel implements Observable {
+                    private PropertyChangeRegistry callbacks = new PropertyChangeRegistry();
+
+                    @Override
+                    protected void addOnPropertyChangedCallback(
+                            Observable.OnPropertyChangedCallback callback) {
+                        callbacks.add(callback);
+                    }
+
+                    @Override
+                    protected void removeOnPropertyChangedCallback(
+                            Observable.OnPropertyChangedCallback callback) {
+                        callbacks.remove(callback);
+                    }
+
+                    /**
+                     * Notifies observers that all properties of this instance have changed.
+                     */
+                    void notifyChange() {
+                        callbacks.notifyCallbacks(this, 0, null);
+                    }
+
+                    /**
+                     * Notifies observers that a specific property has changed. The getter for the
+                     * property that changes should be marked with the @Bindable annotation to
+                     * generate a field in the BR class to be used as the fieldId parameter.
+                     *
+                     * @param fieldId The generated BR id for the Bindable field.
+                     */
+                    void notifyPropertyChanged(int fieldId) {
+                        callbacks.notifyCallbacks(this, fieldId, null);
+                    }
+                }
+        5.双向数据绑定
+
+3.单元测试

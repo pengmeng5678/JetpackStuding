@@ -1,0 +1,122 @@
+https://blog.csdn.net/xyang81/article/details/42066665?utm_source=copy
+1.字符串操作
+    1.访问字符串
+            1.JNI中接收一个jstring类型的参数text,但jstring是指向jvm内部的一个字符串，和C风格中的字符串类型char*不同
+        所以在JNI中需要使用合适的JNI函数来访问JVM内部的字符串数据结构
+            2.GetStringUTFChars(evn,j_str,&isCopy)
+                evn是JNIEnv函数表指针
+                j_str:是jstring类型，java传递给JNI的字符串指针
+                isCopy：取值JNI_TRUE和JNI_FALSE,如果值为JNI_TRUE,表示返回JVM内部原字符串的一份拷贝；
+                    如果值为JNI_FALSE，表示返回JVM中原字符串的指针,意味着可以通过指针改变源字符串的内容。
+                    这样就违背了原字符串不可修改的原则，一般情况，我们不关心这个值，所以使用NULL
+            3.java默认使用Unicode编码，而C/C++默认使用UTF编码，所以在本地代码操作字符串时，必须使用合适的JNI函数把jstring转换成C风格的字符串
+            4.JNI支持字符串在Unicode和UTF-8两种编码之间转换，
+                GetStringUTFChars可以把jstring(指向JVM内部的Unicode编码)指针转换成UTF-8格式的C字符串
+    2.异常检查
+         当调用完GetStringUTFChars之后不要忘记安全检查，因为JVM需要为新诞生的字符串分配内存空间，当内存空间不够分配时，
+         会导致调用失败，返回一个NULL，然后报OutOfMemory。JNI遇到异常后不会改变程序的运行流程，这样后面再使用这个字符串就比较危险了
+         因此我们需要调用Return NULL跳过后面的代码
+    3.释放字符串
+        在使用GetStringUTFChars函数从JVM内部获取到一个字符串后，JVM内部会新开辟一块内存用于存放这个字符串的拷贝
+        以便本地代码访问和修改。既然分配了内存，那用完后通过调用ReleaseStringUTFChars通知JVM释放内存才行。
+    4.创建字符串
+        通过调用NewStringUTF函数，会构建一个新的java.lang.String对象，并自动转换成java支持的Unicode编码
+        在分配内存失败后，会返回一个NULL,并报出OutOfMemory错误，但这里不必检查它的返回值，OutOfMemory会在sample.main方法中抛出
+        如果分配内存成功，会返回一个JNI引用，这个引用指向新创建的java.lang.String对象
+    5.其他字符串处理函数
+        GetStringChars/ReleaseStringChars获取和释放Unicode编码的字符串
+        GetStringLength获取Unicode字符串的长度(因为Unicode字符串不是以'\0'结尾的)
+        GetStringUTFLength获取UTF-8编码字符的长度
+        Get/RleaseStringCritical提高JVM返回源字符串直接指针的可能性。常用于消耗大内存的长字符串。
+            但使用不当会阻塞JVM其他线程的本地函数或JNI函数，因为GetStringCritical得到一个指向JVM内部字符串的直接指针
+            获取这个直接指针会导致暂停GC线程，GC暂停后其他线程触发GC继续运行的话，都会阻塞调用者。
+            所以在GetStringCritical和ReleaseStringCritical这个两个函数之间任何本地代码都不可以执行导致阻塞的调用或为新对象在JVM中分配内存，否则JVM可能死锁
+        GetStringRegion/GetStringUTFRegion获取Unicode/UTF-8编码字符串指定范围内的内容，这对函数会把源字符串复制到一个预先分配的缓冲区中
+
+    6字符串操作总结：
+        1、对于小字符串来说，GetStringRegion和GetStringUTFRegion这两对函数是最佳选择，因为缓冲区可以被编译器提前分配，而且永远不会产生内存溢出的异常。
+            当你需要处理一个字符串的一部分时，使用这对函数也是不错。因为它们提供了一个开始索引和子字符串的长度值。另外，复制少量字符串的消耗 也是非常小的。
+        2、使用GetStringCritical和ReleaseStringCritical这对函数时，必须非常小心。
+            一定要确保在持有一个由 GetStringCritical 获取到的指针时，本地代码不会在 JVM 内部分配新对象，或者做任何其它可能导致系统死锁的阻塞性调用
+        3、获取Unicode字符串和长度，使用GetStringChars和GetStringLength函数
+        4、获取UTF-8字符串的长度，使用GetStringUTFLength函数
+        5、创建Unicode字符串，使用NewStringUTF函数
+        6、从Java字符串转换成C/C++字符串，使用GetStringUTFChars函数
+        7、通过GetStringUTFChars、GetStringChars、GetStringCritical获取字符串，这些函数内部会分配内存，必须调用相对应的ReleaseXXXX函数释放内存
+
+2.JNI开发Crash错误定位
+    1.调试工具的选择：addr2line，objdump，和ndk-stack
+        其中addr2line和objdump在ndk的交叉编译工具链目录下，如D:\Android_software\android-ndk-r13b\toolchains
+        ndk-stack和ndk-build.exe目录同级
+        NDK针对不同CPU架构实现了多套相同的工具，所以在选择addr2line和objdump工具的时候，要根据目标机器的CPU架构来选择
+        adb shell cat /proc/cpuinfo/ 可以查看目标机器的CPU架构
+
+    2.方式一：使用arm-linux-androideabi-addr2line定位出错位置
+        1.根据错误信息找出发生错误的函数willCrash和对应的汇编指令地址00000cf4、00000d1c
+            01-01 17:59:38.596: I/DEBUG(253):     #04  pc 00000cf4  /data/app-lib/com.example.hellojni-1/libhello-jni.so (willCrash+32)
+            01-01 17:59:38.596: I/DEBUG(253):     #05  pc 00000d1c  /data/app-lib/com.example.hellojni-1/libhello-jni.so (JNI_OnLoad+20)
+        2.定位出错位置
+            <arm-linux-androideabi-addr2line.exe目录>arm-linux-androideabi-addr2line -C -f -e <运行so文件的目录> 汇编地址1 汇编地址2
+            /Users/yangxin/Documents/devToos/java/android-ndk-r9d/toolchains/arm-linux-androideabi-4.8/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-addr2line -e /Users/yangxin/Documents/devToos/java/android-ndk-r9d/samples/hello-jni/obj/local/armeabi-v7a/libhello-jni.so 00000cf4 00000d1c
+
+
+    3.方式二：使用ndk-stack
+        adb logcat | ndk-stack -sym <crash的so文件对应CPU架构的目录>
+        adb logcat | ndk-stack -sym /Users/yangxin/Documents/devToos/java/android-ndk-r9d/samples/hello-jni/obj/local/armeabi-v7a
+        出现的日志中会有Crash对应的文件名、函数名和行数
+
+3.JNI/NDK访问数组
+    1.int数组求和
+        1.获取数组长度arr_len=getArrayLength
+        2.申请缓冲区c_array=(jint*)malloc(sizeof(jint)*arr_len)
+        3.初始化缓冲区memset(c_array,0,sizeof(jint) *arr_len)
+        4.将java数组拷贝到缓冲区中GetIntArrayRegion(env,j_array,0,arr_len,c_array)
+            通过setIntArrayRegion函数可以修改所有缓冲区中的基本类型的数据
+        5.对缓冲区的数据求和，返回求和结果
+    2.数组操作总结
+        1.对于小量的，固定大小的数组，选择Get/SetArrayRegion函数效率最高
+        因为函数会提前申请一个临时缓冲区来存储数组元素。
+        2.如果不想预先分配C缓冲区，并且原始数组元素长度也不确定，可以使用Get/RleasePrimitiveArrayCritical函数
+        但是使用这个对函数和使用Get/ReleaseCritical函数一样，要非常小心，避免死锁
+        3.Get/Release<type>ArrayElements系列函数永远是安全的，JVM会选择性的返回一个指针
+        这个指针可能指向原始数据，也可能指向原始数据的复制
+
+    注意：
+        1.如果是用C++文件实现的JNI本地方法，需要在C++文件中include 相应的头文件
+        2.头文件的生成方法
+            进入到build/classes/debug/目录下，javah 全包名路径.class
+
+
+4.JNI调用java类中的方法
+    1.调用java类中的静态方法
+        1.根据java包名，通过FindClass函数获取java的class对象
+            (*env)->FindClass(env,"com/study/jnilearn/ClassMethod");
+        2.根据方法签名，从class类中获取要调用的方法ID,GetStaticMethodID,
+            (*env)->GetStaticMethodID(env,clazz,"callStaticMethod","(Ljava/lang/String;I)V");
+        3.调用方法，CallStaticVoidMethod()
+            str_arg = (*env)->NewStringUTF(env,"我是静态方法");
+            (*env)->CallStaticVoidMethod(env,clazz,mid_static_method, str_arg, 100);
+
+    2.通过java类对象中的普通方法
+        1.根据java包名，通过FindClass函数获取java的class对象
+        2.获取类的默认构造函数，GetMethodID
+            (*env)->GetMethodID(env,clazz, "<init>","()V");
+        3.根据方法签名，从class类中获取要调用的方法ID,GetMethodID
+            (*env)->GetMethodID(env, clazz, "callInstanceMethod", "(Ljava/lang/String;I)V");
+        4.根据构造方法，类对象，创建类的实例，NewObject()
+            (*env)->NewObject(env,clazz,mid_construct);
+        5.调用普通方法，CallVoidMethod()
+            str_arg = (*env)->NewStringUTF(env,"我是实例方法");
+            (*env)->CallVoidMethod(env,jobj,mid_instance,str_arg,200);
+
+    3.方法签名的获取方法
+        1.命令行进入到build/classes/debug/包名
+        2.javap -s -p ClassMethod.class
+5.java访问类中的属性
+    1.访问static属性
+    2.访问类实例属性
+        1.通过传入到JNI的java类对象或包名获取到类引用,GetObjectClass/FindClass
+        2.获取属性ID,GetFieldID
+        3.获取属性值,GetIntField
+        4.修改属性值,SetIntField
+        5.释放局部引用,DeleteLocalRef

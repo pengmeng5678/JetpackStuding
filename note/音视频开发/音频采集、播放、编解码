@@ -1,0 +1,170 @@
+https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650826247&idx=1&sn=b25846e36cb43ba7ea8b1ce694e9690d&chksm=80b7b299b7c03b8fec61fdf33de9b8e75be4086238a1e34a8cba880bcff23aac33a6686f6481&mpshare=1&scene=1&srcid=0914PPkFfTEBffLUEQXeviRh&pass_ticket=4OJvWpZOy%2BriLbYC%2BHrvydEWXMW2OGutnKM%2FM0%2B9Iyv%2FGUjQgjaA09SRYmGPI7L0#rd
+https://blog.51cto.com/ticktick/category15.html
+https://www.jianshu.com/p/2cb75a71009f
+2.AudioRecord音频采集
+    1.创建AudioRecord
+        采样率：其中科大讯飞SDK一般用8K或者16K采样率采集音频；而穿透SDK中统一用的11025HZ
+        recordBufSize = AudioRecord.getMinBufferSize(frequency,channelCofigration,EncodingBitRate)
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,frequency,channelCofigration,EncodingBitRate,recordBufSize)
+
+        AudioRecord构造参数中有以下参数int audioSource, int sampleRateInHz, int channelConfig, int audioFormat,
+                                         int bufferSizeInBytes
+            采样率:sampleRateInHz
+            采样位数：audioFormat
+            声道数：channelConfig
+            音频源:audioSource,音视频通话时一般采用AudioSource.VOICE_COMMUNICATION (默认开启回音消除和自动增益)
+            缓冲区:bufferSizeInBytes
+                麦克风采集到的数据先放置在一个缓冲区里面,之后我们再从这个换成去里读取数据，不同的采样率、采样位数、声道数会有不同要求的缓冲区大小
+                我们传入的bufferSizeInBytes不能小于最小的缓冲区大小，通过以下api获取最小的缓冲区大小
+                recordBufSize = AudioRecord.getMinBufferSize(frequency,channelConfig,audioFormat)
+
+    2.初始化Buffer
+        byte data[] = new Byte[recordBufSize];
+        穿透SDK用的882一帧音频数据
+    3.开始录音
+        audioRecord.startRecording()
+        isRecording = true;
+    4.创建一个数据流,一边从AudioRecord中读取声音数据到初始化的buffer,一边讲buffer中数据导入到数据流
+        while(isRecording){
+            read = audioRecord.read(data,0,recordBufSize)
+            if(AudioRecord.ERROR_INVALID_OPERATION != read){
+                //将data写入文件或者放入到队列里面
+            }
+            Thread.sleep(10)//不释放锁资源
+        }
+    5.释放资源
+       audioRecord.stop()
+       audioRecord.release()
+    6.回声消除
+        音视频通话时，手机一边播放对方的声音，一边用麦克风进行采集,然后又将采集的声音传送给对方。这样的话对方就会听到自己的回声
+        Android解决回音消除有三种方式
+            1.录音音频源设置为AudioSource.VOICE_COMMUNICATION
+                使用这种模式进行录音的时候，需要将AudioManager设置模式为MODE_IN_COMMUNICATION，还需要将麦克风打开。
+                有一点需要特别注意，音频采样率必须设置8000或者16000，通道数必须设为1个
+                      AudioManager audioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
+                      audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                      audioManager.setSpeakerphoneOn(true);
+
+            2.利用Android自身带的AcousticEchoCanceler进行回声消除处理
+                录制声音的时候可以通过audioRecord.getAudioSessionId()获取一个sessionId
+                创建AudioTrack的时候也传入一个AudioSessionId
+                初始化AcousticEchoCanceler的时候传入这个统一的sessionID
+            3.使用第三方库(Speex、Webrtc)进行回音消除
+
+3.AudioTrack音频播放
+    1.配置参数,初始化内部的音频缓冲区
+        m_byteData = new byte[uPackBytes];
+        m_iDataSize = 0;
+        int iSampleFmt = (uSampleBits == 16) ? AudioFormat.ENCODING_PCM_16BIT : AudioFormat.ENCODING_PCM_8BIT;
+        int iMinBufSize = AudioRecord.getMinBufferSize(uSampleRate, AudioFormat.CHANNEL_IN_MONO, iSampleFmt);
+        if (iMinBufSize <= 0) {
+            Log.d("DevExtend", "AudioInput.Open, failed, get min buffer sise");
+            Log.e(Constants.PGLIVEMANAGER, "AudioInput.Open, failed, get min buffer sise");
+            return false;
+        }
+        int iBufSize = uPackBytes * 12;
+        if (iBufSize < iMinBufSize) {
+            iBufSize = (iMinBufSize / uPackBytes) * uPackBytes + uPackBytes;
+        }
+        mAudioTrack =new AudioTrack(AudioManager.STREAM_MUSIC, uSampleRate,AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, iBufSize, AudioTrack.MODE_STREAM);
+
+        AudioTrack(int streamType,int sampleRateInHz,int channelConfig,int audioFormat,int bufferSizeInBytes,int mode)
+            参数介绍：
+            streamType：STREAM_MUSIC,STREAM_ALARM等
+            sampleRateInHz:采样率,8k,16k,11025,44.1k等
+            channelCofig:CHANNEL_IN_MONO,CHANNEL_IN_STEREO
+            audioFormat:ENCODING_PCM_8BIT,ENCODING_PCM_16BIT
+            bufferSizeInBytes：它配置的是AudioTrack内部的音频缓冲区的大小,该缓冲区不能低于一帧"音频帧"的大小,通过getMinBufferSize方法可以计算这个bufferSizeInBytes的大小
+            mode:
+                MODE_STATIC:一次性的将所有的数据都写入到缓冲区,通常用于播放铃声、系统提醒的音频片段
+                MODE_STREAM:按照一定的时间间隔不间断的写入音频数据
+
+    2.需要一个线程,不断的向AudioTrack的缓冲区"写入"音频数据,即播放PCM
+        public boolean play(byte[] audioData,int offsetInBytes,int sizeInBytes){
+            if(sizeInBytes < mMinBufferSize){
+                return false;
+            }
+            mAudioTrack.write(byteData, 0, sizeInBytes);
+        }
+4.音频的编解码
+    1.Android底层多媒体模块采用的是OpenMax框架,任何Androids底层编解码模块的实现,都必须遵循OpenMax标准
+    2.Android应用层统一由MediaCodec API来提供各种音视频编解码功能,由参数配置来决定采用何种编解码算法,是否采用硬件加速等
+    3.MediaCodec使用基本流程
+        1.大致流程
+            -createEncoderByType/createDecodeByType
+            -configure
+            -start
+            -while(){//音视频流的回调函数中
+            -   dequeueInputBuffer
+            -   queueInputBuffer
+            -   dequeueOutputBuffer
+            -   releaseOutputBuffer
+            -}
+            -stop
+            -release
+        2.视频解码器代码样例
+            public void initDecoder(){
+                //createDecoderByType,configure,start
+                try(){
+                    mReentrantLock.lock();
+                    videoDecoder = MediaCodec.createDecoderByType("video/avc",mVideoWidth,mVideoHeight)
+                        MediaFormat format = MediaFormat.createVideoFormat("video/avc",mVideoWidth,mVideoHeight)
+                        format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+                        format.setInteger(MediaFormat.KEY_SAMPLE_RATE, 44100);
+                        format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
+                        format.setInteger(MediaFormat.KEY_BIT_RATE, 64000);
+                    videoDecoder.configure(format,getSurface(),null,0)
+                    videoDecoder.start();
+                    videoInputBuffers = videoDecoder.getInputBuffers();
+                }catch(){
+
+                }finally{
+                    mReentrantLock.unlock();
+                }
+            }
+            public void decodeAnddrawVideo(ByteBuffer sampleData){
+                //dequueInputBuffer,queueInputBuffer,dequeueOutputBuffer,releaseOutputBuffer
+                try(){
+                    mReentrantLock.lock();
+                    int inIndex = videoDecoder.dequeueInputBuffer(decodeTimeout)
+                    if(inIndex >0){
+                        ByteBuffer buffer = videoInputBuffers[inIndex];
+                        int sampleSize = sampleData.limit();
+                        buffer.clear();
+                        buffer.put(sampleData);
+                        buffer.flip();
+                        videoDecoder.queueInputBuffer(inIndex,0,sampleSize,0,0)
+                    }
+                    int ret = videoDecoder.dequeueOutputBuffer(videoBufferInfo,decodeTimeOut)
+                    if(ret < 0){
+                        //output端出队失败
+                        return;
+                    }
+                    videoDecoder.releaseOutputBuffer(ret,true)
+                }catch(){
+
+                }finally{
+                    mReentrantLock.unlock();
+                }
+            }
+
+5.MediaCodec工作原理
+    MediaCodec架构上采用了2个环形缓冲区队列(一个在input端,一个在output端,两个端都是基于"环形缓冲区"的生产者-消费者模式),异步处理数据,以下是Client和MediaCodec工作流程
+
+        1.Client从input缓冲区申请Empty Buffer(dequeueInputBuffer)
+        2.Client把需要编解码的数据放入到Empty Buffer,再将EmptyBuffer放入到Input缓冲区中(queueInputBuffer)
+        3.MediaCodec从Input缓冲区中取出一帧数据进行编解码
+        4.编解码处理结束后，将Input缓冲区中的当前Buffer置为Empty,并将编解码后的Buffer放入到Output缓冲区中
+        5.Client从Output缓冲区申请编解码后的Buffer(dequeueOutputBuffer)
+        6.client对编解码后的buffer进行渲染/播放
+
+    “生产者”和“消费者”其实是共用这一个缓冲区队列，“生产者”负责从队列中取出未使用的 Buffer，填入数据，然后放回队列，“消费者”则负责取出填入数据后的 Buffer，
+    进行处理，处理结束后，再把 Buffer 标记为“空”，退回到队列中去以供“生产者”继续填充数据
+
+6.MediaFormat参数详解
+    MediaFormat.KEY_MIME                MediaFormat的MIME类型
+    MediaFormat.KEY_FRAME_RATE          帧速率
+    MediaFormat.KEY_COLOR_FORMAT        视频格式的内容的颜色格式
+    MediaFormat.KEY_SAMPLE_RATE         采样率
+    MediaFormat.KEY_BIT_RATE            比特率
+    MediaFormat.KEY_I_FRAME_INTERVAL    I帧的频率

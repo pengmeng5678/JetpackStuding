@@ -1,0 +1,152 @@
+线程：https://www.cnblogs.com/yjd_hycf_space/p/7526608.html
+ThreadLocal:https://www.jianshu.com/p/98b68c97df9b
+线程：https://www.jianshu.com/p/3d8f7ec1017a
+synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
+
+并发编码的两大核心：JMM抽象内存模型和happens-before规则。三天性质：原子性、有序性和可见性
+
+1.进程、线程
+    进程：
+        介绍：在现代操作系统中,进程是资源分配的最小单位,而线程是CPU调度的基本单位,一个进程里面最小有一个线程,叫主线程
+        特点：每个进程都有自己独立的内存空间、一组资源系统，其内部数据和状态都是完全独立的；但进程消耗的内存大，进程切换的代价高
+    线程:
+        介绍：线程是进程的一个实体,是CPU调度和分配的基本单位,它是比进程更小的独立运行的基本单位，线程自己基本上不拥有系统资源
+        只拥有在运行中不可少的资源(程序计数器、栈),但它可与其他线程共享进程所拥有的全部资源
+        特点：在JVM中,本地方法栈、虚拟机栈和程序计数器是线程隔离的，而堆区和方法区是线程共享的
+    进程线程的区别
+        地址空间：线程是进程的一个执行单元；进程至少有一个线程；一个进程内的多线程共享该进程的地址空间；而进程自己有独立的地址空间
+        资源有用:进程是资源分配和拥有的单位,同一个进程内的线程共享进程的资源；线程是处理器调度的基本单位,但进程不是
+
+     并发：多个事物在同一个时间段内一起执行
+     并行：多个事件在同一个时刻同时执行
+2.进程和线程的状态
+    1.介绍
+        E:\AndroidProject\Studing\AndroidStudingProject\note\多线程编程\线程状态图.jpg
+        初始状态、可运行状态、运行状态、阻塞状态、死亡状态
+    2.线程的阻塞
+        sleep:使得线程在指定时间内进入阻塞状态,不释放锁
+        yield:使得线程放弃当前分得的CPU时间,但是不使线程阻塞,即线程仍处于可运行状态,随时可能再次分得CPU时间
+        wait/notify:两个方法配套使用,
+            wait使用方式：1.允许以指定时间作为参数，超时就重新进入可执行状态；2.没有时间,必须以notify来唤醒
+        sleep和wait的区别
+            1.wait阻塞时会释放占用的锁，sleep阻塞时不会释放占用的锁
+            2.sleep属于Tread类，wait属于Object类
+            3.wait/notify/notifyAll只能在同步方法/代码块中使用(因为会对锁标志进行操作,如果不同步,编译可通过但运行时会报错IllegalMonitorStateException),
+              而sleep可在任何位置使用
+            4.sleep要捕获异常,而wait不需要
+
+    3.线程的上下文切换
+        多线程编程中,多线程共用资源,计算机对多个线程进行进行调度,因此会在不同的线程中进行切换
+        线程就需要保存状态，以便在切换后需要回复到上一个状态运行，这就是线程的上下文切换
+        线程上下文切换会消耗资源,造成性能损失。所以我们要尽量避免减少上下文切换，提高程序运行性能
+        一些常用的方法
+            1.无锁并发编程
+            2.CAS常用算法
+            3.使用最少线程
+            4.协程：在单线程里实现多任务调度
+
+3.线程的安全问题
+    诱因：1.存在共享数据(临界资源)；2.存在多条线程操作共享数据
+    解决方案:控制多个线程对某个共享数据(临界资源)的有序访问和修改,保证同一时刻只能有一个线程操作共享数据
+            其他线程必须等到该线程处理完数据后再进行。这种方式称为互斥锁
+    1.实现线程安全的工具
+        1.隐式锁synchrounized
+        2.显示锁java.util.concurrent.lock
+        3.volatile
+        4.原子操作java.util.concurrent.atomic
+    2.synchronized的三种应用方式
+        1.修饰实例方法：作用于当前实例加锁,进入同步代码块前要先获取当前实例的锁
+            public synchronized void increase1(){//多个线程调用同一个实例对象的increase1时,安全
+                i++;
+            }
+
+        2.修饰静态方法:作用于当前类加锁,进入同步代码块前要先获取当前类对象的锁
+            public static synchronized void increase2(){//多个线程调用多个实例对象的increase2时，安全
+                i++;
+            }
+        3.修饰代码块:指定加锁对象,对给定对象加锁,进入同步代码块前,要先获取给定对象的锁
+            synchronized(lock){//指定加锁对象是lock实例
+                i++;
+            }
+            synchronized(this){//指定加锁对象是当前实例对象
+                i++;
+            }
+            synchronized(AccountingSync.class){//指定加锁对象是类对象
+                i++;
+            }
+    3.synchronized方法注意点
+        1.synchronized的可重入性
+            当一个线程试图操作一个由其他线程持有对象锁的共享数据时,将会处于阻塞状态
+        但当一个线程再次请求自己持有对象锁的共享数据时,这种情况是允许的,且该线程也可以调用当前实例中的其他synchronized方法
+            如果一个线程处于运行状态,调用interrupt方法是不会抛出异常的,此时我们可以在while方法中手动判断isInterrupted来判断线程是否被执行了interrupt方法
+        进而决定是否要break跳出循环，退出线程。
+
+        2.线程中断与synchronized
+            当线程处于阻塞状态时,调用interrupt方法会中断该线程,并抛出InterruptException异常,同时中断状态复位
+        但是线程的中断操作对于正在处于等待获取锁对象的synchronized方法或代码块是不起作用的，也就是说
+        对于synchronied来说,如果一个线程在等待锁,那么结果只有两种。要么它获取这把锁继续执行,要么它就保存等待
+        即使调用中断线程的方法,也不会生效。
+
+        3.等待唤醒机制与synchronized
+            所谓等待唤醒机制这里主要指wait、notify、notifyAll方法,使用这三个方法时必须处于synchronized方法或代码块中
+        否则就会抛出IllegalMonitorStateException。这是因为调用这几个方法必须拿到当前对象的监视器monitor对象
+
+4.Java内存模型和Java内存区域
+    具体说明见E:\AndroidProject\Studing\AndroidStudingProject\note\Java虚拟机\Java内存模型
+    java内存模型(Java Memory Model,JMM)就是一种符合内存模型规范的,屏蔽了各种硬件和操作系统访问差异,
+  保证了Java程序在各种平台下对内存的访问都能保证效果一致的机制和规范
+
+    java的多线程之间是通过共享内存进行通信的,而由于采用共享内存进行通信,在通信过程中会存在一系列如可见性、原子性、有序性等问题
+  而JMM就是围绕这多线程通信以及与其相关的一系列特性而建立的模型。
+
+    Java内存模型规定了所有的变量都存储在主内存中,每条线程还有自己的工作内存,线程中的保存了该线程中用到的变量的主内存副本拷贝
+  线程对变量的操作都要在工作内存中进行, 而不能直接读写主内存；不同的线程也不能直接访问对方工作内存中的变量,
+  线程间变量的传递需要自己的工作内存先写入到主内存后再进行数据同步进行。
+
+5.原子性、可见性、有序性简介
+    原子性：指一个操作是不可中断的,即使是在多线程环境下,一个操作一旦开始就不会被其他线程影响
+    可见性: 指一个线程修改了一个共享变量的值之后,其他线程是否能够马上知道这个修改的值
+    有序性: 指在单线程的执行代码,我们总是认为代码的执行是按顺序依次执行的。但对于多线程环境,可能是乱序执行的,因为代码编译成机器指令后可能会出现指令重排现象。
+6.java的ThreadLocal
+    1.简介
+        ThreadLocal顾名思义就是线程本地变量。也就是说定义一个ThreadLocal变量,每个线程往这个ThreadLocal变量里面读写的值都是线程隔离,互相之间是不会影响的
+        ThreadLocal实例通常来说都是private static类型,用于关联线程
+
+        Thread类中持有ThreadLocal.ThreadLocalMap变量
+        Threadlocal类中有个静态内部类Threadlocal.ThreadLocalMap
+    2.作用
+        ThreadLocal的作用是提供线程内的局部变量,在本地线程内随时随地可取,隔离其他线程。这种局部变量仅仅在线程的生命周期内起作用。
+
+    3.ThreadLocal的大致实现思路
+        Thread类中有个ThreadLocal.ThreadLocalMap的实例变量,所以说每个线程都有一个自己的ThreadLocalMap,ThreadLocalMap有自己的独立实现
+        可以简单的将它的key视为ThreadLocal(实际不是ThreadLocal本身,而是它的一个弱引用),value视为存入的值
+        所以每个线程往ThreadLocal里面存的值,都是往自己类里面的ThreadLocalMap里面存,读也是从某个ThreadLocal为引用,在自己的map里面找对应的key,从而实现了线程隔离
+
+    3.java ThreadLocal的常用方法
+          public void set(T value) {//设置当前线程的线程局部变量
+              Thread t = Thread.currentThread();
+              ThreadLocalMap map = getMap(t);//获取当前线程的ThreaLocalMap对象
+              if (map != null)
+                  map.set(this, value);
+              else
+                  createMap(t, value);
+          }
+          public T get() {//返回当前线程所对应的线程局部变量
+              Thread t = Thread.currentThread();
+              ThreadLocalMap map = getMap(t);
+              if (map != null) {
+                  ThreadLocalMap.Entry e = map.getEntry(this);
+                  if (e != null)
+                      return (T)e.value;
+              }
+              return setInitialValue();
+          }
+
+    6.ThreadLocal总结
+            ThreadLocal是解决线程安全的一个很好的思路，它通过为每个线程提供了一个独立的变量副本
+        解决了变量并发访问的冲突问题。ThreadLocal和synchronize用一句话就是一个用存储拷贝进行空间换时间
+        另一个用锁机制进行时间换空间。
+            ThreadLocal不是用于解决共享变量的问题,不是为了协调线程同步而存在,
+        而是为了方便每个线程处理自己的状态而引入的一个机制。
+
+

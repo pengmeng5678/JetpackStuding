@@ -1,0 +1,96 @@
+https://blog.csdn.net/u012760183/article/details/52068490
+https://blog.csdn.net/junhuahouse/article/details/79731529
+https://www.jianshu.com/p/e75680772375
+https://mp.weixin.qq.com/s?__biz=MzI1MTA1MzM2Nw==&mid=2649796884&idx=1&sn=92b4e344060362128e4a86d6132c3736&scene=0#wechat_redirect
+https://github.com/JsonChao/Awesome-Android-Interview/blob/master/Android%E7%9B%B8%E5%85%B3/Android%E9%AB%98%E7%BA%A7%E9%9D%A2%E8%AF%95%E9%A2%98.md
+一、基础介绍
+    1.ART和Dalvik虚拟机GC打印日志格式
+        格式
+            D/dalvikvm: <GC_Reason> <Amount_freed>, <Heap_stats>, <External_memory_stats>, <Pause_time>
+            I/art:<GC_Reason><Amount_freed>,<LOS_Space_Status>,<Heap_stats>,<Pause_time>,<Total_time>
+        字段说明
+            GC_Reason:GC触发原因
+            GC_CONCURRENT           当已分配内存达到某一值时,触发GC
+            GC_FOR_AOLLOC           当尝试在堆上分配内存不足时触发GC，系统必须停止应用程序并回收内存
+            GC_HPROF_DUMP_HEAP      当需要创建HPROF文件来分析堆内存时触发的GC
+            GC_EXPLICIT             当明确的调用GC,如System.gc,或者通过DDMS工具显示的告诉系统进行GC操作
+            GC_EXTERNAL_            ALLOC 当API为10或者更低时，新版本分配内存都在Dalvik堆上
+            Amount_freed            GC 回收内存的大小
+            Heap stats              堆上的空闲内存百分比，(已用内存)/(堆上总内存)
+            External memory stats   API级别为10或者更低：（已分配的内存量）/ （即将发生垃圾的极限）
+            Pause time              GC开始和结束的时候阻塞的时间
+
+        示例
+            D/dalvikvm: GC_FOR_ALLOC freed 1416K, 56% free 3570K/7972K, paused 17ms, total 17ms
+            D/dalvikvm: GC_CONCURRENT freed 1933K, 39% free 3130K/5088K, paused 3ms+3ms, total 44ms
+
+    2.shell命令分析内存状况(不同手机的App进程分配最大内存不一样)
+        dvm最大可用内存:adb shell getprop|grep dalvik.vm.heapsize(B款是96M)
+        单个程序限制最大可用内存:adb shell getprop|grep heapgrowthlimit(如果开启了largeHeap,则可提高到dvm最大可用内存才会OOM,B款设备是384M)
+        当前应用的内存信息：adb shell dumpsys meminfo packagename
+            Pss:此进程内存+其他进程共享内存
+            Private Dirty:此进程独享内存
+            Heap Size:分配的内存
+            Heap Alloc：已使用内存
+            Heap Free:空闲内存
+
+    3.查看Profile,可优化的点包括
+        JavaHeap
+        NativeHeap
+        Stack
+        Code
+    4.MAT使用(MAT下载地址 https://www.eclipse.org/mat/downloads.php)
+        1.使用MAT之前,先使用as的Profile中的Memory去获取要分析的堆内存快照文件.hprof,如果要测试某个页面是否产生内存泄漏
+        可以先dump出没进入该页面的.hprof文件,然后执行5次进入/退出该页面,然后再dump此刻的.hprof文件,最后,将两者比较
+        如果内存相差明显,则可能发生了内存泄漏。
+            注意MAT需要标准的.hprof文件,一次在as的Profiler中GC后dump出的内存快照文件需要手动使用android sdk platform-tools下的prof-conv程序进行转换后才能被打开
+
+        2.使用MAT打开堆内存快照文件.hprofile,点击leak Suspects Reports
+            overView栏
+                会展示四个Actions:
+                Histogram：柱状图展示可以和另一个hprof快速对比,compare to another heap dumps
+                Dominator Tree:支配树,按对象大小降序列出对象和其引用的对象，注重引用关系分析，选择Group by package,找到要检测的类，查看该类引用链
+                Top Consumers:消耗内存最大的对象
+                Duplicate Classes
+            default_report...栏
+                界面会显示可能发生泄漏的点Leak Suspects,点击某个Leaks可以看到对象占用的内存和引用链
+
+二、检测内存泄漏方式
+    1.shell命令+LeakCanary+MAT
+        运行程序所有功能全部跑一遍,手动触发GC,
+        然后使用adb shell dumpsys meminfo package -d查看退出界面后Objects下的Views和Activitys数目是否为0.
+        如果不为0就通过LeakCanary检测可能存在可能内存泄漏的地方，然后使用MAT分析
+
+    2.通过AndroidStudio的Android Profiler(As3.0以上)或者Android Monitor(AS3.0以下)进行简单分析
+        运行程序,反复打开关闭页面5次,然后点击GC此时看total内存还没有恢复到之前的数值,就可能发生了内存泄漏
+        此时再点击heap dump按钮查看当前的内存堆栈情况,按包名查找,找到当前测试的Activity,如果引用了多个实例，则表明发生了内存泄漏
+
+三、内存优化
+    1.内存泄漏的本质
+        无法回收无用的对象，长生命周期的对象持有了短生命周期对象的引用
+    2.常见的内存泄漏场景
+        1.单例造成的内存泄漏(单例对象持有了Activity的引用,将context用ApplicationContext代替)
+        2.非静态内部类创建了静态实例
+            泄漏原因：非静态内部类默认持有外部类的引用(因为只有存在隐式引用才能调用外部类的方法),且非静态内部类的生命周期不可控，它创建静态实例,导致静态实例会一直持有外部类的引用。
+            解决方案:将非静态内部类改为静态内部类或者将静态内部类抽取成一个单例，为什么静态内部类不会持有外部类的引用？
+        3.Handler造成的内存泄漏(将Handler使用一个类包装起来,或者使用静态内部类)
+        4.Bitmap或者IO资源未关闭
+        5.BroadcastReceiver未反注册
+
+    3.常见的内存优化点
+        1.UI只提供一套高分辨率的图,图片建议放在drawable-xxhdpi文件夹下，这样在低分辨率设备中图片大小只是压缩，不会存在内存增大的情况
+        2.图片的优化，颜色模式使用RGB565替换RGB8888
+        3.item不可见时释放掉图片的引用
+            listView每次在item被回收后再次利用都会重新绑定数据,只需要在ImageView onDetachFromWindow的时候释放掉图片引用既可
+            RecycleView不可见时会放到mCacheView中,被回收时放进mRecyclePool中后拿出来复用才会重新绑定数据，所以在adapter中重写onViewRecycled方法释放图片引用
+        4.集合优化，如SparseArray、SparseBooleanArray、LongSparseArray,这些Api避免了基本数据类型转换成对象数据类型的时间
+        5.避免创建不必要的对象，用StringBuffer代替加号拼接字符串
+        6.onDraw方法不要执行对象的创建
+        7.静态内部类,避免内存泄漏
+
+四、内存抖动
+    内存抖动是由于短时间内有大量的对象进入到新生代区域,它伴随着频繁的GC,GC会大量占用UI线程和CPU资源,会导致APP整体卡顿
+    避免发生内存抖动的方法
+        尽量避免在循环体里面创建对象
+        避免在onDraw方法里面创建对象
+        当需要大量使用Bitmap的时候可以使用

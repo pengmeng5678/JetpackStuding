@@ -1,0 +1,35 @@
+https://www.jianshu.com/p/81d2e0132a10
+https://www.jianshu.com/p/59822a7b2fad
+1.组件化介绍
+    项目解耦、提高构建速度、提高开发效率、为插件化铺路
+2.如何实现组件化
+    1.代码解耦：拆分基础库和依赖库
+    2.组件单独运行
+        apply plugin:'com.android.library'切换成apply plugin:'com.android.application'
+        if(isRunAlone.toBoolean()){
+        apply plugin: 'com.android.application'
+        }else{
+         apply plugin: 'com.android.library'
+        }
+        .....
+            resourcePrefix "readerbook_"
+            sourceSets {
+                main {
+                    if (isRunAlone.toBoolean()) {
+                        manifest.srcFile 'src/main/runalone/AndroidManifest.xml'
+                        java.srcDirs = ['src/main/java','src/main/runalone/java']
+                        res.srcDirs = ['src/main/res','src/main/runalone/res']
+                    } else {
+                        manifest.srcFile 'src/main/AndroidManifest.xml'
+                    }
+                }
+            }
+    3.数据传递
+        所有组件基于接口编程,实现公有接口，暴露方法
+    4.UI跳转
+        阿里路由框架ARouter
+    5.集成调试
+        gradlew.properties配置开关决定是以library还是momule方法运行项目
+        gradlew中使用exclude 过滤重复依赖
+    6.代码隔离
+        资源命名加前缀

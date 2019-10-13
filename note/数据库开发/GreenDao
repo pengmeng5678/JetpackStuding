@@ -1,0 +1,263 @@
+https://www.jianshu.com/p/b017ca5fe0ab
+https://blog.csdn.net/zxm317122667/article/details/73528387
+https://www.jianshu.com/p/53083f782ea2
+http://greenrobot.org/greendao/documentation/joins/
+1.环境配置
+    在app的gradle文件中配置以下内容
+
+    apply plugin: 'com.android.application'
+    apply plugin: 'org.greenrobot.greendao' // 添加应用依赖插件
+    android {
+        // 省略部分内容...
+    }
+    // 配置GreenDao基本参数
+    greendao {
+        schemaVersion 1 //当前数据库版本
+        targetGenDir 'src/main/java'//生成Master的文件夹
+    }
+    dependencies {
+        // 省略部分内容...
+        compile 'org.greenrobot:greendao:3.2.2' // 添加库
+    }
+2.使用
+    1.实体类配置
+    @Entity
+    public class User {
+        @Id
+        private Long id;
+        private String name;
+        @Transient
+        private int tempUsageCount; // not persisted
+       // getters and setters for id and user ...
+    }
+    2.注解说明
+        注解添加成功后点击Make Project可以生产DaoManster和DaoSession类
+        1.@Entity
+        其中@Entity注解标记了一个Java类作为greenDAO的一个presistable实体,简单理解为，它告诉GreenDAO，要根据这个实体类生成相应的DAO
+        我们也可以使用@Entity配置一些详细信息
+        @Entity(
+                // 如果你有一个以上的模式，你可以告诉greendao实体属于哪个模式（选择任何字符串作为名称）。
+                schema = "myschema",
+
+                // 标志允许实体类可有更新，删除，刷新方法
+                active = true,
+
+                // 指定数据库中表的名称。默认情况下，该名称基于实体类名。
+                nameInDb = "AWESOME_USERS",
+
+                // 在这里定义多个列的索引
+                indexes = {
+                        @Index(value = "name DESC", unique = true)
+                },
+
+                // 如果DAO创建数据库表(默认为true)，则设置标记去标识。如果有多个实体映射到一个表，或者在greenDAO之外创建表创建，将此设置为false。
+                createInDb = false,
+
+                // 是否应该生成所有的属性构造函数。一个无args构造函数总是需要的
+                generateConstructors = true,
+
+                // 是否生成属性的getter和setter
+                generateGettersSetters = true
+        )
+
+        2.@id
+            选择long属性作为实体ID,在数据库方面,他是主要的关键参数autoincrement，使ID值不断增加的标志
+
+        3.@Property
+            允许您定义属性映射到的非默认名称,如果缺少,greenDao将以SQL-ish方式使用字段名称(例如customName将成为CUSTOM_NAME)。注意:当前只能使用内联常量来指定列名
+
+        4.NotNull
+            该属性在数据库端成为NOT NULL列
+
+    3.使用初始化
+        public DaoSession getDaoSession(){
+            if(mDevOpenHelper == null){
+                mDevOpenHelper = new DaoMaster.DevOpenHelper(mContext, ItemOneCourseBeanDao.TABLENAME);
+            }
+            if(mItemOneDaoMaster == null){
+                mItemOneDaoMaster = new DaoMaster(mDevOpenHelper.getWritableDb());
+            }
+            if(mDaoSession == null){
+                mDaoSession = mItemOneDaoMaster.newSession();
+            }
+            return mDaoSession;
+        }
+3.GreenDao保存List数据
+    1.在list成员上新增Convert属性，如下
+        @Convert(columnType = String.class,converter = ItemEntityConverter.class)
+        private List<ItemEntity> item;
+    2.通过ItemEntityConverter中的回调方法，编写LIst<---->JsonString的相互转换类
+        class ItemEntityConverter implements PropertyConverter<List<GetOneCoursewareBean.ItemEntity>,String> {
+            @Override
+            public List<GetOneCoursewareBean.ItemEntity> convertToEntityProperty(String jsonListStr) {
+                List<GetOneCoursewareBean.ItemEntity> itemEntities = JSONArray.parseArray(jsonListStr, GetOneCoursewareBean.ItemEntity.class);
+                return itemEntities;
+            }
+            @Override
+            public String convertToDatabaseValue(List<GetOneCoursewareBean.ItemEntity> entityProperty) {
+                String jsonListStr = JSONArray.toJSONString(entityProperty);
+                return jsonListStr;
+            }
+        }
+4.GreenDAO查询
+    1.简单使用
+        mDaoSession.loadAll(bean.class);//查询所有数据
+        mDaoSession.load(bean.class,id);//根据id条件查询数据
+        mDaoSession.insertOrReplace(bean);//插入数据
+    2.条件查询
+        1.查询name为“一”的所有student集合并正序排序
+        mDaoSession
+            .queryBuilder(Student.class)
+            .where(StudentDao.Properties.name.eq("一"))
+            .orderAsc(StudentDao.Properties.name)
+            .list();
+        2.原始查询,ID大于5的所有学生
+            mDaoSession
+               .queryBuilder(Student.class)
+               .where(new WhereCondition.StringCondition("_ID in (SELECT _ID FROM STUDENT WHERE _ID > 5)"))
+               .build()
+               .list();
+        3.嵌套条件查询，查询ID大于5,小于10,且Name值为“一”的数据
+            QueryBuilder<Student> qb = mDaoSession.queryBuilder(Student.class)
+
+                qb.where(StudentDao.Properties.name.eq("一"),qb.and(StudentDao.Properties.Id.get(5),StudentDao.Properties.Id.get(10)))
+                .orderAsc(StudentDao.Properties.name)
+                .list();
+
+5.多表查询：一对一，一对多，多对多
+    数据库主键，指的是一个列或者多列的组合,其值能唯一的标识表中的每一行,通过它可强制表的实体性
+    故数据库的主键有两个作用
+        1.唯一的标识一行
+        2.作为一个可以被外键有效引用的对象
+    定义主键和外键主要是为了维护关系数据库的完整性
+
+    若有两个表A，B，c是A的主键，而B中也有c字段，则c就是表B的外键，外键约束主要用来维护两个表之间数据的一致性
+    简单理解
+        主键就是当前这张表的主要键，唯一确定某行值。
+        外键就是外面另外一个表的主键，但是在我们这个表中有
+
+    一对一:学生与身份证
+        @ToOne(joinProperty = "stuId")//当前Student实体中的stuId属性与IdCard实体一一对应关系
+        IdCard idCard;
+    一对多:学生与信用卡
+        //这里的userId,是在目标实体CreditCard中定义的外键，这个外键与源实体Student定义了N:1的关系
+        @ToMany(referencedJoinProperty = "userFid")//学生与信用卡是一对多的关系，一个学生可能有多张信用卡。即多个相同CreditCard的userId都属于同一个(Student的)stuId
+        List<CreditCard> creditCardList ;
+    多对多:
+        @ToMany
+        @JoinEntity(entity = StudentAndTeacher.class,sourceProperty = "studentId",targetProperty = "teacherId")
+        List<Teacher> teacherList;
+    官网示例
+        涉及三个实例City, Country, and Continent.查询欧洲的所有人数超过一百万的所有城市：
+        QueryBuilder qb = cityDao.queryBuilder().where(Properties.Population.ge(1000000));
+         Join country = qb.join(Properties.CountryId, Country.class);
+         Join continent = qb.join(country, CountryDao.Properties.ContinentId, Continent.class, ContinentDao.Properties.Id);
+         continent.where(ContinentDao.Properties.Name.eq("Europe"));
+         List<City> bigEuropeanCities = qb.list();
+
+         QueryBuilder<User> queryBuilder = userDao.queryBuilder();
+         queryBuilder.join(Address.class, AddressDao.Properties.userFid)
+            .where(AddressDao.Properties.Street.eq("Sesame Street"));
+         List<User> users = queryBuilder.list();
+
+         QueryBuilder qb = userDao.queryBuilder();
+         qb.where(Properties.FirstName.eq("Joe"),
+            qb.or(Properties.YearOfBirth.gt(1970),
+            qb.and(Properties.YearOfBirth.eq(1970),
+            Properties.MonthOfBirth.ge(10))));
+
+6.数据的升级
+    1.GreenDao的升级思路
+        1.创建临时表TMP_,复制原来的数据库到临时表中
+        2.删除之前的原表
+        3.创建新表
+        4.将临时表中的数据复制到新表中,最后将TMP_表删除掉
+    2.GreenDao数据库实现步骤
+        1.新建类MyDaoMaster extends DaoMaster.OpenHelper
+        2.新建MyMigrationHelper处理数据库升级逻辑
+            MyMigrationHelper.migrate(db, new MyMigrationHelper.ReCreateAllTableListener() {
+                @Override
+                public void onCreateAllTables(Database db, boolean ifNotExists) {
+                    Log.i(TAG,"MyDaoMaster onCreateAllTables");
+                    DaoMaster.createAllTables(db,ifNotExists);
+                }
+
+                @Override
+                public void onDropAllTables(Database db, boolean ifExists) {
+                    Log.i(TAG,"MyDaoMaster onDropAllTables");
+                    DaoMaster.dropAllTables(db,ifExists);
+                }
+            },StudentDao.class,TeacherDao.class,IdCardDao.class,CreditCardDao.class,StudentAndTeacherDao.class);
+        3.使用新的MyDaoMaster替换旧的DaoMaster创建DevOpenHelper
+          if(mDevOpenHelper == null){
+              mDevOpenHelper = new MyDaoMaster(MainGreenDaoActivity.this, "myGreenDao.db");
+          }
+7.数据库的加密
+
+8.GreenDao踩坑记录
+
+    1.构建一对一的关系时,IdCard都采用自增id作为主键,Student的stuId作为外键和IdCard的cardId保持一一对应关系
+
+        问题1：idCard、student、teacher都使用默认自增id作为主键
+            idCard.setCardId(student.getStuId())//绑定与学生的一对一关系
+            idCard.setCardId(teacher.getTeacherId()) //绑定与教师的一对一关系
+            如果不通过student.setIdCard(IdCard idCard)主动绑定,就无法形成绑定关系(student.getIdCard为null)
+
+            但是如果IdCard不把id作为主键，而是用cardId当成主键后,不通过student.setIdCard(IdCard idCard)，
+            只需要idCard.setCardId(student.getStuId())就能自动绑定
+
+        问题2：idCard、student、teacher都使用默认自增id作为主键
+            因为student和teacher的id都是可以从1开始的,所以绑定身份证时会造成老师和学生信用卡绑定错乱的问题
+        结论:两个Bean实体使用GreenDao建立一对一关系连接时,建议使用子表的主键作为外键,因为查询时是根据主键进行查询的。
+
+        GreenDao的关联关系时通过主外键(对象之间关联的id)
+        Realm是直接通过对象关系来自动构建的
+
+    2.建立关系连接时,打印toString信息为空
+        比如打印学生的身份证信息时，toString默认是使用了成员变量idCard,这里应该修改为getIdCard()，因为成员变量没有被赋值
+
+    3.建立多对多的关系时(student和teacher),如果主键使用默认id时,而建立绑定关系时，是采用下面这种方式来绑定
+        studentAndTeacher.setStudentId(student.getStuId());
+        studentAndTeacher.setTeacherId(teacher.getTeacherId());
+        那么通过自动生成的方法getTeacherList获取到的列表就为空
+        如果主键使用stuId时,通过自动生成的方法getTeacherList获取到的列表就不为空
+
+        结论：多对多建立绑定关系时,要使用两个表的主键进行绑定
+
+    4.多表关联时，删除主表中的数据并不会自动删除其其关联表中的数据
+        删除数据时,需要先删除关联表中的数据，然后再删除主表中的数据
+        ItemCourseListDaoManager.getInstance()
+            .getItemCourseListSession()
+            .getItemOneCourseBeanDao()
+            .queryBuilder()
+            .where(ItemOneCourseBeanDao.Properties.Fid.eq(courseId))
+            .buildDelete()
+            .executeDeleteWithoutDetachingEntities();
+
+    5.建立一对多关系时，如果老师对信用卡，学生对信用卡，这里面如果使用同一个表同时管理学生和老师的信用卡
+        问题2：
+            关联查询时就有可能出现，老师或者学生的信用卡被相互覆盖的情况，因为teacher.getId可能和student.getId相等
+            creditCard.setUserId(teacher.getId())
+            creditCard.setUserId(student.getId())
+        解决
+            在creaditCard中新增type字段用于分辨是student还是teacher的信用卡
+
+    6.多表关联查询
+        理解：
+        QueryBuilder<目标表bean> queryBuilder = 目标表Dao.queryBuilder();
+            queryBuilder.join(已知表, 已知表和已知表的外键)
+                    .where(已知表的已知字段=“xxx”);
+        List<User> users = queryBuilder.list();
+
+        方式一：查询课件id为courseId，同时章节id为courseItemId的章节数据，关联查询
+        QueryBuilder<ItemOneCourseBean> qb
+                            = ItemCourseListDaoManager.getInstance().getItemCourseListSession().getItemOneCourseBeanDao()
+                            .queryBuilder()
+                            .where(ItemOneCourseBeanDao.Properties.Chapter_id.eq(courseItemId));
+
+        qb.join(ItemCourseListBean.class, ItemCourseListBeanDao.Properties.Id).where(ItemCourseListBeanDao.Properties.Id.eq(courseId));
+
+        方式二：章节表根据主键courseItemId和外键Fid同时查询
+        QueryBuilder<ItemOneCourseBean> qb = ItemCourseListDaoManager.getInstance().getItemCourseListSession().getItemOneCourseBeanDao()
+                        .queryBuilder();
+                List<ItemOneCourseBean> list = qb.where(qb.and(ItemOneCourseBeanDao.Properties.Chapter_id.eq(courseItemId), ItemOneCourseBeanDao.Properties.Fid.eq(courseId))).list();

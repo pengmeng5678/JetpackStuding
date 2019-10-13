@@ -1,0 +1,233 @@
+https://www.jianshu.com/p/3696923aa4f7
+https://blog.csdn.net/qq_25827845/article/details/52997523https://blog.csdn.net/android_jiangjun/article/details/77113883
+
+1.关键类
+    /frameworks/base/core/java/android/bluetooth/
+    BluetoothAdapter:本地蓝牙适配器，是所有蓝牙交互的入口,
+        通过它搜索其他蓝牙设备,查询已经配对的蓝牙列表,通过已知的MAC地址创建BluetoothDevice，创建BluetoothServerSocket监听来自其他设备的通信
+    BluetoothDevice：代表了一个远端的蓝牙设备
+        使用它请求远端蓝牙设备连接或者获取远端蓝牙设备的名称、地址、种类和绑定状态(信息封装在bluetoothsocket中)
+    BluetoothSocket
+        代表了一个蓝牙套接字的接口(类似于TCP的套接字),它是应用程序通过输入、输出流与其他蓝牙设备通信的连接点
+    BluetoothServerSocket
+        代表打开服务连接来监听可能到来的连接请求(属于server端)。为了连接两个蓝牙设备必须有一个设备作为服务器打开一个服务套接字。
+        当远端设备发起连接请求的时候,并且已经连接到了的时候,Blueboothserversocket类将会返回一个bluetoothsocket
+
+2.主要方法
+    BluetoothAdapter (蓝牙本地适配器)
+        getDefaultAdapter() 得到本地蓝牙适配器
+        setName(String name) 设置蓝牙名称
+        disable() 关闭蓝牙
+        enable() 打开蓝牙
+        isEnabled() 判断蓝牙是否打开
+        getName() 得到本地蓝牙的名称
+        getAddress() 得到本地蓝牙适配器的地址
+        getBondedDevices() 得到已经绑定的蓝牙的设备
+        getRemoteDevice(byte[] address) 得到远程蓝牙设备
+        getRemoteDevice(String address) 得到远程蓝牙设备
+        startDiscovery() 开始搜索附近蓝牙
+        cancelDiscovery() 停止当前搜索蓝牙的 Task
+        listenUsingInsecureRfcommWithServiceRecord(String name, UUID uuid) 创建 BluetoothServerSocket
+
+    BluetoothDevice (蓝牙设备)
+        createBond() 蓝牙配对 （低版本不支持，>=api19）
+        createRfcommSocketToServiceRecord(UUID uuid) 创建 BluetoothSocket
+        getBondState() 得到配对的状态
+        getAddress() 得到远程蓝牙适配器的地址
+        getName() 得到远程蓝牙的名称
+
+    BluetoothServerSocket (数据传输服务端)
+        这个类一共只有三个方法两个重载的。两个重载的区别在于后面的方法指定了过时时间，
+        需要注意的是，执行这两个方法的时候，直到接收到了客户端的请求（或是过期之后），都会阻塞线程，应该放在新线程里运行！
+        close() 关闭
+        connect() 连接
+        isConnected() 判断当前的连接状态
+        accept() 接收请求
+        accept(int timeout) 接收请求
+
+    BluetoothSocket (数据传输客户端)
+        close() 关闭
+        connect() 连接
+        getInptuStream() 获取输入流
+        getOutputStream() 获取输出流
+        getRemoteDevice() 获取远程设备，这里指的是获取bluetoothSocket指定连接的那个远程蓝牙设备
+
+3.使用流程
+    1.打开蓝牙
+        调用系统对话框启动蓝牙
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableIntent = new Intent(
+                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            }
+        //静默开启，且动态申请权限
+            <!-- 已适配Android6.0 -->
+            <uses-permission android:name="android.permission.BLUETOOTH" />
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+            <uses-feature
+                android:name="android.hardware.bluetooth_le"
+                android:required="true" />
+
+            mBluetoothAdapter.enable(); //开启
+    2.搜索蓝牙
+        //被动搜索
+            if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE)
+            {
+                Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                // 设置被发现时间，最大值是3600秒,0表示设备总是可以被发现的(小于0或者大于3600则会被自动设置为120秒)
+                discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 120);
+                activity.startActivity(discoverableIntent);
+            }
+        //主动搜索
+            2.1显示已配对的设备列表
+            private ListView mBoundDevicesLv;
+            private void showBoundDevices() {
+                List<Map<String, String>> mBoundDevicesList = new ArrayList<>();
+                Set<BluetoothDevice> boundDeviceSet = mBluetoothAdapter.getBondedDevices();
+                for (BluetoothDevice boundDevices : boundDeviceSet) {
+                    Map<String, String> mBoundDevicesMap = new HashMap<>();
+                    mBoundDevicesMap.put("name", boundDevices.getName());
+                    mBoundDevicesMap.put("address", boundDevices.getAddress());
+                    mBoundDevicesList.add(mBoundDevicesMap);
+                }
+                SimpleAdapter mSimpleAdapter = new SimpleAdapter(MainActivity.this, mBoundDevicesList,
+                        android.R.layout.simple_list_item_2,
+                        new String[]{"name", "address"},
+                        new int[]{android.R.id.text1, android.R.id.text2});
+                mBoundDevicesLv.setAdapter(mSimpleAdapter);
+            }
+
+           2.2 开始搜索
+            if (mBluetoothAdapter == null) {
+                     LogUtil.e(TAG, "设备不支持蓝牙");
+                 }
+                 // 打开蓝牙
+                 if (!mBluetoothAdapter.isEnabled()) {
+                     BluetoothAdapter.enable();
+                     mBluetoothAdapter.cancelDiscovery();
+                 }
+                 // 寻找蓝牙设备，android会将查找到的设备以广播形式发出去
+                 while (!mBluetoothAdapter.startDiscovery()) {
+                     LogUtil.e(TAG, "尝试失败");
+                     try {
+                         Thread.sleep(100);
+                     } catch (InterruptedException e) {
+                         e.printStackTrace();
+                     }
+                 }
+            2.3 定义搜索结果的广播接收器
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(BluetoothDevice.ACTION_FOUND);//每搜索到一个设备就会发送一个该广播
+                filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);//当全部搜索完后发送该广播
+                filter.setPriority(Integer.MAX_VALUE);//设置优先级
+                registerReceiver(receiver, filter);// 注册蓝牙搜索广播接收者，接收并处理搜索结果
+
+            2.4显示搜索到的蓝牙列表
+
+                private List<Map<String, String>> devices = new ArrayList<>();
+                private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        String action = intent.getAction();
+
+                        // When discovery finds a device
+                        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                            ToastUtil.showToast(MainActivity.this, "Showing Devices");
+                                // 从Intent中获取设备对象
+                                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                                // 定义一个装载蓝牙设备名字和地址的Map
+                                Map<String, String> deviceMap = new HashMap<>();
+                                // 过滤已配对的和重复的蓝牙设备
+                                if ((device.getBondState() != BluetoothDevice.BOND_BONDED) && isSingleDevice(device)) {
+                                    deviceMap.put("name", device.getName() == null ? "null" : device.getName());
+                                    deviceMap.put("address", device.getAddress());
+                                    devices.add(deviceMap);
+                                }
+                                // 显示发现的蓝牙设备列表
+                                mDevicesLv.setVisibility(View.VISIBLE);
+                                // 加载设备
+                                showDevices();
+                        } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                            //已搜素完成
+                        }
+                    }
+                };
+
+    3.蓝牙配对
+        //在adapter的点击事件中开始配对
+        BluetoothDevice device = (BluetoothDevice) adapter.getItem(i);
+        if (device.getBondState() == BluetoothDevice.BOND_BONDED) {//是否已配对
+            connect(device);
+        } else {
+            try {
+                Method boned=device.getClass().getMethod("createBond");
+                boolean isok= (boolean) boned.invoke(device);
+                if(isOk) {
+                    connect(device);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    4.蓝牙的UUID
+        两个蓝牙设备进行连接时需要使用同一个UUID
+        默认的UUID 00001101-0000-1000-8000-00805F9B34FB
+
+    5.蓝牙设备间的数据传输
+        蓝牙传输数据与Socket类似,在网络中使用Socket和ServerSocket进行控制客户端和服务器的数据读写
+        蓝牙客户端Socket是BlutoothSocket,蓝牙服务端Socket是BluetoothServerSocket
+        蓝牙地址相当于Socket的IP,UUID相当于Socket的端口
+
+        客户端线程：
+            //主动连接蓝牙服务端
+                try {
+                    // 如果当前正在搜索，则取消搜索。
+                    if (mBluetoothAdapter.isDiscovering()) {
+                        mBluetoothAdapter.cancelDiscovery();
+                    }
+                    try {
+                        if (device == null) {
+                            //获得远程设备
+                            device = mBluetoothAdapter.getRemoteDevice(address);
+                        }
+                        if (clientSocket == null) {
+                            //创建客户端蓝牙Socket
+                            clientSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+                            //开始连接蓝牙，如果没有配对则弹出对话框提示我们进行配对
+                            clientSocket.connect();
+                            //获得输出流（客户端指向服务端输出文本）
+                            os = clientSocket.getOutputStream();
+                        }
+                    } catch (Exception e) {
+                    }
+                    if (os != null) {
+                        //往服务端写信息
+                        os.write("蓝牙信息来了".getBytes("utf-8"));
+                    }
+                } catch (Exception e) {
+                }
+        服务端线程:
+            public AcceptThread() {
+                try {
+                    serverSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+                } catch (Exception e) {
+                }
+            }
+            public void run() {
+                try {
+                    socket = serverSocket.accept();
+                    is = socket.getInputStream();
+                    while(true) {
+                        byte[] buffer =new byte[1024];
+                        int count = is.read(buffer);
+                        Message msg = new Message();
+                        msg.obj = new String(buffer, 0, count, "utf-8");
+                        handler.sendMessage(msg);
+                    }
+                }
+                catch (Exception e) {
+                }
+            }

@@ -1,0 +1,77 @@
+1.SurfaceView、TextureView、OpenGlSurefaceView区别
+2.打开系统相机显示与拍照
+    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//打开系统相机拍照
+    fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+    // start the image capture Intent
+    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+
+3.自定义相机显示与拍照，应遵循如下步骤：
+    1检测和访问相机 - 首先代码检测该设备相机是否存在，如果存在才能请求访问设备相机.
+        getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)
+    2创建一个预览来显示相机图像 - 在你的布局中使用SurfaceView控件，然后在代码中继承SurfaceHolder.Callback接口并且实现接口中的方法来显示来自相机的图像信息。
+      Holder holder =   mSurfaceView.getHolder();
+      holder.addCallback(this);
+    3设置相机基本参数 - 根据需求设置相机预览尺寸，图片大小，预览方向，图片方向等,surfaceCreated方法中执行。
+        mCamera = Camera.open(tagInfo);
+        mCamera.setPreviewDisplay(mHolder);
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setPictureSize(1024,1024);
+        parameters.set("orientation", "portrait");
+        mCamera.setDisplayOrientation(0);
+        mCamera.setParameters(parameters);
+    4设置拍照录像监听 - 当用户按下按钮时调用Camera#takePicture或者MediaRecorder#start()来进行拍照或录像。
+        mCamera.takePicture(new Camera.ShutterCallback() {}
+    5文件保存 - 当拍照结束或者录像视频结束时，需要开启一个后台线程去保存图片或者视频文件。
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        Matrix matrix = new Matrix();
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        mRecentSaveFile = new File(path, fileName);
+        fos = new FileOutputStream(mRecentSaveFile);
+        bitmap.compress(Bitmap.CompressFormat.JPEG,80,fos);
+    6释放相机资源 - Camera硬件是一个共享资源，所以你必须小心的编写你的应用代码来管理相机资源。一般在Activity的生命周期的onResume中开机相机，在onPause中释放相机
+         stopPreview();
+         mCamera.release();
+
+4.接收NV21数据显示、保存帧和流媒体
+    //保存帧图片
+    private Bitmap getBitmap(byte[] byteData,int width,int height) {
+        YuvImage image = new YuvImage(byteData, ImageFormat.NV21, width, height, null);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(byteData.length);
+        image.compressToJpeg(new Rect(0, 0, width, height), 100, os);
+        byte[] tmp = os.toByteArray();
+        return BitmapFactory.decodeByteArray(tmp, 0,tmp.length);
+    }
+
+5.接收H264数据硬解码显示、保存帧图片和流媒体
+
+6.接收RGB565数据显示与保存帧图片
+    private Bitmap getBitmapFromRGB565(byte[] data, int width, int height) {
+            Bitmap bmp = null;
+            try {
+                bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            } catch (OutOfMemoryError e) {
+                if (bmp != null) {
+                    bmp.recycle();
+                    bmp = null;
+                }
+                System.gc();
+            }
+
+            if (bmp != null && data != null && data.length > 0) {
+                //this.byteBuffer.rewind();
+                //bmp.copyPixelsFromBuffer(ByteBuffer.wrap(data));
+                ByteBuffer.wrap(data).rewind();
+                bmp.copyPixelsFromBuffer(ByteBuffer.wrap(data));
+            }
+            return bmp;
+        }
+7.android.hardware.Camera和android.hardware.Camera2及android.graphics.Camera三者区别
+    Android5.0时android.hardware.Camera就被废弃了
+    android.graphics.Camera不是用来照相的，是用来处理图像的，可以做出3D的图像效果之类的
+    Android5.0后Camera2支持RAW输出，可以调节曝光，对焦模式，快门等，功能比原先Camera强大
+
+8.SurfaceView和View最本质的区别在于：
+    1.surfaceView是在一个新起的单独线程中重新绘制画面,而View必须在UI的主线程中更新画面
+    2.surfaceView采用双缓存机制，而view没有采用双缓冲机制
+    3.View适合主动刷新，surfaceview适合被动刷新，如频繁的刷新

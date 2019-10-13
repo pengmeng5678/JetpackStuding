@@ -1,0 +1,46 @@
+https://www.jianshu.com/p/3a372af38103
+https://github.com/Belolme/RxBLE
+https://blog.csdn.net/android_jiangjun/article/details/77113883
+1.声明权限
+    <uses-permission android:name="android.permission.BLUETOOTH"/> 使用蓝牙所需要的权限
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/> 使用扫描和设置蓝牙的权限（申明这一个权限必须申明上面一个权限
+    <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
+     <uses-feature android:name="android.hardware.location.gps" />
+    <-- 6.0及以上，需要打开位置权限,不然蓝牙扫描功能不能使用-->
+     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+2.连接蓝牙前的初始化
+    1.获取BluetoothAdapter
+        final BluetoothManager bluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE)
+        mBluetoothAdapter = bluetoothManager.getAdapter()
+    2.如果检测到蓝牙没有开启，尝试开启蓝牙
+        if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent,REQUEST_ENABLE_BT)
+        }
+3.扫描蓝牙设备
+    1.指定只扫描含有特定UUID Service的蓝牙设备
+        boolean startLeScan(UUID[] serviceUuids,BluetoothAdapter.LeScanCallback callback)
+    2.扫描全部蓝牙设备
+        boolean startLeScan(BluetoothAdapter.LeScanCallback callback)
+        final BluetoothAdapter.LeScanCallback callback = new BluetoothAdapter.LeScanCallback(){
+            @Override
+            public void onLeScan(final BluetoothDevice device,int rssi,byte[] scanRecord){
+                //其中device是蓝牙设备的类,可以通过这个类建立蓝牙连接获取关于这以设备的一系列详细的参数，如名字、MAC地址等
+                //rssi表示蓝牙信号强弱，通过它可以计算蓝牙离手机的距离d = 10^((abs(RSSI) - A) / (10 * n))
+                //
+                bluetoothDeviceArrayList.add(device)
+            }
+        }
+        //停止蓝牙扫描
+        stopLedScan(BluetoothAdapter.LeScanCallback callback)
+
+4.连接蓝牙设备
+    BluetoothGatt   connectGatt(Context context, boolean autoConnect, BluetoothGattCallback callback)
+    boolean connect()
+    当调用蓝牙的连接方法之后，蓝牙会异步执行蓝牙连接的操作,如果连接成功会回调BluetoothGattCallback#OnConnectionStateChange方法,这个方法运行的线程是一个Binder线程
+        void    onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
+
+5.发现服务
+    成功连接到蓝牙设备后就可以发现服务了，BluetoothGatt.dicoverService,发现服务后onServiceDiscovered会被系统回调
+    此时表示手机设备和蓝牙设备是真正建立了可通信的连接

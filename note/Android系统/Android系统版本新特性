@@ -1,0 +1,53 @@
+https://www.jianshu.com/p/88409d6f5795
+Android4.x
+    1.新锁屏界面
+    2.全新widget排列
+    3.更直观的程序文件夹
+    4.人脸识别解锁
+    5.截屏功能
+    6.全新通知栏
+    7.语音识别的键盘
+    8.浏览器
+
+Android5.x
+    1.Material design
+    2.改善通知栏
+    3.Dalvik改为ART,实现ahead-of-time (AOT)静态编译与just-in-time (JIT)动态编译交互进行
+    4.V7中引入CardView和RecycleView
+    5.支持64位系统
+
+Android6.x(M)
+    1.运行时权限
+    2.新增瞌睡模式和待机模式
+    3.移除对Apache HTTP Client的支持
+    4.Doze电量管理
+
+Android7.x(N)
+    1.通知栏快捷回复
+    2.加入原生分屏多任务功能,多任务快速切换
+    3.增加VR功能支持(实际上是使用了一个新的跨平台图形计算库——Vulkan，Vlukan API提升处理能力，减少GPU处理)
+    4.引入全新的JIT编译器,是的App的安装速度快了75%,编译代码的规模减少了50%
+    5.安全:更安全的加密模式,可以对单独的文件进行加密,android系统启动加密
+
+Android 8.x(O)
+    1.画中画(如视频悬浮)
+    2.Notification Dots(通知气泡、未读消息快速预览)
+    3.自动填充(常用的应用、自动快速登录,不用每次都填写账户名和密码)
+    4.自适应图标
+    5.后台进程限制
+    6.运行时权限策略变化
+
+Android 9.x(P)
+    1.使用WIFI RTT进行室内定位
+    2.凹凸屏幕的支持
+    3.消息通知的改进
+    4.多摄像头API
+    5.用于位图和drawable的ImageDecoder
+    6.HDR VP9 视频、HEIF 以及媒体 APIs
+    7.JobScheduler 中的数据费用敏感度
+    8.神经网络 API 1.1
+    9.自动填充的改进
+    10.用于 NFC 支付和安全交易的 Open Mobile API
+
+Android 10.x(Q)
+    1.暗黑模式

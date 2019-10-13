@@ -1,0 +1,63 @@
+https://www.jianshu.com/p/089fb79e308b
+1.Socket定义
+    1.即套接字,是应用层和TCP/IP协议族通信的中间软件抽象层,表现为一个封装了TCP/IP协议的接口
+        1.Socket不是一种协议，而是一个编程调用接口(API),属于传输层(主要解决数据如何在网络中传输)
+        2.通过Socket,我们才能在Android平台上通过TCP/IP协议进行开发
+        3.对用户来说,只需要调用Socket去组织数据，以符合指定的协议，既可通信
+    2.成对出现,一对套接字
+        socket = {(IP地址1：port端口)，(IP地址2：Port端口)}
+    3.一个socket实例,唯一代表一个主机上的一个应用程序的通信链路
+
+2.建立Socket连接过程
+    客户端
+        1.创建一个Socket实例
+        2.操作系统为该Socket实例分配一个未使用的本地端口号
+        3.操作系统创建一个含本地、远程地址、端口号的套接字数据结构(系统将一直保存该数据结构到连接关闭)
+        4.在创建Socket实例的构造函数正确返回前,进行TCP的三次握手协议
+        5.TCP握手协议完成后,Socket实例对象将创建完成
+        //示例代码
+
+    // 步骤1：创建客户端 & 服务器的连接
+        // 创建Socket对象 & 指定服务端的IP及端口号
+        Socket socket = new Socket("192.168.1.32", 1989);
+        // 判断客户端和服务器是否连接成功
+        socket.isConnected());
+
+    // 步骤2：客户端 & 服务器 通信
+    // 通信包括：客户端 接收服务器的数据 & 发送数据 到 服务器
+
+    <-- 操作1：接收服务器的数据 -->
+            // 步骤1：创建输入流对象InputStream
+            InputStream is = socket.getInputStream()
+            // 步骤2：创建输入流读取器对象 并传入输入流对象
+            // 该对象作用：获取服务器返回的数据
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            // 步骤3：通过输入流读取器对象 接收服务器发送过来的数据
+            br.readLine()；
+
+    <-- 操作2：发送数据 到 服务器 -->
+            // 步骤1：从Socket 获得输出流对象OutputStream
+            // 该对象作用：发送数据
+            OutputStream outputStream = socket.getOutputStream();
+            // 步骤2：写入需要发送的数据到输出流对象中
+            outputStream.write（（"Carson_Ho"+"\n"）.getBytes("utf-8")）；
+            // 特别注意：数据的结尾加上换行符才可让服务器端的readline()停止阻塞
+            // 步骤3：发送数据到服务端
+            outputStream.flush();
+
+    <-- 操作3：断开客户端 & 服务器 连接 -->
+             os.close();
+            // 断开 客户端发送到服务器 的连接，即关闭输出流对象OutputStream
+            br.close();
+            // 断开 服务器发送到客户端 的连接，即关闭输入流读取器对象BufferedReader
+            socket.close();
+            // 最终关闭整个Socket连接
+
+    服务器
+        1.创建一个ServerSocket实例
+        2.操作系统将为该ServerSocket实例创建一个底层数据结构(含有制定监听的端口号,包含监听地址的通配符,通常监听所有地址)
+        3.调用accept方法，进入阻塞状态,等待客户端的请求
+        4.当一个新的请求到来时,将为该连接创建一个新的套接字数据结构
+        5.等三次握手完成后,该服务端的Socket实例才会返回同时将该Sockt实例对应的数据结构从未完成列表中移动已完成列表中
+

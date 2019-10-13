@@ -1,0 +1,65 @@
+https://a.codekk.com/detail/Android/Trinea/EventBus%20%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90
+https://blog.csdn.net/lmj623565791/article/details/40920453
+1.基本使用
+	EventBus.getDefault().register(this);
+    EventBus.getDefault().post(param);
+    EventBus.getDefault().unregister(this);
+2.原理概述
+    EventBus其实就是内部存储了一堆onEvent开头的方法,
+    然后当调用EventBus.getDefault().post(param)时，
+    EventBus会根据post传入的参数，去找到匹配的方法,反射调用这个方法
+3.源码解析
+    一句话源码简介
+        register会把当前类中匹配的方法，存入一个map，而post会根据实参去map查找进行反射调用
+    1.getDefault方法
+        getDefault方法简介：getDefault方法中结合单例和Builder模式初始化所有消息容器、两个poster和一个SubscriberMethodFinder类对象，同时初始化一个线程池Executors.newCachedThreadPool
+        public static EventBus getDefault() {
+            if (defaultInstance == null) {
+                synchronized (EventBus.class) {
+                    if (defaultInstance == null) {
+                        defaultInstance = new EventBus();
+                    }
+                }
+            }
+            return defaultInstance;
+        }
+        private static final EventBusBuilder DEFAULT_BUILDER = new EventBusBuilder();
+        public EventBus() {
+            this(DEFAULT_BUILDER);
+        }
+        EventBus(EventBusBuilder builder) {
+            //初始化四个HashMap
+            private static final Map<Class<?>, List<Class<?>>> eventTypesCache = new HashMap<>();
+            private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> subscriptionsByEventType;
+            private final Map<Object, List<Class<?>>> typesBySubscriber;
+            private final Map<Class<?>, Object> stickyEvents;
+            //一个BackgroundPoster,一个AsyncPoster，SubscriberMethodFinder
+        }
+
+    2.register方法
+        register方法内容简介
+            扫描了订阅类的所有方法,将匹配到的订阅方法存放到subscriptionsByEventType中,
+            其中key是EventType，value是一个保存了Subscription对象的ArrayList,Subscription中有subscriber和subscriberMethod属性
+        public void register(Object subscriber) {
+            Class<?> subscriberClass = subscriber.getClass();
+            List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
+            synchronized (this) {
+                for (SubscriberMethod subscriberMethod : subscriberMethods) {
+                    subscribe(subscriber, subscriberMethod);
+                }
+            }
+        }
+        2.1通过SubscriberMethodFinder类的findSubscriberMethods通过反射找到传入的类中的所有订阅方法,并通过一个Map缓存这些方法
+            private static final Map<Class<?>, List<SubscriberMethod>> METHOD_CACHE = new ConcurrentHashMap<>();
+
+        2.2遍历这些订阅方法，并根据订阅方法的eventType进行存储,然后根据优先级依次存放到subscriptions列表中
+            private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> subscriptionsByEventType;
+            subscriptions = new CopyOnWriteArrayList<>();
+            subscriptionsByEventType.put(eventType, subscriptions);
+            最终匹配到的方法都存放到了subscriptionsByEventType这个Map中,key是eventType,value是CopyOnWriteArrayList列表，
+                而CopyOnWriteArrayList存放的Subscription中包含了subscriber和subscriberMethod属性
+
+        2.3以订阅者为key,以ArrayList为value保存到typesBySubscriber的Map容器中,ArrayList存放这个eventType
+    3.post方法
+
+    4.unregister方法

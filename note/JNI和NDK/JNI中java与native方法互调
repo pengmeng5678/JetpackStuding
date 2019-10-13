@@ -1,0 +1,159 @@
+本文介绍java与native方法互相调用的基本知识点
+Java与Native相互调用大纲
+    1.注册native函数
+        1.静态函数
+        2.动态注册
+    2.JNI签名
+        1.为什么JNI中突然多出了一个概念叫“签名”
+        2.如何查看类中的方法的签名
+        3.JNI规范定义的函数签名信息
+    3.native代码反调用Java层代码
+        1.获取Class对象
+        2.获取属性方法
+        3.构造一个对象
+内容：
+1.注册native函数
+    当java代码中执行Native代码的时候，首先是通过一定的方法来找到这些native方法，
+    而注册native函数的具体方式不同，会导致系统在运行时采用不同的方式来找到这些native方法
+    JNI有如下两种方式注册native方法
+        1.静态注册
+            先由java得到本地方法的声明，然后再通过JNI实现该声明方法
+            JNI方法名的规范：
+                返回值 + Java前缀+全路径类名+方法名+参数1JNIEnv+参数2jobject+其他参数
+                JNIEXPORT jstring JNICALL Java_demo_studing_com_jni_customjni_NDKTools_getNDKString
+        2.动态注册
+            先通过JNI重载JNI_OnLoad()实现本地方法，然后直接在Java中调用本地方法
+
+    1.动态注册native函数
+       让Java层的native函数和任一JNI函数连接起来，即通过RegisterNatives方法把C/C++中的方法映射到Java中native方法，而无需遵循特定的命名格式
+       当我们使用System.loadLibarary方法加载so库的时候，java虚拟机就会找到这个JNI_OnLoad函数并调用该函数
+       这个JNI_OnLoad函数的作用是告诉Dalvik虚拟机此C库使用的是哪一个JNI版本，如果不写这个函数就会用最老的版本
+       举例说明
+           加载so库
+               static{
+                    System.loadLibrary("jnilib")
+               }
+           在jni中的实现
+               jint JNI_OnLoad(JavaVM* vm,void* reserved)
+               并且在这个函数里面去动态的注册native方法，完整的代码参考：https://www.jianshu.com/p/b71aeb4ed13d
+               主要是两个代码块，一个if语句和一个jniRegisterNativeMethods
+               jint JNI_OnLoad(JavaVM* vm, void* reserved){
+                     LOGI("JNI", "enter jni_onload");
+                     JNIEnv* env = NULL;
+                     jint result = -1;
+                     if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK) {
+                        return result;
+                     }
+                     jniRegisterNativeMethods(env, className, gJni_Methods_table, sizeof(gJni_Methods_table) / sizeof(JNINativeMethod));
+                     return JNI_VERSION_1_4;
+                 }
+               这里调用了GetEnv函数是为了获取JNIEnv结构体指针，其实JNIEnv结构体指向了一个函数表
+               这个函数表指向了对应的JNI函数，我们通过这些JNI函数实现JNI编程
+
+               然后调用jniRegisterNativeMethods，这里有个gJni_Methods_table,它其实代表了一个native方法的数组
+               一个java类中有几个native方法，这个数组的size就是几
+               gJni_Methods_table的类型是JNINativeMethod，其具体实现如下
+                    static JNINativeMethod gJni_Methods_table[] = {
+                        {"sayHello", "(J)V", (void*)sayHello},
+                    };
+
+                    JNI允许我们提供一个函数映射表，注册给Java虚拟机，这样JVM就可以用函数映射表来调用相应的函数，
+                这样就可以不必通过函数名来查找需要调用的函数了，Java与JNI通过JNINativeMethod的结构来建立联系，
+                它被定义在jni.h中，其结构内容如下
+                    typef struct{
+                        const char* name;       //代表Java中的函数名
+                        const char* signature;  //代表的是Java中的参数和返回值
+                        void* fnPtr;            //代表的是指向C函数的函数指针
+                    }JNINativeMethod;
+
+              如果知道了java类名和注册的方法及签名，那么就可以开始动态注册了
+              jint ret = (*env)->RegisterNatives(env,jClassName,gJni_Methods_table,1)
+                    其中jClassName可以通过(*env)->FindClass(env,"全路劲类名")获取
+                    1表示gJni_Methods_table方法的个数
+
+2.JNI中的签名
+    1.为什么JNI中突然多出了一个概念叫“签名”
+        因为Java是支持函数重载的，可以定义相同的方法名，但是参数不同的方法，java通过不同的参数可以找到不同的方法
+        而JNI怎么支持呢，仅仅通过函数名没有办法找到重载函数，所以为了解决这个问题，JNI就衍生了“签名”这个概念
+        即参数类型和返回值类型的组合。如果拥有一个该函数的签名信息和这个函数的函数名，我们就可以找到这个函数
+
+    2.如何查看类中方法的签名
+        可以使用javap命令,进入到build/intermediates/classes/debug目录下后，再执行以下命令
+        javap -s -p MainActivity.class
+        得到结果
+            public class jni.studing.MainActivity extends android.support.v7.app.AppCompatActivity {
+              public jni.studing.MainActivity();
+                descriptor: ()V
+
+              protected void onCreate(android.os.Bundle);
+                descriptor: (Landroid/os/Bundle;)V
+            }
+        这个就是MainActivity类中方法的签名
+
+    3.JNI规范定义的函数签名信息
+        具体格式如下
+        (参数1类型标示，参数2类型标示，...)返回值类型标示
+            当参数为引用类型时，参数类型的标示根式为“L包名”的，其中包名的.(点)要换成"/",具体类型标示对应的Java类型如下
+            类型标示    Java类型
+               Z        boolean
+               B         byte
+               C         char
+               J         long
+                    ...
+            其实很好记，除了boolean和long的类型标示，其他都是首字母大写，如果返回值是void，对应的签名是V
+
+3.native代码反调用Java层代码
+    1.获取Class对象
+        1.通过类全名获取
+            jclass FindClass(const char* clsName),比如jclass jcl_string = env->FindClass("java/lang/String")
+        2.通过类示例获取
+            jclass GetObjectClass(jobject obj),相当于java中的getClass函数
+        3.通过获取其父类的jclass对象
+            jclass getSuperClass(jclass obj)
+
+    2.获取属性方法
+        为了C/C++获取Java层的属性和方法，JNI在jni.h头文件中定义了jfieldID和jmethodID这两种类型分别代表Java端的属性和方法
+        所以在访问或设置java中某个属性和方法的时候，首先要在本地代码中取得代表该Java类中的jfieldID和JmethodID,才能开始操作
+        常见的调用Java层的方法如下
+            GetFieldID/GetMethodID:获取某个属性/某个方法
+            GetStaticFieldID/GetStaticMethodID:获取某个静态属性/某个静态方法
+        方法具体实现
+            jfieldID GetFieldID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+            jmethodID GetMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+            jfieldID GetStaticFieldID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+            jmethodID GetStaticMethodID(JNIEnv *env, jclass clazz,const char *name, const char *sig);
+        每个方法都是四个参数
+            JNIEnv代表一个JNI环境接口，jclass代表Java层中的类，name代表属性或方法，char * sig代表签名
+
+    3.构造一个对象
+        jobject NewObject(jclass clazz,jmethodID methodID,...)
+        当我们要指定调用某个构造函数的时候，会调用下面这个方法
+        jmethodID mid = (*env)->GetMethodID(env,cls,"<init>","()V");
+        obj = (*env) ->NewObject(env,cls,mid);
+            其中，clazz是需要创建的Java对象的Class对象
+            methodID是传递一个方法ID,比如当Java对象创建的时候，也要执行构造函数
+
+        一行代码实现创建对象
+        jobject NewObject(JNIEnv *env, jclass clazz, jmethodID methodID, jvalue *args);
+        多出了的args参数就是对于构造函数的所有参数的
+        NewObject()收到数组中的这些参数后，将把他们传给编程人所要调用的Java方法
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

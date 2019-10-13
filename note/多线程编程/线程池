@@ -1,0 +1,86 @@
+https://www.jianshu.com/p/87bff5cc8d8c
+1.作用
+    线程是稀缺资源，如果被无限制的创建和销毁，不仅会消耗系统资源，还会降低系统稳定性,合理使用线程池对线程进行统一分配、调优和监控，有以下好处
+        1.降低系统资源销毁
+        2.提高系统稳定性和可管理性
+2.使用
+    1.自定义线程池
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(mCorePoolSize, mMaximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+    executor.execute(task);//executor.submit(task)
+
+    2.使用Exectors自带的api
+    Exectors工厂类提供了线程池的初始化接口,主要有
+        1.newFixedThreadPool:可重用固定线程数的线程池
+            new ThreadPoolExecutor(nThreads,nThreads,0L,TimeUnit.MILLISECONDS,new LinkedBlockQueue)
+            corePoolSize和maxnumPoolSize相等，表示只有固定数量的核心线程,没有非核心线程,所以KeepAlive为0L表示多余的线程会被立即终止,使用了无界阻塞的LindedBlockQueue
+            当线程数超过corePoolSize时,就将任务存储在任务队列中,当核心线程池有空闲任务时,就从任务队列中取取任务执行
+        2.newCachedThreadPool:
+            new TheadPoolExecutor(0,Integer.MAX_VALUE,keepAlive=60,TimeUnit.SECONDS,new SynchronousQueue)
+            CacheThreadPool没有核心线程,非核心线程是无界的,使用了SynchrounQueue
+            SynchrounQueue是一个不存储元素的无界阻塞队列，一个线程的插入必须等待另一个线程的移除操作,一个线程的移除操作必须等待另一个线程的插入操作
+                当执行excute方法时,会执行SynchronousQueue的offer方法提交任务,并且查询线程池是否有空闲的线程执行poll方法移除任务,如果有就配对成功,将任务交给这个空闲的线程,如果配对失败,就创建新的线程去处理任务。
+                当线程池的线程空闲时,它会执行队列的poll方法,等待队列的offer操作,如果空闲60S没有新任务提交就终止这个线程
+                另外，每次提交都会立即有线程去处理,所以CacheThreadPool适合有大量的需要立即处理并且耗时较少的任务
+
+        3.newSingleThreadExecutor
+            coolPoolSize==maxnumPoolSize==1,linkedBlockingQueue
+
+        4.newScheduledThreadPool
+            初始化的线程池可以在指定的时间内周期性的执行所提交的任务
+            new ScheduledThreadPoolExcutor(corePoolSize)
+3.原理
+    1.ThreadPoolExecutor构造函数参数说明
+        1.corePoolSize:核心线程池
+            提交任务时,线程池会创建新线程执行任务直到线程数等于corePoolSize;如果线程数等于corePoolSize时,新任务会被加入到阻塞队列中
+        2.maxnumPoolSize:线程池允许的最大线程数
+            如果当前阻塞队列满了,且继续提交任务,则创建新的线程执行任务,前提是当前线程小于maxnumPoolSize
+        3.keepAliveTime:线程空闲时的存活时间
+            当前线程没有任务执行时,继续存活的时间；默认情况下,该参数只在线程数大于corePoolSize时才有用
+        4.unit:keepAliveTime的单位
+        5.workQueue:用来保存等待被执行的任务的阻塞队列,且任务必须实现Runnable接口
+            ArrayBlockingQueue:基于数组结构的有界阻塞队列,按FIFO排序任务
+            LinkedBlockingQueue:基于链表的阻塞队列,按FIFO排序任务
+            SynchronousQueue:一个不存储元素的阻塞队列,每个插入操作必须等到另一个线程的移除操作,否则插入操作一直阻塞
+            priorityBlockingQueue:具有优先级的无界阻塞队列
+        6.threadFactory
+            创建线程的工厂,通过自定义的线程工厂可以给每个新建的线程设置一个具有识别度高的线程名
+        7.hander:饱和策略
+            当阻塞队列满了,且没有空闲的工作线程,如果继续提交任务,必须采取一种策略处理该任务,线程池提供了4中策略
+            AbortPolicy:直接抛出异常,默认策略
+            CallerRunsPolicy:用调用者所在的线程来执行任务
+            DiscardOldestPolicy:丢弃阻塞队列中最靠前的任务,并执行当前任务
+            DiscardPolicy:直接丢弃任务
+
+4.任务执行
+    1.excute
+        任务必须实现Runnable接口,没有返回值,无法判断任务是否执行成功
+    2.submit
+        任务必须实现Callable接口,有返回值,返回值是Future类型
+        Future.get方法会导致线程阻塞,直到Callable任务执行完成
+
+5.阻塞队列
+    1.阻塞队列介绍
+        阻塞队列常用于生产者消费者场景,具体如下。
+            1.当队列中没有数据的时候，消费者所有线程全部挂起(阻塞),直到有数据放入队列
+            2.当队列中的数据满的时候，生产者所有线程全部挂起(阻塞),直到队列中有空的位置后，线程被唤醒
+
+         插入数据
+            add：若队列已满，直接抛异常
+            offer:插入成功就返回ture,插入失败返回false,不阻塞线程;offer(e,time,unit)插入数据超时退出
+            put:如果队列已满,会一直阻塞，等待队列有空位置
+
+         获取数据
+            remove：若队列为空,会抛异常
+            poll：若队列为null,会返回null,poll(time,unit)获取数据超时退出
+            take:若队列为null，会阻塞直到队列中有数据
+
+    2.阻塞队列种类
+        ArrayBlockingQueue,一个由数组结构组成的有界阻塞队列
+        LinkedBlockingQueue,一个由链表结构组成的有界阻塞队列，默认长度为Integer.MAX_VALUE
+        PriorityBlockingQueue,一个支持优先级排序的无界阻塞队列
+        DelayQueue,一个使用优先级队列实现的无界阻塞队列
+        SynchronousQueue,一个不存储元素的阻塞队列
+        LinkedTransferQueue,一个由链表结构组成的无界阻塞队列
+        LinkedBlockDeque,一个由链表结构组成的双向阻塞队列
+
+    3.阻塞队列实现原理

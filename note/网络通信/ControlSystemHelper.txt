@@ -1,0 +1,460 @@
+package cn.qihan.www.procuratorate.util;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+
+import cn.qihan.www.procuratorate.R;
+import cn.qihan.www.procuratorate.app.MyApplication;
+import cn.qihan.www.procuratorate.config.Constants;
+import cn.qihan.www.procuratorate.service.TcpServerService;
+
+/**
+ * 创建者     彭猛
+ * 创建时间   2017/11/28 9:25
+ * 描述	     TODO
+ * 更新者     Author
+ * 更新时间   Date
+ * 更新描述   TODO
+ */
+public class ControlSystemHelper {
+
+    public static final String CONNECT_SERVER = "Connection_request";
+    public static final String GET_KEYWORDS = "Keyword_request";
+    public static final String HEARBEAT_BROADCAST_RECEIVER = "hearbeatBroadcastReceiver";//接收心跳广播
+    public static final int CODE_SOCKET_CONNECT_SUCCESS = 5;
+    public static final int CODE_SOCKET_CONNECT_ERROR = 6;
+    public static final int CODE_RECEIVE_MSG = 7;
+    public static final int CODE_RECEIVE_MSG_CODE = 8;
+    public static final int CODE_SEND_MSG_STR = 9;
+    public static final int CODE_SEND_MSG_CODE = 10;
+    public static final int CODE_SEND_MSG_ERROR = 11;
+    public static final int CODE_SEND_MSG_EMPTY_ERROR = 12;
+    public static final int CODE_FIRST_TIME_CONNECT = 13;
+    public static final int CODE_SEND_MSG_ERROR_DISCONNECT = 14;
+
+    public static  String CONTROL_SYSTEM_DEFAULT_IP = "127.0.0.1";
+    public static  int CONTROL_SYSTEM_DEFAULT_PORT = 9999;
+    String mCurrentConnectIp = "";
+    int mCurrentConnectPort = 0;
+    public static final String TAG = Constants.CONTROL_SYSTEM_TAG;
+    public static final int SENDMSG_CH_COMMAND_TYPE = 100;//服务器返回中文命令词类型,如"打开空调"
+    public static final int SENDMSG_EN_CONTENT_TYPE = 101;//请求服务器内容的英文类型,如Keyword_request
+    private static final long RECONNECT_INTERVER_TIME = 2000;//连接失败时,默认每隔2秒钟重连一次
+    public static final int RECONNECT_TIMES_QUIT = 30;//连接超时多少次就放弃连接,30次表示1分钟(30*RECONNECT_INTERVER_TIME秒钟)
+
+    private static ControlSystemHelper instance;
+    private IControlSystemHelperListener mIControlSystemHelperListener;
+    private Context mContext;
+    private boolean isFinishing;
+    private OutputStream mOutputStream;
+    private Socket socket;
+    private String port;
+    private String IP;
+    private StringBuffer mStringBuffer = new StringBuffer();
+    private HearbeatReceiver mBroadcastReceiver;
+    private Intent mIntentTcpService;
+    private Thread mBindThread;
+    private int mConnectNum;
+    private boolean mIsSetIpAndPort;
+
+    public static ControlSystemHelper getInstance() {
+        if (null == instance) {
+            instance = new ControlSystemHelper();
+        }
+        return instance;
+    }
+
+    public void init(Context context) {
+        if(context == null){
+            ToastUtil.showShort(MyApplication.getContext(),"context is null");
+            return;
+        }
+        this.mContext = context;
+        bindSocketService();
+        registerHearbeatReceiver();
+    }
+
+    private void registerHearbeatReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(HEARBEAT_BROADCAST_RECEIVER);
+        mBroadcastReceiver = new HearbeatReceiver();
+        mContext.registerReceiver(mBroadcastReceiver, filter);
+    }
+
+    public void setOnControlSystemHelperListener(IControlSystemHelperListener iListener) {
+        this.mIControlSystemHelperListener = iListener;
+    }
+    Handler mSocketHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+
+            switch (msg.what) {
+                case CODE_SOCKET_CONNECT_SUCCESS:
+                    //连接服务器成功
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.connectSuccees((String) msg.obj);
+                    }
+                    break;
+                case CODE_SOCKET_CONNECT_ERROR:
+                    //连接服务器失败
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.connectFailed(mConnectNum,(String) msg.obj);
+                    }
+                    if(mConnectNum == RECONNECT_TIMES_QUIT){
+                        mConnectNum = 0;
+                    }
+                    break;
+                case CODE_RECEIVE_MSG:
+                    //接收到服务器发送过来的文本消息
+                    if(mIControlSystemHelperListener != null ){
+                        mIControlSystemHelperListener.receiveMsg((String) msg.obj);
+                    }
+                    parseReceiveMsg((String)msg.obj);
+                    break;
+                case CODE_RECEIVE_MSG_CODE:
+                    //接收到服务器发送过来的文本对应的16进制消息
+                    if(mIControlSystemHelperListener != null ){
+                        mIControlSystemHelperListener.receiveMsgCode((String) msg.obj);
+                    }
+                    parseReceiveMsg((String)msg.obj);
+                    break;
+                case CODE_SEND_MSG_STR:
+                    //给服务器发送的文本消息
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.sendMsgStr((String) msg.obj);
+                    }
+                    break;
+                case CODE_SEND_MSG_CODE:
+                    //给服务器发送的16进制机器码消息
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.sendMsgCode((String) msg.obj);
+                    }
+                    break;
+                case CODE_SEND_MSG_ERROR:
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.sendMsgError(CODE_SEND_MSG_ERROR,(String) msg.obj);
+                    }
+                    break;
+                case CODE_SEND_MSG_EMPTY_ERROR:
+                    ToastUtil.showShort(MyApplication.getContext(),MyApplication.getContext().getResources().getString(R.string.msg_is_empty));
+                    break;
+                case CODE_FIRST_TIME_CONNECT:
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.firstTimeConnectSocket((String) msg.obj);
+                    }
+                    break;
+                case CODE_SEND_MSG_ERROR_DISCONNECT://消息发送失败,暂未连接中控服务器
+                    if(mIControlSystemHelperListener != null){
+                        mIControlSystemHelperListener.sendMsgError(CODE_SEND_MSG_ERROR_DISCONNECT,(String) msg.obj);
+                    }
+                    break;
+            }
+        }
+    };
+
+    private void parseReceiveMsg(String obj) {
+        //TODO
+    }
+
+    public void bindSocketService() {
+        //启动服务端
+        mConnectNum = 0;
+        mIntentTcpService = new Intent(mContext, TcpServerService.class);
+        mContext.startService(mIntentTcpService);
+        reStartClient();
+    }
+
+    private void reStartClient() {
+        closeClient();
+        mBindThread = new bindSocketThread();
+        mBindThread.start();
+    }
+
+    public void connectSocketServer(){
+        isFinishing = false;
+        while (socket == null && !isFinishing) {    //选择在循环中连接是因为有时请求连接时服务端还没创建，需要重试
+            try {
+                if(!StringUtils.isEmpty(IP) && !StringUtils.isEmpty(port)){
+                    //优先使用用户最新设置的IP
+                    mCurrentConnectIp = IP;
+                    mCurrentConnectPort = Integer.parseInt(port);
+                }else{
+                    //检测是否有连接成功过的Ip，如果有就连以前连过的
+                    mCurrentConnectIp = MyApplication.getSPUtil().getString(Constants.CONTROL_SYSTEM_SERVER_IP, CONTROL_SYSTEM_DEFAULT_IP);
+                    mCurrentConnectPort = MyApplication.getSPUtil().getInt(Constants.CONTROL_SYSTEM_SERVER_PORT, CONTROL_SYSTEM_DEFAULT_PORT);
+                }
+                LogUtils.Logd(TAG,"connectSocket ip="+ mCurrentConnectIp +",port="+ mCurrentConnectPort);
+                if(CONTROL_SYSTEM_DEFAULT_IP.equals(mCurrentConnectIp) && CONTROL_SYSTEM_DEFAULT_PORT== mCurrentConnectPort && !mIsSetIpAndPort){
+                    mSocketHandler.obtainMessage(CODE_FIRST_TIME_CONNECT, mCurrentConnectIp +":"+ mCurrentConnectPort).sendToTarget();
+                    isFinishing = true;
+                }
+                socket = new Socket(mCurrentConnectIp, mCurrentConnectPort);
+                mSocketHandler.obtainMessage(CODE_SOCKET_CONNECT_SUCCESS, mCurrentConnectIp +":"+ mCurrentConnectPort).sendToTarget();
+                MyApplication.getSPUtil().putString(Constants.CONTROL_SYSTEM_SERVER_IP, mCurrentConnectIp);
+                MyApplication.getSPUtil().putInt(Constants.CONTROL_SYSTEM_SERVER_PORT, mCurrentConnectPort);
+                mConnectNum = 0;
+                setIsSetIpAndPortState(true);
+                LogUtils.Logd(TAG,"connectSocketServer success,reset mConnectNum = 0");
+            } catch (Exception e) {
+                mConnectNum++;
+                if(mConnectNum >= RECONNECT_TIMES_QUIT){//连接RECONNECT_TIMES_QUIT次都不成功就放弃
+                    mSocketHandler.obtainMessage(CODE_SOCKET_CONNECT_ERROR,"Try to reconnect times:"+ mConnectNum).sendToTarget();
+                    closeClient();
+                    if(mContext != null){
+                        if(mIntentTcpService != null){
+                            mContext.stopService(mIntentTcpService);
+                        }
+                    }
+                    return;
+                }else if(!isFinishing){//人为关闭连接通道就不发消息通知用户了
+                    mSocketHandler.obtainMessage(CODE_SOCKET_CONNECT_ERROR,"Try to reconnect times:"+ mConnectNum).sendToTarget();
+                }else{
+                    LogUtils.Logd(TAG,"isFinishing is false,cancle sendMessage CODE_SOCKET_CONNECT_ERROR ");
+                }
+                try {
+                    LogUtils.Logd(TAG,"connectNum="+mConnectNum+",connectSocketServer failed:"+e.toString());
+                    Thread.sleep(RECONNECT_INTERVER_TIME);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        //获取输入流
+        if(!isFinishing){
+            receiveResponseMsg(socket);
+        }
+    }
+    public void closeClient(){
+        isFinishing = true;
+        try {
+            if(mOutputStream != null){
+                mOutputStream.close();
+            }
+            if(socket != null){
+                socket.close();
+                socket = null;
+            }
+        } catch (Exception e) {
+            LogUtils.Logd(TAG,"closeClient Exception"+e.toString());
+            e.printStackTrace();
+        }
+        if(mBindThread != null){
+            mBindThread.interrupt();
+            mBindThread = null;
+        }
+    }
+
+    public void release(){
+        closeClient();
+        if(mContext != null){
+            mContext.unregisterReceiver(mBroadcastReceiver);
+            if(mIntentTcpService != null){
+                mContext.stopService(mIntentTcpService);
+            }
+        }
+    }
+
+    public void receiveResponseMsg(Socket socket) {//UTF-8
+        LogUtils.Logv(TAG,"receiveResponseMsg:"+ Thread.currentThread());
+        //接收服务器发送过来的消息
+        BufferedReader br = null;
+        InputStreamReader isr;
+        int DEFAULTSIZE = 1024 * 64;
+        try {
+            InputStream inputStream = socket.getInputStream();
+            DataInputStream inputData = new DataInputStream(inputStream);
+            isr = new InputStreamReader(inputData, "UTF-8");
+            int count = 0;
+            char[] buf = new char[DEFAULTSIZE];
+            StringBuffer sb = null;
+            while(!isFinishing){
+                if(sb == null){
+                    sb = new StringBuffer();
+                }
+                while ((count = isr.read(buf, 0, buf.length)) > -1) {
+                    sb.append(buf, 0, count);
+                    if (count < DEFAULTSIZE) {
+                        count = 0;
+                        break;
+                    }
+                }
+                String msg = sb.toString();
+                if (!TextUtils.isEmpty(msg)) {
+                    count = 0;
+                    LogUtils.Logd(TAG,"\n" + "receive server msg String: " + msg);
+                    mSocketHandler.obtainMessage(CODE_RECEIVE_MSG, msg).sendToTarget();
+                    byte[] bytes = msg.getBytes("UTF-8");
+                    StringBuilder sb1 = new StringBuilder();
+                    for (int i = 0; i < bytes.length; i++) {
+                        sb1.append(Integer.toHexString((bytes[i] & 0x000000FF) | 0xFFFFFF00).substring(6)+" ");
+                    }
+                    mSocketHandler.obtainMessage(CODE_RECEIVE_MSG_CODE, sb1.toString()).sendToTarget();
+                    sb = null;
+                }
+            }
+
+            LogUtils.Logd(TAG,"client quit");
+            if(mOutputStream != null) {
+                mOutputStream.close();
+            }
+            socket.close();
+        } catch (IOException e) {
+            LogUtils.Logd(TAG,"receiveResponseMsg Exception:"+e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    public void sendRequestMsg(final int msgType, final String content){
+        LogUtils.Logd(TAG,"sendRequestMsg:content="+content);
+        if(socket == null || !socket.isConnected()){
+            LogUtils.Logd(TAG,"sendRequestMsg failed:socket is null or socket is not Connect");
+            if(!isFinishing){
+                //如果不是人为关闭的socket就重连,closeClient后isFinishing会置为true
+                reStartClient();
+            }else{
+                if(!CONNECT_SERVER.equals(content)){
+                    mSocketHandler.obtainMessage(CODE_SEND_MSG_ERROR_DISCONNECT,content).sendToTarget();
+                }
+            }
+            return;
+        }
+        String messageType = "";
+        switch (content) {
+            case CONNECT_SERVER:
+                messageType = CONNECT_SERVER;
+                break;
+            case GET_KEYWORDS:
+                messageType = GET_KEYWORDS;
+                break;
+            default:
+                messageType = content;//语音命令词
+                break;
+        }
+
+        if(StringUtils.isEmpty(messageType)){
+            LogUtils.Logw(TAG,"finalMessageType is null");
+            mSocketHandler.obtainMessage(CODE_SEND_MSG_EMPTY_ERROR,"send message can not be null").sendToTarget();
+            return;
+        }
+
+        final String finalMessageType = messageType;
+        ThreadPoolProxyFactory.getNormalThreadPoolProxy().submit(new Runnable() {
+            @Override
+            public void run() {
+                LogUtils.Logd(TAG,"sendRequestMsg:"+ finalMessageType);
+                try {
+                    mOutputStream = socket.getOutputStream();
+                    byte[] bytes = finalMessageType.getBytes("UTF-8");
+                    byte[] finalBytes;
+                    if(msgType == ControlSystemHelper.SENDMSG_CH_COMMAND_TYPE){
+                        //如果是发送中文命令词消息,后面要自动加16位校验码FFFF
+                        byte[] ffff = CodeUtils.hex2Bytes("FFFF");
+                        int fLength = ffff.length;
+                        LogUtils.Logd(TAG,"bytes.length="+bytes.length+",ffff.length = "+ffff.length);
+                        finalBytes = new byte[bytes.length + ffff.length];
+                        for (int i = 0; i < finalBytes.length; i++) {
+                            if(i<bytes.length){
+                                finalBytes[i] = bytes[i];
+                            }else{
+                                finalBytes[i] =  ffff[finalBytes.length - bytes.length-fLength];
+                                fLength--;
+                            }
+                            LogUtils.Logv(TAG,"finalBytes["+i+"] = "+finalBytes[i]);
+                        }
+                    }else{
+                        //如果发送的是英文数据,就直接用原byte数组
+                        finalBytes = bytes;
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < finalBytes.length; i++) {
+                        LogUtils.Logv(TAG,"sendRequestMsg bytes[i]="+finalBytes[i]);
+                        //sb.append(Integer.toHexString(bytes[i])+" ");
+                        //byteVar & 0x000000FF的作用是，如果byteVar 是负数，则会清除前面24个零，正的byte整型不受影响。(...) | 0xFFFFFF00的作用是，
+                        //如果byteVar 是正数，则置前24位为一，这样toHexString输出一个小于等于15的byte整型的十六进制时，
+                        //倒数第二位为零且不会被丢弃，这样可以通过substring方法进行截取最后两位即可
+                        sb.append(Integer.toHexString((finalBytes[i] & 0x000000FF) | 0xFFFFFF00).substring(6)+" ");
+                    }
+
+                    LogUtils.Logv(TAG,"sendRequestMsg byte:"+ sb.toString());
+                    mOutputStream.write(finalBytes);
+                    mOutputStream.flush();
+                    mSocketHandler.obtainMessage(CODE_SEND_MSG_STR,finalMessageType).sendToTarget();
+                    mSocketHandler.obtainMessage(CODE_SEND_MSG_CODE,sb.toString()).sendToTarget();
+                    LogUtils.Logd(TAG,"sendRequestMsg success:"+finalMessageType);
+                } catch (Exception e) {
+                    LogUtils.Logd(TAG,"sendRequestMsg Exception:"+e.toString());
+                    mSocketHandler.obtainMessage(CODE_SEND_MSG_ERROR,finalMessageType).sendToTarget();
+                    reStartClient();
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void setIpAndPort(String ip, String port) {
+        this.IP = ip;
+        this.port = port;
+        setIsSetIpAndPortState(true);
+        LogUtils.Logd(TAG,"setIpAndPort:IP:"+IP+",PORT:"+port);
+    }
+    public String getCurrentConnectServer(){
+        return mCurrentConnectIp+":"+mCurrentConnectPort;
+    }
+
+    public void setIsSetIpAndPortState(boolean isSetIpAndPort) {
+        mIsSetIpAndPort = isSetIpAndPort;
+    }
+    public boolean getIsSetIpAndPortState() {
+        return mIsSetIpAndPort;
+    }
+
+    private class HearbeatReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(HEARBEAT_BROADCAST_RECEIVER.equals(action)) {
+                LogUtils.Logd(TAG, "receive  broadcast to send hearbeat msg ");
+                sendRequestMsg(ControlSystemHelper.SENDMSG_EN_CONTENT_TYPE,CONNECT_SERVER);
+            }
+        }
+    }
+    public  interface IControlSystemHelperListener{
+        void connectSuccees(String msg);
+        void firstTimeConnectSocket(String msg);
+        void connectFailed(int code, String msg);
+        void sendMsgStr(String msg);
+        void sendMsgCode(String msg);
+        void sendMsgError(int errorCode, String msg);
+        void receiveMsg(String msg);
+        void receiveMsgCode(String msg);
+    }
+
+
+    public class bindSocketThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(1200);
+                connectSocketServer();
+            } catch (InterruptedException e) {
+                LogUtils.Logd(TAG,"connectSocketServer InterruptedException Exception:"+e.toString());
+                e.printStackTrace();
+            }
+            super.run();
+        }
+    }
+}

@@ -1,0 +1,133 @@
+https://www.jianshu.com/p/02962454adf7
+原理分析：https://www.jianshu.com/p/f0b23ee5a922
+源码分析：https://www.jianshu.com/p/b4d745c7ff7a
+https://blog.csdn.net/qian520ao/article/details/78262289
+1.Handler简介
+    Handler是一套Android消息传递机制
+        本质：一个线程开启循环模式持续监听并依次处理其他线程给它发的消息
+        作用：将工作线程需要操作UI的消息传递到主线程,使得主线程可以根据工作线程的需求更新UI,从而避免线程操作不安全的问题
+
+2.Handler机制原理
+    Handler机制的工作流程主要包括4个步骤
+    1.异步通信准备
+        主线程中创建Looper、MessageQueue、Handler;创建MessageQueue后,Looper自动进入消息循环；Handler自动绑定了主线程的Looper和MessageQueue
+    2.消息入队
+        工作线程通过Handler发送消息(Message)到消息队列(MessageQueue)
+    3.消息循环
+        消息出队:Looper循环取出消息队列(MessageQueue)中的消息(MessageQueue)
+        消息分发:Looper将取出的消息发送给创建该消息的处理者(Handler)
+    4.消息处理
+        处理者(Handler)接收处理器Looper发送过来的消息
+        处理者根据Message执行UI操作
+
+3. Looper、Handler、MessageQueue、Message作用和存在的意义
+    Looper:
+        主线程中的Looper是个死循环不断等其他线程给它发消息(Activity启动、生命周期、更新UI、控件事件等),另一部分工作就是在循环代码中不断从消息队列挨个拿出消息给主线程处理
+    handler:
+        1.用于同一个进程的线程间通信。如果在主线程中创建Handler对象,那这个Handler就获取了主线程MessageQueue的引用,就可以往队列里插入新消息了
+        2.另一个作用可以统一处理消息的回调
+    MessageQueue:
+        多个线程往主线程的MessageQueue发消息时,用队列来保存消息和安排每个消息的处理顺序
+    Message
+        消息的载体
+
+4.注意点
+    1.一个线程只能绑定一个Looper,但可以有多个Handler
+    2.一个Looper可以绑定多个处理者
+    3.一个Handler，只能绑定一个Looper
+
+5.Handler源码分析
+    1.Activity的main方法执行
+        //在Android应用进程启动的时候,会默认创建一个主线程ActivityThread,同时调用静态的main方法
+        public static void main(){
+            //创建Looper对象同时生成一个消息队列对象
+            Looper.prepareMainLooper();
+            ActivityThread thread = new ActivityThread();
+            //自动开启消息循环
+            Looper.loop();
+         }
+    2.准备Looper和MessageQueue
+         1.Looper.prepare
+            public static final void prepare(){
+                    if(mThreadLocal.get() != null){
+                        抛RuntimeException   //同一个线程不能prepare两次
+                    }
+                    sThreadLocal.set(new Looper(true))//创建Looper对象,并且存入到ThreadLocal里面
+                }
+            }
+            作用：为当前工作线程创建一个Looper,同时也生成了1个消息队列对象。
+            需要程序员在线程中主动调用Looper.prepare和Looper.loop启动消息循环
+
+        2.Looper.prepareMainLooper
+          public static void prepareMainLooper() {
+            prepare(false);
+             synchronized (Looper.class) {
+                if (sMainLooper != null) {
+                    throw new IllegalStateException("The main Looper has already been prepared.");
+                }
+                sMainLooper = myLooper();
+             }
+           }
+
+    2.消息循环
+        public Looper(){
+            mQueue = new MessageQueue(quitAllowed)
+            mThread = Thread.currentThread();
+        }
+        public static void loop(){
+            //1.获取当前Looper的消息队列。myLooper返回sThreadLocal存储的Looper实例
+            final Looper me = myLooper()
+            final MessageQueue queue = me.mQueue;
+            //2.消息循环
+            for(;;){
+                Message msg = queue.next();
+                if(msg == null){
+                    return;
+                }
+                //target其实就是创建该消息的Handler对象
+                msg.target.dispatchMessage(msg)
+                msg.recycle();
+            }
+        }
+
+    3.用户创建Handler,执行Handler的构造方法
+            public handler(){
+                this(null,false)
+            }
+            public Handler(Callback callback,boolea async){
+                mLooper = Looper.myLooper()
+                mQueue = mLooper.mQueue;
+            }
+6.ThreadLocal
+      1.作用
+          ThreadLocal的作用是提供线程内的局部变量,在本地线程内随时随地可取,隔离其他线程。这种局部变量仅仅在线程的生命周期内起作用。
+          比如Looper.prepare方法,创建后的Looper对象就是保存到ThreadLoacal里面的,这样就保证了每个线程对应一个唯一的Looper
+
+      2.ThreadLocal的大致实现思路
+          Thread类中有个ThreadLocal.ThreadLocalMap的实例变量,所以说每个线程都有一个自己的ThreadLocalMap,ThreadLocalMap有自己的独立实现
+          可以简单的将它的key视为ThreadLocal(实际不是ThreadLocal本身,而是它的一个弱引用),value视为存入的值
+          所以每个线程往ThreadLocal里面存的值,都是往自己类里面的ThreadLocalMap里面存,读也是从某个ThreadLocal为引用,在自己的map里面找对应的key,从而实现了线程隔离
+
+      3.java ThreadLocal的常用方法
+            public void set(T value) {//设置当前线程的线程局部变量
+                Thread t = Thread.currentThread();
+                ThreadLocalMap map = getMap(t);//获取当前线程的ThreaLocalMap对象
+                if (map != null)
+                    map.set(this, value);
+                else
+                    createMap(t, value);
+            }
+            public T get() {//返回当前线程所对应的线程局部变量
+                Thread t = Thread.currentThread();
+                ThreadLocalMap map = getMap(t);
+                if (map != null) {
+                    ThreadLocalMap.Entry e = map.getEntry(this);
+                    if (e != null)
+                        return (T)e.value;
+                }
+                return setInitialValue();
+            }
+7.常见问答
+    1.为什么主线程的Looper死循环不会导致卡顿
+    2.子线程可以创建Handler并使用
+    3.为什么子线程不可以操作UI

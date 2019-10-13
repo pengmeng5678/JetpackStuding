@@ -1,0 +1,48 @@
+https://www.jianshu.com/p/8f4f58b4b8ab
+1.构造方法
+    public LinkedHashMap(){
+        //继承于HashMap，所以这里是调用HashMap的构造方法
+        super();
+        //这里是设置是否基于访问排序,默认为false,表示默认构造函数是按照插入顺序进行排序的，而非访问顺序
+        accessOrder = false;
+    }
+    LinkedHashMap也提供了根据访问顺序进行排序的构造函数，基于访问顺序可实现LRU存储，如
+    LinkedHashMap map = new LinedHashMap(16,0.75,true)
+
+2.LinedHashMap的扩容
+    LinkedHashMap扩容时，数据的再散列和HashMap是不一样的。
+        HashMap是先遍历旧table，再遍历旧table中每个元素的单向链表，取得Entry以后，重新计算hash值，然后存放到新table的对应位置。
+        LinkedHashMap是遍历的双向链表，取得每一个Entry，然后重新计算hash值，然后存放到新table的对应位置。
+    从遍历的效率来说，遍历双向链表的效率要高于遍历table，因为遍历双向链表是N次（N为元素个数）；而遍历table是N+table的空余个数（N为元素个数）。
+
+3.双向链表的重排序
+    在LinkedHashMap中，只有accessOrder为true，即是访问顺序模式，才会put时对更新的Entry进行重新排序，
+    而如果是插入顺序模式时，不会重新排序，这里的排序跟在HashMap中存储没有关系，只是指在双向链表中的顺序。
+
+    举个栗子：开始时，HashMap中有Entry1、Entry2、Entry3，并设置LinkedHashMap为访问顺序，
+    则更新Entry1时，会先把Entry1从双向链表中删除，然后再把Entry1加入到双向链表的表尾，而Entry1在HashMap结构中的存储位置没有变化
+
+    void recordAccess(HashMap<K,V> m) {
+        LinkedHashMap<K,V> lm = (LinkedHashMap<K,V>)m;
+        // 如果LinkedHashMap的accessOrder为true，则进行重排序
+        // 比如前面提到LruCache中使用到的LinkedHashMap的accessOrder属性就为true
+        if (lm.accessOrder) {
+            lm.modCount++;
+            // 把更新的Entry从双向链表中移除
+            remove();
+            // 再把更新的Entry加入到双向链表的表尾
+            addBefore(lm.header);
+        }
+    }
+
+4.LinkedHashMap小结
+    1.LinkedHashMap是继承于HashMap，是基于HashMap和双向链表来实现的。
+    2.HashMap无序；LinkedHashMap有序，可分为插入顺序和访问顺序两种。如果是访问顺序，那put和get操作已存在的Entry时，都会把Entry移动到双向链表的表尾(其实是先删除再插入)。
+    3.LinkedHashMap存取数据，还是跟HashMap一样使用的Entry[]的方式，双向链表只是为了保证顺序。
+    4.LinkedHashMap是线程不安全的。
+5.LRU实现原理
+    Least Recently Used
+    LruCache中Lru算法的实现就是通过LinkedHashMap来实现的。LinkedHashMap继承于HashMap，它使用了一个双向链表来存储Map中的Entry顺序关系，
+    对于get、put、remove等操作，LinkedHashMap除了要做HashMap做的事情，还做些调整Entry顺序链表的工作。
+    LruCache中将LinkedHashMap的顺序设置为LRU顺序来实现LRU缓存，每次调用get(也就是从内存缓存中取图片)，则将该对象移到链表的尾端。
+    调用put插入新的对象也是存储在链表尾端，这样当内存缓存达到设定的最大值时，将链表头部的对象（近期最少用到的）移除。

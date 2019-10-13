@@ -1,0 +1,35 @@
+https://www.jianshu.com/p/a68dc1ca6120
+OkHttp的DiskLruCache分析
+1.DiskLruCache
+        三个内部类
+            Entry：用于存储缓存数据的实体类,一个Url对应一个Entry
+            SnapShot:一个Entry对应一个SnapShot
+            Editor：操作SnapShot的类
+        1.重要属性
+            private final LinkedHashMap<String, Entry> lruEntries = new LinkedHashMap<>(0,0.75f,true)
+            private final Executor executor:用于清理、维护缓存数据
+        2.构造函数和创建对象
+            public static DiskLruCahe create()(FileSystem fileSystem, File directory, int appVersion,int valueCount, long maxSize) {
+                Executor executor = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS,
+                        new LinkedBlockingQueue<Runnable>(), Util.threadFactory("OkHttp DiskLruCache", true));
+            }
+        3.初始化
+            public synchronized void initialize() throws IOException {}
+
+        4.关于Cache类的增删改查方法
+        5.总结DisLruCache的主要特点
+            1、通过LinkedHashMap实现LRU替换
+            2、通过本地维护Cache操作日志保证Cache原子性与可用性，同时为防止日志过分膨胀定时执行日志精简。
+            3、 每一个Cache项对应两个状态副本：DIRTY，CLEAN。CLEAN表示当前可用的Cache。外部访问到cache快照均为CLEAN状态；DIRTY为编辑状态的cache。由于更新和创新都只操作DIRTY状态的副本，实现了读和写的分离。
+            4、每一个url请求cache有四个文件，两个状态(DIRY，CLEAN)，每个状态对应两个文件：一个0文件对应存储meta数据，一个文件存储body数据。
+
+        6.流程
+            1.如果配置了缓存，则从缓存获取，可能为null
+            2.获取缓存的策略
+            3.监测缓存
+            4.如果禁止使用网络(如飞行模式)，且缓存无效,直接返回504
+            5.如果缓存有效，使用缓存，不使用网络
+            6.如果缓存无效，执行下一个拦截链
+            7.本地有缓存,根据条件判断使用缓存还是网络的response
+            8.把response缓存到本地
+2.LRU原理

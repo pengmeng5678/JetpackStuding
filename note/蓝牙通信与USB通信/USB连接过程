@@ -1,0 +1,81 @@
+private UsbManager mUsbManager;
+private UsbDevice mUsbDevice;
+private UsbInterface mUsbInterface;
+private UsbEndpoint mInEndpoint;
+private UsbEndpoint mOutEndpoint;
+private UsbDeviceConnection mConnection;
+
+初始化UsbManager
+mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+
+1.findDevice
+    UsbDevice findDevice(UsbManager usbManager) {
+        int size = usbManager.getDeviceList().size();
+        Log.i(TAG,"findDevice size="+size);
+        for (UsbDevice usbDevice : usbManager.getDeviceList().values()) {
+            if (usbDevice.getDeviceClass() == UsbConstants.USB_CLASS_PER_INTERFACE) {
+                return usbDevice;
+            } else {
+                UsbInterface usbInterface = findInterface(usbDevice);
+                if (usbInterface != null) return usbDevice;
+            }
+        }
+        return null;
+    }
+2.findInterface
+    UsbInterface findInterface(UsbDevice usbDevice) {
+        for (int nIf = 0; nIf < usbDevice.getInterfaceCount(); nIf++) {
+            UsbInterface usbInterface = usbDevice.getInterface(nIf);
+            if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_PER_INTERFACE) {
+                return usbInterface;
+            }
+        }
+        return null;
+    }
+
+3.getEndpoint
+    private void getEndpoint() {
+        for (int nEp = 0; nEp < mUsbInterface.getEndpointCount(); nEp++) {
+            UsbEndpoint tmpEndpoint = mUsbInterface.getEndpoint(nEp);
+            if (tmpEndpoint.getType() != UsbConstants.USB_ENDPOINT_XFER_BULK) continue;
+
+            if ((mOutEndpoint == null)
+                    && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_OUT)) {
+                mOutEndpoint = tmpEndpoint;
+            } else if ((mInEndpoint == null)
+                    && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_IN)) {
+                mInEndpoint = tmpEndpoint;
+            }
+        }
+    }
+4.打开USB设备连接并声明接口
+    mConnection = mUsbManager.openDevice(mUsbDevice);
+    if (mConnection == null) {
+        Toast.makeText(this, "can't open device", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    mConnection.claimInterface(mUsbInterface, true);
+
+5.从USB读取数据
+    public int read(final byte[] data) throws IOException {
+        int size = Math.min(data.length, mInEndpoint.getMaxPacketSize());
+        return mConnection.bulkTransfer(mInEndpoint, data, size, READ_TIMEOUT);
+    }
+6.向USB写入数据
+    public int write(final byte[] data) {
+        int length = data.length;
+        int offset = 0;
+
+        while (offset < length) {
+            int size = Math.min(length - offset, mInEndpoint.getMaxPacketSize());
+            int bytesWritten = mConnection.bulkTransfer(mOutEndpoint,
+                    Arrays.copyOfRange(data, offset, offset + size), size, WRITE_TIMEOUT);
+
+            if (bytesWritten <= 0) {
+                Log.i(TAG, "nothing write");
+                //Toast.makeText(this, "nothing write", Toast.LENGTH_LONG).show();
+            }
+            offset += bytesWritten;
+        }
+        return offset;
+    }

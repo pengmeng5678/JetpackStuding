@@ -1,0 +1,30 @@
+https://github.com/JsonChao/Awesome-Android-Interview
+1.认识App启动加速
+    冷启动:指App进程被杀死后,再启动App就叫冷启动
+    热启动:指App进程按Home键后在后台运行,再启动App就叫热启动
+    启动过程
+        冷启动前:
+            加载启动App
+            启动后展示一个空白View
+            创建App进程
+        冷启动后:
+            创建App对象
+            启动Main Thread
+            创建启动的Activity对象
+            加载View布局
+            布置屏幕
+            第一次绘制
+2.优化工具TraceView
+    作用:主要做热点分析，得到两种数据:1.单此执行最耗时的方法；2.执行次数最多的方法
+    使用:
+        1.方法中添加Debug.startMethodTracing,Debug.stopMethodTracing()
+        2.Android5.0及以上设备，AndroidProfiler中动态查看CPU,start Record,stop Record,点TopDown,ButtonUp看哪些方法耗时
+3.怎么优化
+    1.优化区域：Application、Activity创建
+    2.优化手段
+        1.利用主题曲防止出现白屏,给启动页设置一个Theme属性,在windowBackground标签下设置默认图片替代白屏
+        2.减少Application、Activity中做的事,不重要的SDK懒加载、异步加载。能异步执行的全部异步执行
+        3.5.0以下的系统multidex预加载优化。5.0以后
+
+
+

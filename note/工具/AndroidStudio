@@ -1,0 +1,68 @@
+1.多渠道打包
+    1.编辑productFlavors
+    productFlavors{
+            zhiyin{
+                dimension "app"
+                applicationId "com.qihancloud.zhiyin"
+                resValue "string", "app_name", "@string/app_name_zhiyin"
+                manifestPlaceholders = [CHANNEL_VALUE: "zhiyin"
+                                        ,app_icon   : "@mipmap/zhiyin_logo"]
+                versionCode getMyVersionCode()
+                versionName "v2.2.8.8"
+                signingConfig signingConfigs.config
+            }
+            desk{
+                dimension "app"
+                applicationId "com.qihancloud.zhiyin"
+                resValue "string", "app_name", "@string/app_name_zhiyin"
+                manifestPlaceholders = [CHANNEL_VALUE: "desk"
+                                        ,app_icon   : "@mipmap/zhiyin_logo"]
+                versionCode getMyVersionCode()
+                versionName "v2.2.8.9"
+                signingConfig signingConfigs.config
+            }
+            haiguan{
+               dimension "app"
+                //海关项目由海关和检验检疫项目合并而来,故延用iqtc包名
+               applicationId "cn.qihan.www.iqtc"
+               resValue "string", "app_name", "@string/app_name_haiguan"
+               manifestPlaceholders = [CHANNEL_VALUE: "haiguan"
+                                        ,app_icon   : "@mipmap/haiguan_logo"]
+                versionCode getMyVersionCode()
+                versionName "v2.0.5"
+                signingConfig signingConfigs.config
+            }
+
+        }
+    2.根据不同的渠道依赖不同的lib
+        dependencies {
+            //    implementation fileTree(include: ['*.jar'], dir: 'libs')
+            androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+                exclude group: 'com.android.support', module: 'support-annotations'
+            })
+            //语音SDK,不同的渠道依赖不同的lib
+            zhiyinImplementation(name: 'SanbotSDK-1.0.0-beta11', ext: 'aar')
+            zhiyin_bankImplementation(name: 'SanbotSDK-1.0.0-beta11', ext: 'aar')
+            haiguanImplementation(name: 'SanbotSDK-1.0.0-beta11', ext: 'aar')
+            deskImplementation(name: 'SanbotOpenSDK_2.0.1.8', ext: 'aar')
+
+        }
+    3.根据不同的渠道依赖不同资源文件(xml文件或者图片)
+        在src目录下新建文件夹,和main目录同级，要求文件夹名和渠道名一致,在该文件夹下的res目录放渠道独有的资源
+            src
+                androidTest
+                zhiyin
+                    java
+                    res
+                haiguan
+                    java
+                    res
+                main
+                    java
+                    res
+        如果zhiyin渠道的res和main中的res有相同的文件,则优先使用zhiyin渠道的文件
+
+    4.根据不同的渠道依赖不同的java文件
+        和依赖资源文件不同的是,
+        对于Java文件,各个渠道文件夹和main文件夹之间的关系不是单纯的替换,而是优先使用渠道的东西
+        编译时相当于是合并,xml等资源文件相当于是替换,而java文件不是

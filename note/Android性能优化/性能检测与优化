@@ -1,0 +1,84 @@
+性能检测：https://blog.csdn.net/u011240877/article/details/54141714
+性能优化：https://blog.csdn.net/csdn_aiyang/article/details/74989318
+https://www.jianshu.com/nb/8407779
+一.性能检测
+    1.Setting-Editors-inspection可以配置Link检测的语言、配置快捷键、错误等级颜色等
+    2.通过ALT+i可以自动开始检测,或者AndroidStudio-Analyze-inspect code
+    3.根据检测出的错误级别按照优先级处理
+        根据安全级别分类
+            Error、Critical、Blocker、Major、Warning、Typo。其中Blocker和Critical属于阿里编码规约
+    具体要优化的内容包括但不限于
+        Error:
+            1.Android Resources Validation，如使用的无用的颜色值@android:color/black
+            2.中文未翻译,单个字符串可以在name标签里标注translatable="false",整个文件可以在xml文件里tools:ignore="MissingTranslation"
+        Critical:
+            1.Object的equals方法容易抛空指针异常,应使用常量或者有确定的值的对象来调用equals
+            2.不能使用过时方法
+            3.不能在finally中使用return,finally块中的return返回后方法,不会再执行try块中的return语句
+            4.方法名、参数名、成员变量、局部变量统一使用lowerCamelCase，必须遵从驼峰命名
+            5.不允许在代码中使用魔法值
+        Blocker
+            if要加大括号
+
+        1.Ali-check的所有要优化的项(阿里编码规约)
+        2.merge优化布局层级
+        3.Handler持有外部Activity的引用
+        4.部分区域过度绘制(如布局的backgroud颜色和theme的backgroud颜色重叠)
+        5.没有使用到的资源文件
+
+二、性能优化
+    用户的四个方面需求
+        1.追求稳定,防止闪退(内存、安全优化)
+        2.追求流畅,防止卡顿(卡顿优化)
+        3.追求续航,防止损耗(电量优化)
+        4.追求精简,防止臃肿(Apk瘦身)
+    1.内存优化(追求稳定,防止闪退)
+        Memory Monitor
+        Memory Analyzer
+        leakCanary工具
+        具体优化内容见同级"内存优化"目录
+
+    2.卡顿优化(追求流畅,防止卡顿)
+        1.卡顿的场景
+            1.UI：绘制和刷新
+            2.启动：安装启动,冷启动，热启动
+            3.跳转：页面间切换，前后台切换
+            4.响应：按键、系统事件、滑动
+        2.影响卡顿的两大因素，分别是界面绘制和数据处理
+            界面绘制：绘制层级深,页面复杂,刷新不合理
+            数据处理:主线程处理数据；处理数据CPU高,导致主线程拿不到时间片;三是内存增加导致GC频繁触发
+        3.布局优化
+            布局复用,使用include标签复用layout
+            减少层级,使用merge标签替换父级布局,使用constrainlayout约束布局(AndroidStudio2.3)
+            注意使用wrap_content,会增加measure计算成本
+        4.绘制优化
+            要确保刷新帧率>60fps,完成单次刷新<16ms，即保证稳定的帧率避免卡顿
+            过度绘制是指在在同一帧时间内，屏幕上某个像素区域被绘制了多次。在多层次像素重叠时,不可见的UI也在进行绘制,从而浪费CPU和GPU资源
+                如何防止过度绘制
+                    要移除XML中多余的资源
+                    自定义View优化。使用canvas.clipRect帮助系统识别那些可见的区域
+            卡顿检测工具
+                1.layout inspector,只能分析AndroidStudio正在运行的App视图布局结构
+                2.卡顿检测工具：
+                    监听Looper日志实现,开源的AndroidperformanceMonitor(BlockCanary),
+                    利用Choreographer的Takt和TinyDancer
+
+        5.启动优化
+            在启动一个进程时,系统会检测在是否已经存在这一一个进程，如果不存在,系统会检查StartActivity中的Intent信息,然后创建进程,最后启动Activity,即冷启动
+            而启动出现的黑屏问题就是在这段时间内产生的,此时我们可以指定Theme属性中的windowBackGround将一张静态图作为背景，替代白屏或者黑屏
+
+        6.刷新优化
+            减少刷新次数，适当使用缓存
+            减少刷新区域, 局部刷新
+
+    3.追求续航,防止损耗
+    https://blog.csdn.net/bboyfeiyu/article/details/44809395
+        1.计算优化
+        2.避免wake/lock使用不当
+        3.使用Job Scheduler管理后台任务
+    4.追求精简,防止臃肿
+        1.代码混淆压缩
+        2.资源优化,可使用Android Lint删除冗余资源
+        3.图片优化,Android4.0以上可以使用WebP图片格式
+        4.微信开源资源文件混淆工具AndResGard
+        5.插件化热修复开发

@@ -1,0 +1,4 @@
+1.启动黑屏、白屏
+    每次启动都白屏考虑是Application或Activity的主线程中做了太多耗时操作,可通过日志打印看哪里耗时了，然后将其在子线程执行
+    在清单文件中的application字段中的them属性中增加默认背景图
+        <item name="android:windowBackground">@drawable/default_splash</item>

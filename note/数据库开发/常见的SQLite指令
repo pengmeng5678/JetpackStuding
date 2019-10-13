@@ -1,0 +1,75 @@
+https://www.cnblogs.com/ly1973/p/5394389.html
+1.创表
+    create table 表名[字段名1,字段类型1,字段名2,字段类型2...];
+    create talbe if not exists 表名[字段名1,字段类型1,字段名2,字段类型2...];
+    create talbe t_student[id integer,name text,age integer,score real]
+2.字段类型
+    integer整形值
+    real浮点值
+    text文本字符串
+    blob二进制数据
+3.删表
+    drop table 表名
+    drop table if exists 表名
+4. 插入数据
+    insert into 表名[字段1,字段2,...]  values[字段1的值,字段2的值,...];
+    insert into t_student[name,age] values['shadiao',22];//注意字符串内容应该用单引号
+5.更新数据
+    update 表名 set 字段1=字段1的值,字段2=字段2的值,...
+    update t_student set name='jack',age=21;//将t_student表中所有记录的name都改为jack
+6.删除数据
+    delete from 表名
+7.条件语句
+    如果只想更新或者删除某些固定的记录,就必须在SQL语句后面加上条件语句
+    where 字段1 = 某个值;//不能用两个=
+    where 字段1 is 某个值;//is相当于=
+    where 字段1 is not 某个值;
+    where 字段1 != 某个值;
+    where 字段1 = 某个值 and 字段2 > 某个值;//and相当于C语言的&&
+    where 字段1 = 某个值 or 字段2 = 某个值;//or相当于C语言的||
+8条件语句练习
+    将t_student表中年龄大于10并且姓名不等于jack的年龄都改为5
+        update t_student set age=5 where age > 10 and name != 'jack';
+    删除t_student表中年龄小于等于10或者年龄大于30的记录
+        delete t_student where age <= 10 or age > 30;
+
+9.DQL语句
+    select 字段1,字段2,...from 表名
+    select * from 表名
+
+    select name,age from t_student;
+    select * from t_student where age > 10;
+
+10.起别名
+    字段和表，都可以起别名
+    select 字段1 别名,字段2 别名,... from 表名 别名
+    select name myname,age myage from t_student;
+    select s.name,s.age form t_student s;//给s_student表起个别名叫做s，利用s来引用表中的字段
+
+11.计算记录的数量
+    select count[字段] from 表名;
+    select count[*] from 表名
+    select count[*] from t_student where score < 60
+
+12.排序
+    查询出来的结果可以用order by进行排序
+    select * from t_student order by score
+
+    默认是按升序排序(由小到大)
+    select * from t_student order by age desc;//降序
+    select * from t_student order by age asc;//升序
+
+    select * from t_student order by age asc,height desc;//先按年龄升序排序,年龄相等就按照身高降序排序
+
+13.limit
+    select * from 表名 limit 数值1,数值2;
+    select * from t_student limit 4,8;//取第4条到第8条的数据
+
+14.主键的声明
+    //其中的id就是主键，为了唯一标识某一条记录,主键默认就包含了not null和unique两个约束
+    //主键设计原则：1.对用户没有意义；2.永远不要更新主键；3.主键不应包含动态变化的数据；4.主键应该由计算机自动生成
+    create table t_student[id integer primary key,name text,age,integer]
+
+15.外键约束
+
+16.表连接查询

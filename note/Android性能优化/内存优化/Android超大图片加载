@@ -1,0 +1,96 @@
+https://blog.csdn.net/guolin_blog/article/details/9316683
+https://www.jianshu.com/p/f850a23ab99c
+https://www.cnblogs.com/liyiran/p/9272880.html
+1.背景介绍
+    1.每个应用进程的最高可用内存
+        int maxMemory = (int)(Runtime.getRuntime().maxMemory/1024) KB
+        在Android app中,测试该结果为96MB
+
+    2.每张图片加载到到内存需要分配的空间为
+        以2400*3200像素的jpg格式图片,假设它的大小为3MB,
+        但是如果我们直接在Android中解码(BitmapFoctory.decodeFile("xx.jpg")),
+        那么解码这张图片时会申请29MB的内存来解码
+
+        因为Android中使用ARGB来展示颜色,不同格式的图片所对应单个像素大小也不同
+            ARGB_8888,每个像素占4Byte
+            ARGB_4444,每个像素占2Byte
+            RGB_565,每个像素占2Byte
+
+        所以这张图片解码申请的内存为2499*3200*4=30720000Byte，约为29M
+        因此当加载大图申请内存时,如果我们不对图片进行压缩直接申请内存空间时,可能会因内存空间不足触发OOM异常。
+
+2.Android如何加载超大图片防止OOM
+    1.BitmapFactory API介绍
+        decodeFile加载文件
+        decodeSteam加载网络图片
+        decodeResource加载本地资源
+    2.三个步骤加载超大图片
+        1.不加载图片到内存,只获取图片的宽高
+            BitmapFoctory.Options options = new BitmapFoctory.Options();
+            options.inJustDecodeBounds = true;//不加载图片到内存
+            BitmapFoctory.decodeResource(getResouces(),R.id.xx.jpg,options)
+            mImageWight = options.outWeight;//获取要加载图片的宽高
+            mImageHeight = options.outHeight;
+
+        2.计算图片宽高和实际要显示的图片宽高比率,计算要缩放比
+            inSimpleSize采样率一般为2的指数，1,2,4,8...
+            当inSimpleSize设置为2时,其宽高都减少为原来的1/2,即像素数和内存值减少为原来的1/4
+
+            public int calculateSampleSize(BitmapFoctory.Options options,reqWight,reqHeight){
+                mWight = options.outWeight;
+                mHeight = options.outHeight;
+                int inSampleSize = 1;
+                if(mWight>reqWight || mHeigh > reqHeight){
+                    int wightRatio = mWight/reqWight
+                    int heightRatio = mHeight/reqHeight
+                    inSampleSize = wightRatio > heightRatio ? wightRatio : heightRatio
+                }
+                return inSampleSize;
+            }
+        3.根据计算的缩放比开始真正解析位图
+            BitmapFoctory.Options options = new BitmapFoctory.Options();
+            options.inJustDecodeBounds = false;//真正开始加载图片到内存
+            options.inSimpleSize = calculateSampleSize(options,100,100);
+            BitmapFoctory.decodeResource(getResouces(),R.id.xx.jpg,options)
+
+        4.示例代码
+            private void loadImage(ImageView view) {
+                BitmapFactory.Options options = new Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeResource(getResources(), R.drawable.bigpicture, options);
+                int outHeight = options.outHeight;
+                int outWidth = options.outWidth;
+                int inSampleSize = 1;
+                int height = view.getMeasuredHeight();
+                int width = view.getMeasuredWidth();
+                if (outHeight > height || outWidth > width) {
+                    int halfHeight = outHeight / 2;
+                    int halfWidth = outWidth / 2;
+                    while ((halfHeight / inSampleSize) >= height || (halfWidth / inSampleSize) >= width) {
+                        inSampleSize *= 2;
+                    }
+                }
+                options.inSampleSize = inSampleSize;
+                options.inJustDecodeBounds = false;
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bigpicture, options);
+                view.setImageBitmap(bitmap);
+            }
+3.加载超大超长的图
+    1.BitmapRegionDecoder的基本使用
+        //设置显示图片的中心区域
+        BitmapRegionDecoder bitmapRegionDecoder = BitmapRegionDecoder.newInstance(inputStream, false);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        Bitmap bitmap = bitmapRegionDecoder.decodeRegion(new Rect(width / 2 - 100, height / 2 - 100, width / 2 + 100, height / 2 + 100), options);
+        mImageView.setImageBitmap(bitmap);
+
+        使用这个类可以只加载某一块区域Rect
+
+    2.加载超大超长图的思路
+        a.自定义View中监听手势变化onMove方法中时刻改变要加载图片的区域值mRect,并调用invalidate重新绘制
+
+        b.自定义View的onDraw方法每次都调用decodeRegion加载某一块区域然后画出来,其中mRect的值是根据手势变化的
+            Bitmap bm = mDecoder.decodeRegion(mRect, options);
+            canvas.drawBitmap(bm, 0, 0, null);
+
+

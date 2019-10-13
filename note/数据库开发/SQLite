@@ -1,0 +1,202 @@
+https://www.jianshu.com/p/8e3f294e2828
+1.定义
+    一种嵌入式数据库
+2.特点
+    存储结构型、关系型数据
+    可使用SQL语音
+    支持事务处理
+    独立、无需服务进程
+3.Android中的具体表现
+    SQLiteOpenHelper
+        定义：一个SQLite数据辅助操作的类
+        作用:在Android中实现SQLite数据库操作,即管理数据库(创建、增、删、改、查)&版本控制
+        使用流程：
+            1.创建SQLite数据库操作子类，继承SQLiteOpenHelper
+            2.根据自身需求,实现SQLiteOpenHelper的方法,从而实现对数据库的操作
+4.注意
+    应用程序中的任何类型都可以通过名称访问所属的所有SQLite数据库；但应用程序外不可以
+    储存在单一磁盘文件中的一个完整数据库
+
+5.SQLiteOpenHelper常用方法
+    1.创建数据库or打开可读写的数据库,返回SQLiteDatabase对象进行操作
+        getWritableDatabase
+        数据库在第一次创建时,调用getWritableDatabase/getReadableDatabase()时,会在子类复写onCreate(SQLiteDatabase db)方法
+        SQLiteOpenHelper dbHelper = new DatabaseHelper(SQLiteActivity.this,"test.db",2)
+        SQLiteDatabase sqlitedb = dbHelper.getWritableDatabase();
+
+    2.数据库升级时自动调用
+        onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion)
+    3.关闭数据库
+        close
+    4.数据库(增删改查)
+        1.查询数据
+            (Cursor) query(String table,String[] colums,String selection,String selectionArgs,String groupBy, String having, String orderBy, String limit)
+                // 各参数说明：
+                 // table：表名称
+                 // colums：列名称数组
+                 // selection：条件子句，相当于where
+                 // selectionArgs：条件语句的参数数组
+                 // groupBy：分组
+                 // having：分组条件
+                 // orderBy：排序类
+                 // limit：分页查询的限制
+                 // Cursor：返回值，相当于结果集ResultSet
+             (Cursor) rawQuery(String sql, String[] selectionArgs)
+             //运行一个预置的SQL语句，返回带游标的数据集（与上面的语句最大的区别 = 防止SQL注入）
+        2. 删除数据行
+         (int) delete(String table,String whereClause,String[] whereArgs)
+
+        3. 添加数据行
+         (long) insert(String table,String nullColumnHack,ContentValues values)
+
+        4. 更新数据行
+        (int) update(String table, ContentValues values, String whereClause, String[] whereArgs)
+
+        5. 执行一个SQL语句，可以是一个select or 其他sql语句
+         即 直接使用String类型传入sql语句 & 执行
+         (void) execSQL(String sql)
+
+6.数据库具体操作
+        /**
+        *  操作1：插入数据 = insert()
+        */
+            // a. 创建ContentValues对象
+            ContentValues values = new ContentValues();
+
+            // b. 向该对象中插入键值对
+            values.put("id", 1);
+            values.put("name", "carson");
+                //其中，key = 列名，value = 插入的值
+                //注：ContentValues内部实现 = HashMap，区别在于：ContenValues Key只能是String类型，Value可存储基本类型数据 & String类型
+
+            // c. 插入数据到数据库当中：insert()
+            sqliteDatabase.insert("user", null, values);
+                    // 参数1：要操作的表名称
+                    // 参数2：SQl不允许一个空列，若ContentValues是空，那么这一列被明确的指明为NULL值
+                    // 参数3：ContentValues对象
+            // 注：也可采用SQL语句插入
+            String sql = "insert into user (id,name) values (1,'carson')";
+            db.execSQL(sql) ；
+
+      /**
+        *  操作2：修改数据 = update（）
+        */
+            // a. 创建一个ContentValues对象
+            ContentValues values = new ContentValues();
+            values.put("name", "zhangsan");
+
+            // b. 调用update方法修改数据库：将id=1 修改成 name = zhangsan
+            sqliteDatabase.update("user", values, "id=?", new String[] { "1" });
+                // 参数1：表名(String)
+                // 参数2：需修改的ContentValues对象
+                // 参数3：WHERE表达式（String），需数据更新的行； 若该参数为 null, 就会修改所有行；？号是占位符
+                // 参数4：WHERE选择语句的参数(String[]), 逐个替换 WHERE表达式中 的“？”占位符;
+
+                // 注：调用完upgrate（）后，则会回调 数据库子类的onUpgrade()
+
+            // 注：也可采用SQL语句修改
+            String sql = "update [user] set name = 'zhangsan' where id="1";
+            db.execSQL(sql);
+
+      /**
+        *  操作3：删除数据 = delete()
+        */
+            // 删除 id = 1的数据
+            sqliteDatabase.delete("user", "id=?", new String[]{"1"});
+                // 参数1：表名(String)
+                // 参数2：WHERE表达式（String），需删除数据的行； 若该参数为 null, 就会删除所有行；？号是占位符
+                // 参数3：WHERE选择语句的参数(String[]), 逐个替换 WHERE表达式中 的“？”占位符;
+
+            // 注：也可采用SQL语句修改
+            String sql = "delete from user where id="1"；
+            db.execSQL(sql);
+
+      /**
+        *  操作4：查询数据1 = rawQuery()
+        *  直接调用 SELECT 语句
+        */
+            Cursor c = db.rawQuery("select * from user where id=?",new Stirng[]{"1"});
+            // 返回值一个 cursor 对象
+
+            // 通过游标的方法可迭代查询结果
+            if(cursor.moveToFirst()) {
+               String password = c.getString(c.getColumnIndex("password"));
+             }
+
+            //Cursor对象常用方法如下：
+            c.move(int offset); //以当前位置为参考,移动到指定行
+            c.moveToFirst();    //移动到第一行
+            c.moveToLast();     //移动到最后一行
+            c.moveToPosition(int position); //移动到指定行
+            c.moveToPrevious(); //移动到前一行
+            c.moveToNext();     //移动到下一行
+            c.isFirst();        //是否指向第一条
+            c.isLast();     //是否指向最后一条
+            c.isBeforeFirst();  //是否指向第一条之前
+            c.isAfterLast();    //是否指向最后一条之后
+            c.isNull(int columnIndex);  //指定列是否为空(列基数为0)
+            c.isClosed();       //游标是否已关闭
+            c.getCount();       //总数据项数
+            c.getPosition();    //返回当前游标所指向的行数
+            c.getColumnIndex(String columnName);//返回某列名对应的列索引值
+            c.getString(int columnIndex);   //返回当前行指定列的值
+
+            // 通过游标遍历1个名为user的表
+            Cursor result=db.rawQuery("SELECT _id, username, password FROM user");
+             result.moveToFirst();
+             while (!result.isAfterLast()) {
+                int id=result.getInt(0);
+                String name=result.getString(1);
+                String password =result.getString(2);
+                // do something useful with these
+                result.moveToNext();
+              }
+             result.close();
+
+
+         // 若查询是动态的，使用该方法会复杂。此时使用 query() 会方便很多
+         // 注：无法使用SQL语句，即db.execSQL(sql);
+
+      /**
+        *  操作4：查询数据2 = query()
+        *  直接调用 SELECT 语句
+        */
+            // 方法说明
+            db.query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy);
+            db.query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy, String limit);
+            db.query(String distinct, String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy, String limit);
+
+            // 参数说明
+            // table：要操作的表
+            // columns：查询的列所有名称集
+            // selection：WHERE之后的条件语句，可以使用占位符
+            // groupBy：指定分组的列名
+            // having指定分组条件，配合groupBy使用
+            // orderBy指定排序的列名
+            // limit指定分页参数
+            // distinct可以指定“true”或“false”表示要不要过滤重复值
+
+            // 所有方法将返回一个Cursor对象，代表数据集的游标
+
+            // 具体使用
+             Cursor cursor = sqliteDatabase.query("user", new String[] { "id","name" }, "id=?", new String[] { "1" }, null, null, null);
+                // 参数1：（String）表名
+                // 参数2：（String[]）要查询的列名
+                // 参数3：（String）查询条件
+                // 参数4：（String[]）查询条件的参数
+                // 参数5：（String）对查询的结果进行分组
+                // 参数6：（String）对分组的结果进行限制
+                // 参数7：（String）对查询的结果进行排序
+
+            // 注：无法使用SQL语句，即db.execSQL(sql);
+      /**
+        *  操作5：关闭数据库 = close()
+        *  注：完成数据库操作后，记得调用close（）关闭数据库，从而释放数据库的连接
+        */
+            sqliteDatabase.close();
+
+      /**
+        *  操作6：删除数据库 = deleteDatabase（）
+        */
+            // 删除 名为person的数据库
+            deleteDatabase("test.db");

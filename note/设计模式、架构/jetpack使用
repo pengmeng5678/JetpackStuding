@@ -1,0 +1,54 @@
+https://github.com/android/architecture-components-samples
+一.架构组件
+    1.Lifecycle
+    2.LiveData
+        1.在Activity中监听LiveData的变化后，会回调onChange方法
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {//1
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:"+s);
+                }
+            });
+        2.一般在ViewModel层更新数据
+            mutableLiveData.postValue("Android进阶三部曲");//setValue只能在主线程中使用
+
+    3.ViewModel
+
+    4.Room
+    5.Navigation
+        1布局文件里面声明导航文件navigation.xml,navigation.xml在
+            <fragment
+                 android:id="@+id/my_nav_host_fragment"
+                 ...
+                 android:name="androidx.navigation.fragment.NavHostFragment"
+                 app:defaultNavHost="true"
+                 app:navGraph="@navigation/navigation"/>
+        2.navigation.xml文件中写导航的action
+            1.初始的Fragment在TitleScreen,定义一个id为action_title_screen_to_register的action,
+            2.在TitleScreen就可以通过代码跳转到id为Register的Fragment中了
+            3.具体跳转逻辑Navigation.findNavController(view).navigate(R.id.action_title_screen_to_register)
+
+               <navigation xmlns:android="http://schemas.android.com/apk/res/android"
+                           xmlns:app="http://schemas.android.com/apk/res-auto"
+                           xmlns:tools="http://schemas.android.com/tools"
+                           app:startDestination="@+id/title_screen">
+                   <fragment
+                           android:id="@+id/title_screen"
+                           android:name="com.example.android.navigationsample.TitleScreen"
+                           android:label="fragment_title_screen"
+                           tools:layout="@layout/fragment_title_screen">
+                       <action
+                               android:id="@+id/action_title_screen_to_register"
+                               app:destination="@id/register"
+                               app:popEnterAnim="@anim/slide_in_left"
+                               app:popExitAnim="@anim/slide_out_right"
+                               app:enterAnim="@anim/slide_in_right"
+                               app:exitAnim="@anim/slide_out_left"/>
+                   </fragment>
+              </navigation>
+    6.DataBinding
+    7.WorkManager
+二.基础组件
+三.行为组件
+四.界面组件

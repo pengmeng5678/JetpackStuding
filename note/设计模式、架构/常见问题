@@ -1,0 +1,73 @@
+1.装饰模式和代理模式即外观模式的区别？
+    1.装饰模式
+        注重的是对功能的扩展,关注在一个对象上动态的增加方法,在同一个方法下实现更多的功能
+    装饰模式通常的做法是将原始对象作为一个参数传给装饰着的构造器
+    2.代理模式
+        注重的是隔离限制,关注于对控制对象的方法,让外部不能访问实际的调用对象
+        代理模式与原对象实现同一个接口,代理者必须要实现原接口，并持有真实的对象
+    3.外观模式
+        注重的是多个类的集成、统一调配
+
+2.手写Builder模式
+public class SimpleRequest{
+    public SimepleRequest(){}
+    public SimpleRequest(Builder builder){
+        this.url = builder.url;
+        this.tag = builder.tag;
+    }
+    public static Class Builder(){
+        String url;
+        String Tag;
+
+        public Builder url(String url){
+            this.url = url;
+            return this;
+        }
+        public Builder tag(String tag){
+            this.tag = tag;
+        }
+        public SimpleRequest build(){
+            return new SimepleRequest(this)
+        }
+    }
+}
+3.手写单例模式
+    public class SpeeachManager(){
+       1. 静态内部类形式
+        public static SpeechManager getInstance(){
+            return SpeechManagerHolder.mHolder;
+        }
+
+        private static class SpeechManagerHolder{
+            private static SpeechManager mHolder = new SpeechManager();
+        }
+        为什么静态内部类能保证类延迟加载和线程安全
+            1.延迟加载是因为第一次初始化外部类的时候，静态内部类不会被初始化,只有当调用getInstance方法时才会初始化静态内部类
+            2.线程安全的原因是JVM在初始化一个类的时候是同步的，会保证多个线程下只有一个线程能初始化此类，其他线程会阻塞
+      2.双重检查形式
+        public static SpeechManager getInstance1(){
+            private static valotile SpeechManager mInstance = null;
+            if(mInstance == null){
+                synchronize(SpeechManager.class){
+                   if(mInstance == null){
+                      mInstance = new SpeachManager();
+                   }
+                }
+            }
+            return mInstance;
+        }
+    }
+    为什么要双重判空
+        第一次判断,是为了提高性能，对象不为空就直接返回,不需要执行同步代码块，如果去掉第一次判断，那么多个线程同时竞争锁资源会降低系统性能
+        第二次判断,是为了保证单例唯一性,如果多个线程都通过了第一个判空条件,线程1创建完对象后,线程2获取CPU执行权，若不判空，就会再次创建对象，导致对象不唯一
+    为什么要用volotile修饰单例成员变量
+        因为mInstance = new SpeechManager();这条语句不是原子操作,被编译成汇编指令后大概会做三件事，处理器会对指令进行重排序,并不保证有序性
+            1.给对象分配内存空间
+            2.初始化对象，调用构造方法初始化成员变量
+            3.将变量mInstance指向分配的内存空间(此时mInstance就不为null了)
+
+            如果线程1进入方法执行了1,3后，线程2再次进入方法,那么此时获取的mInstance就不为null了,但是此时SpeechaManager并未进行初始化
+            线程2拿到未初始化的对象使用就会报错,不过JDK1.5以后，推出valotile关键字修饰可避免指令重排序，可以解决此问题
+
+4.手写观察者模式
+5.

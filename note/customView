@@ -1,0 +1,117 @@
+本文主要整理自定义View和自定义ViewGroup的相关知识点
+https://www.jianshu.com/p/5e61b6af4e4c
+https://www.jianshu.com/p/d507e3514b65
+1.自定义View
+    1.从Android系统设计者的角度，View这个概念究竟是做什么的？
+        设计View，主要是为了让应用能够与用户交互，
+        要想完成交互，这个View就要在屏幕上占据一个矩形区域，
+        然后利用这块屏幕区域与用户交互，交互的方式就两种，绘制自己与事件处理
+    2.Android系统中那个View类，它由哪些默认功能和行为，能干什么，不能干什么
+        一个用户界面，有许多View，如何把他们组织起来并协作。Google的解决方案是：
+            (1).一套完整的用户界面用一个Window来表示，Window管理所有的View们
+            (2).借鉴复合View的思路，Window首先加载一个超级复合View,即DecorView包含住所有的其他View
+            (3).DecorView掌握着能够分配给这些View的屏幕区域，包括区域的大小和位置
+            (4).DecorView知道不同的View为了完成自己的交互任务所需要的屏幕区域大小是不同的，
+            所以DecorView在确定给每个View分配的屏幕区域大小时，是允许View参与进来，与它一起商量的
+            但是每个View在屏幕区域中的位置就不能让View自己来决定了，而是DecorView一手操办
+
+        1.确定每个View的位置
+            虽然View无法决定自己在ViewGroup中的位置，但是开发者在使用View时，可以向ViewGroup表达自己所用View要放在哪里
+            layout_*之类的配置虽然在书写上与View的属性一起，但他们并不是View的属性，
+            他们只是该View的使用者用来细化调整该View在ViewGroup中的位置的，同时，这些值在Inflate时，
+            是由ViewGroup读取，然后生成一个ViewGroup特定的LayoutParams对象，再把这个对象存入到子View中的
+            这样ViewGroup为该子View安排位置时，就可以参考这个LayoutParams中的信息了
+
+        2.确定View的大小
+            View的大小，是由开发者、View和ViewGroup三方相互商量的过程
+            1.开发者在写布局文件时对layout_width和layout_height的配置
+            2.ViewGroup收到开发者对View大小的说明，然后ViewGroup会综合考虑自己空间大小及开发者的需求
+                然后生成两个MeasureSpec对象(width和height)传给View。这两个对象是ViewGroup向子View提出的要求，
+                如高度不能违反Height MesureSpeck对象的要求，然后这两个对象传到子View的onMeasure方法中
+
+                protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec)
+                子View能怎么办呢，肯定是先看ViewGroup的要求是什么啊，于是
+                    int widthMode = MeasureSpec.getMode(widthMeasureSpec)
+                    int widthSize = MeasureSpec.getSize(widthMeasureSpec)
+                    int heightMode = MeasureSpec.getMode(heightMeasureSpec)
+                    int heightSize = MeasureSpec.getSize(heightMeasureSpec)
+
+                Mode和size一起准确表达了ViewGroup的要求,假设size是100dp,Mode的三种取值，分别表示
+                    1.EXACTLY，ViewGroup对View说，你只能用100dp。原因可能是使用者的要求是这样
+                    2.AT_MOST,你最多只能用100dp,因为开发者让你占据wrap_content的大小，而我最多只有100dp
+                    3.UNSPECIFIED，表示你自己看着办
+
+            3.子View已经清楚的理解了ViewGroup和它的使用者对它的大小的期望和要求了，
+                下面就要在该要求下确定自己的大小并告诉ViewGroup了
+                关于View怎么确定自己的大小，不同的View有不同的态度，但是有几条规矩要遵守
+                    1.宽高不能违反ViewGroup的规定，不能超出要求的范围
+                        但是如果想要更大的空间，也可以调用resolveSizeAndState(int(wantWidth),widthMeasureSpec,0)
+                        如果想要的大小没有超过要求就OK，否则，方法内部会自己调整成符合要求的大小，同时设置一个标记告诉ViewGroup这是委屈求全的结果
+
+                    2.在该方法中调整自己的绘制参数
+                        这一点比较理解，比较ViewGroup提出了尺寸要求，要及时根据这一要求调整自己的绘制
+                        如自己背景图太大，就要算算缩放多少才合适，设置一个合理的缩放值
+                    3.要设置自己考虑后的尺寸，如果不设置就相当于没有告诉ViewGroup自己想要的大小，这就导致ViewGroup无法正常工作
+                    设置的办法就是在onMeasure方法的最后，调用setMeasureDimension方法
+        3.如何绘制自己
+            就一个方法onDraw,CustomClock代码中细说
+
+    3.我要改变这个View的行为，外观，肯定是复写View类中方法，但是怎么复写，复写哪些方法能够改变哪些行为
+        1.确定位置，用layout方法，当然这个只适用于ViewGroup，实现自己的ViewGroup时，才需要修改该方法
+        2.确定大小，用onMeasure方法，如果你不满意默认的确定大小的方法，就可以自定义
+        3.改变默认的绘制，就复写onDraw方法
+
+        4.view被inflate出来会回调onFinishInflate
+        5.view的Window可见性发生了变化，系统会回调该View的onWindowVisibilityChange方法
+        6.当ViewGroup中的子View数量增加或者减少，导致ViewGroup给自己分配的屏幕区域大小发生了变化，
+            系统会回调view的onSizeChange方法，该方法中可以获取自己的最新尺寸，然后根据这个尺寸调整自己的绘制
+        7.当View所占据的屏幕区域发生了触摸交互，系统会将用户的交互动作分解成如DOWN、MOVE、UP等一系列的MotionEvent
+        并且把这些时间传递给View的onTouchEvent方法，View可以在这个方法中进行与用户的交互处理。具体逻辑见事件分发
+        8.除了这些方法，View还实现了三个接口
+            Drawable.Callback :用来让View中的Drawable能够与View通信的，尤其是AnimationDrawable
+            KeyEvent.Callback :用来处理键盘事件的，这与onTouchEvent用来处理触摸事件是相对的
+            AccessbilityEventSource :
+
+2.自定义ViewGroup
+    1.自定义ViewGroup本质上就干一件事-layout
+        ViewGroup是一个组合View,它与基本的View最大的区别在于，它可以容纳其他View，这些View即可以是基本View,也可以是ViewGroup
+        但在我们这个ViewGroup眼中，不论孩子是View还是ViewGroup都被抽象成了一个普通的View
+        ViewGroup最根本的职责就是在自己内部，它给每一个人找一个合适的位置，即调用它们的方法
+        public void layout(int left,int top,int right,int bottom)
+
+        这个方法，即确定了子View的位置，也确定了子View的大小。一般情况下,我们的ViewGroup在确定大小时，会考虑子View的自身要求
+        也就是measured的大小。通常我们自定义ViewGroup时，大体有两条率可选
+            一条就是让我们的ViewGroup满足我们开发中的特定需求，这个时候可以，随心所欲的定义ViewGroup
+            另一条就是自定义一个ViewGroup,提供给更多人使用，这个时候，你就要遵守一些基本的规矩，让你的ViewGroup符合使用者
+                的使用习惯和期望，这样大家才愿意用你的ViewGroup.
+        使用者使用一个ViewGroup最基本的期望是什么？
+            使用者放入这个ViewGroup中的子View layout出来的尺寸和每个子View measured的尺寸相符
+
+        图解CustomViewGroup.png说明
+            1.关于left,right,top,bottom他们都是坐标值，既然是坐标值，就要明确坐标系，这个坐标系是什么？
+                这些值都是ViewGroup设定的那么这个坐标系也是由ViewGroup决定的，没错这个坐标系就是以ViewGroup左上角为原点，向右x,向下y构建起来的
+            2.ViewGroup的左上角又在哪里呢？
+                在ViewGroup的parent眼中，我们的ViewGroup就是一个普通的View,parent也会调用我们ViewGroup中的layout方法
+                此时，我们ViewGroup的左上角，就是在parent坐标系的点(left,top),最顶级的parent就是我们的DecorView
+            3.ViewGroup的那个方框，是什么意思，是代表ViewGroup的大小吗？
+                这个方框是ViewGroup的parent在layout我们的ViewGroup时，给ViewGroup设定的大小，
+                parent调用我们ViewGroup的layout方法
+                图中ViewGroup方框的宽是上述方法中的right-left,高是bottom-top,我们一般称这个宽高
+                为availableWidth和availableHeight，它们表示我们ViewGroup总共可以获得的屏幕区域大小
+            4.假设我们的ViewGroup的parent给我们的ViewGroup设定的宽高小于我们的ViewGroup measured的宽高，
+              我们的ViewGroup怎么优雅的layout自己的子View呢
+                  我们的ViewGroup在layout自己的子View时，想怎么layout就怎么layout，不需要关心parent给自己设定的尺寸
+                  因为parent给我们的ViewGroup的尺寸，并不一定就完全对应着手机屏幕上的一块相同大小的区域，
+                  在有些情况下，parent给我们的ViewGroup设定的这个尺寸可能比整个手机屏幕还大
+                    比如通过parent的scroll功能
+            5.那些完全被layout在parent限定的区域之外的子View无法完全展示怎么办呢，作为一个ViewGroup，有三个选择
+                1.不用讲子View放到这个区域之外
+                2.让你的ViewGroup实现scroll功能，从而确保parent限定区域外的子View也能够有机会展示自己
+                3.将你的ViweGroup的parent换成ScrollView，这样就不用自己实现scroll功能了
+                    但是ScrollView只能允许子View的高度超过自己，不允许子View的宽度超过自己
+                    所以ViewGroup在layout子View时，宁超高度，不超宽度
+            6.FrameLayout、LinearLaout等都支持子View设定layout_gravity,它到底是干什么用的
+                当ViewGroup给子View分配的空间超过子View要求的大小时，就需要gravity帮助ViewGroup为子View精确定位
+                可见，layout_gravity就是ViewGroup在layout阶段，协助ViewGroup为它的子View确定位置的
+                没错，就是协助确定子View的left,top,bottom,right四个值
+3.Activity、View、Window之间的关系

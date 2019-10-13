@@ -1,0 +1,10 @@
+1.Activity横竖屏的生命周期
+    1.不设置configChange时，横屏执行所有生命周期方法，竖屏执行两次所有生命周期方法
+        横屏onSaveInstanceState-onPause-onStop-onDestroy-onCreate-onStart-onRestoreInstance-onResume
+        竖屏onSaveInstanceState-onPause-onStop-onDestroy-onCreate-onStart-onRestoreInstance-onResume-onSaveInstanceState-onPause-onStop-onDestroy-onCreate-onStart-onRestoreInstance-onResume
+    2.设置configChanges="oritation"时,横竖屏各会执行一次所有的生命周期方法，同时竖屏会多执行一次onConfigChanges
+        横屏onSaveInstanceState-onPause-onStop-onDestroy-onCreate-onStart-onRestoreInstance-onResume
+        竖屏onSaveInstanceState-onPause-onStop-onDestroy-onCreate-onStart-onRestoreInstance-onResume-onConfigChanges
+    3.设置configChange="oritation|keybordHidden",横竖屏不执行生命周期方法,横屏执行一次onConfigChange方法，竖屏执行两次onConfigChange方法
+        横屏onConfigChanges
+        竖屏onConfigChanges-onConfigChanges

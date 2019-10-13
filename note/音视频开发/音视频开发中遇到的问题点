@@ -1,0 +1,26 @@
+1.AudioTrack和SoundTouch的采样率、采样位数、音频通道这些参数要保持一致,否则声音无法播放
+2.经过SoundTouch处理后的数据与原有音频数据大小不一致，使用AudioTrack.write的数据要和SounTouch.getBytes的大小一致
+3.Android和Web端音视频通话时,Web端有概率无法播放声音,但视频传输正常。后确认是SDK的Web端插件版本问题导致
+4.平板摄像头音视频正常,使用高清摄像头时时Web端显示的视频偏蓝色
+    因为h264支持YUV420SP格式的输入和输出
+    硬编的话，由于Android的硬编解码库支持I420和NV21,因此可以将NV21图片转换为I420或者NV12,然后交给硬编解码器
+    Android camera1默认回调NV21帧
+        可以使用android.hardware.Camera.Parameters#setPreviewFormat(int)设置回调的图片类型
+        设置的图片类型可以是NV21或者YV12
+    B款设备里面返回的的就是YUV420格式的图片，再交换一次UV分量导致Web端视频变色了
+5.往SDK里面写数据时要保证是单线程，可以用队列先保存起来了再统一写到SDK里面去
+6.往sdk写入H264数据时要求用flag注明当前是否是IDR帧,对于IDR帧的判断，不同的厂商可能使用的编码方案不一样
+    可以通过打印每一帧的数据
+    private static final int H264NAL_TYPE_SLICE_IDR = 5;
+    private boolean HardwareEncodeIsIDR(int iData) {
+        if (m_iHWCodecType == pgDevVideoIn.PG_DEV_VIDEO_IN_FMT_H264) {
+            return ((iData & 0x1F) == H264NAL_TYPE_SLICE_IDR);//关键帧里面肯定有SPS头
+        }
+    }
+
+    B款高清相机IDR帧的第四个字节的值是39,前四个字节如下
+        IDR帧：byte[0]=0,byte[1]=0,byte[2]=0,byte[3]=1,byte[4]=39
+        其他帧：byte[0]=0,byte[1]=0,byte[2]=0,byte[3]=1,byte[4]=33
+    D款高清相机
+        IDR帧	0 0 0 1 9 16 0 0 0 1 103
+    return ((iData & 0x1F) == H264NAL_TYPE_SLICE_IDR) || ((iData & 0x1F) == H264NAL_TYPE_SPS) || ((iData & 0x1F) == H264NAL_TYPE_PPS);
