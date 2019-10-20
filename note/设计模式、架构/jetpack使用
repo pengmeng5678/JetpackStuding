@@ -17,6 +17,20 @@ https://github.com/android/architecture-components-samples
 
     4.Room
     5.Navigation
+        https://developer.android.google.cn/guide/navigation/navigation-getting-started
+        使用前添加依赖
+            dependencies {
+              def nav_version = "2.1.0"
+
+              // Java
+              implementation "androidx.navigation:navigation-fragment:$nav_version"
+              implementation "androidx.navigation:navigation-ui:$nav_version"
+
+              // Kotlin
+              implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+              implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+            }
         1布局文件里面声明导航文件navigation.xml,navigation.xml在
             <fragment
                  android:id="@+id/my_nav_host_fragment"
@@ -48,6 +62,7 @@ https://github.com/android/architecture-components-samples
                    </fragment>
               </navigation>
     6.DataBinding
+
     7.WorkManager
 二.基础组件
 三.行为组件
