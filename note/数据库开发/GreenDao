@@ -145,7 +145,7 @@ http://greenrobot.org/greendao/documentation/joins/
         List<CreditCard> creditCardList ;
     多对多:
         @ToMany
-        @JoinEntity(entity = StudentAndTeacher.class,sourceProperty = "studentId",targetProperty = "teacherId")
+        @JoinEntity(entity = StudentAndTeacher.class,sourceProperty = "teacherId",targetProperty = "teacherId")
         List<Teacher> teacherList;
     官网示例
         涉及三个实例City, Country, and Continent.查询欧洲的所有人数超过一百万的所有城市：
