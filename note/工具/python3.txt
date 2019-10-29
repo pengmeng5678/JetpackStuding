@@ -1,0 +1,598 @@
+一.Python简介:
+	1.Python优点:跨平台；完善的基础代码库；简单优雅、开发速度快；易于包装其他语言开发的程序，适合开发网络应用、网站、后台服务、脚本。
+	2.Python缺点:代码不能加密；运行速度慢，解释型语言，代码执行时会一行行翻译成CPU能理解的机器码，而C是直接编译成机器码。
+	
+二.第一个Python程序
+	1.安装好环境后，在命令行窗口输入python就可以就如Python交互式环境，标志是:>>>
+	2.输入100+200也可以运行出结果；或者打印一个字符串：print('Hellor,world')
+	3.使用文本编辑器
+		在Notepad++或者Sublime Text中写代码，如何以.py后缀结尾保存文件，再命令行进入到文件目录，执行python <file-name>.py
+		这样就可以一次性执行文件中所有代码。
+		用Python开发程序，完全可以一边在文本编辑器中写代码，一边开个交互式的命令行窗口。边写边在命令行验证部分代码
+		导入文件中的函数到命令行窗口:
+			1.在文件目录下打开命令行窗口
+			2.from fileName import functionName，fileName不要.py后缀
+	4.输入输出
+	print('hello,world'):输出hello,world
+	print('hello','world','python')：输出hello world python
+	print(100+200):输出300
+	print(‘100+200 = ’,100+200):输出100+200 = 300
+	
+	name=input():提示用户输入，输入pengmeng回车表示输入完成，内容保存到name里面。在命令行再输入name,就会显示pengmeng
+	此时的name就是一个变量
+	name = input(‘please input your name:’):提示输入框
+	print('hello,',name):输出用户输入的变量name
+
+三、python基础
+	lambda的一般形式是关键字lambda后面跟一个或多个参数，紧跟一个冒号，以后是一个表达式。作为表达式，lambda返回一个值。
+		例1：
+			f = lambda x,y,z : x+y+z  
+			print f(1,2,3)  
+		例2：
+			def inc(x):  
+			return x+10     
+			L = [1,2,3,4]  
+			print map(inc,L)  
+			
+			print map((lambda x: x+10),L)
+	1.数据类型包括
+		整数：普通正负数，还有十六进制0x
+		浮点数:小数，可用科学记数法,1.23e9 = 1.23*10的9次方
+		字符串:'a',"abc",'I \'m \"OK\"'即表示 I'm "OK",\表示转义字符。如果字符串内部既包含'又包含"就可以用转义字符\来标识
+			\自身转义就是\\,r''表示''内部的字符串默认不转义
+		布尔值:只有True和False两种值,可以用and、or、not运算
+		空值:用None表示
+		变量:变量可以是数字、还可以是任意数据类型，变量必须是大小英文、数字和_组合，不能数字开头。一个变量可以反复赋值。如
+		     动态语言：
+			a=123	#a是整数；
+			a="abc" #a变为字符串
+		     静态语言:
+			int a = 123 #a是整数类型变量
+			a = "abc"   #错误，不能把字符串付给整型变量
+		     运算:
+			a = 'ABC'	#解释器创建了字符串'ABC'和变量a,并把a指向了'ABC'
+			b = a		#解释器创建了b,并把b指向了a指向的字符串'ABC'
+			a = 'XYZ'       #解释器创建了字符串'XYZ',并把a的指向改为'XYZ',但b并没有更改
+			print(b)	#输出结果 'ABC'
+		常量：通常用全部大写的变量表示常量，比如PI = 3.1415,但事实PI仍然是一个变量，大写表示约束并不是规则
+		     python中有两种除法:
+			一种是/:	10/3 = 3.3333333333333335	#结果是浮点数；9/3 = 3.0
+			另一种是//:	10//3 = 3			#结果永远是整数
+	2.字符串和编码
+		ASCII编码：大小写英文字母、数字和一些符号，两个字节表示的最大整数65535
+		GB2312编码：处理中文用一个字节不够，至少需要两个字节，所以中国制定了这个编码用来把中文编进去
+		Unicode编码:用于把不同语言统一到一套编码里，Unicode通常是2个字节，而ASCII编码是一个字节,弊端是ASCII一个字节可以存的字符，这里需要两个字节
+		UTF-8:可变长编码，把Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母编成1个字节，汉子通常3个字节。
+		
+		Python 3的版本，字符串是Unicode编码的，即支持多语言，对于单个字符编码，ord()函数获取字符的整数表示,chr()函数把编码转换成对应的字符
+			ord('A')输出65，chr(65)输出A，ord('中')输出20013,如果知道字符的整数编码，还可以用十六进制这么写str：'\u4e2d\u6587'输出'中文'
+
+		Python对bytes类型的数据用b前缀的单引号或双引号表示:	x=b'ABC',在网上上传输或在磁盘读写的数据必须转换为bytes类型
+		以Unicode表示的str通过：
+			encode()方法可以编码为指定的bytes，'ABC'.encode('ascii')输出b'ABC'，中文无法编码成指定bytes，超出范围会报错
+			decode()方法可以把bytes转换成str，b'ABC'.decode('ascii')输出'ABC'
+											  '中文'.encode('utf-8')输出b'\xe4\xb8\xad\xe6\x96\x87'
+		要计算str包含多少个字符,用len()函数
+			len('ABC')输出3，len('中文')输出2
+		如果len函数参数换成bytes，len()就计算字节数
+			len(b'ABC')输出3，len('中文'.encode('utf-8'))输出6,一个中文字符经过UTF-8编码通常会占用3个字节
+	
+		Python源代码也是一个文本文件,所以一般会在源文件写以下两行注释
+			#!/usr/bin/env python3		告诉Linux/OS X系统,这是一个Python可执行程序,Windows系统会忽略这个注释
+			# -*- coding: utf-8 -*-		安装UTF-8编码读取源代码,否则可能乱码;文本编辑器也必须是UTF-8 without BOM编码格式
+
+		格式化：
+			格式化和C语言一致:%d表示整数，%s表示字符床，%f表示浮点数，%x表示十六进制整数
+			'Hello,%s' % 'world'输出Hello,world
+			'Hi, %s, you have $%d.' % ('Michael', 1000000)输出'Hi, Michael, you have $1000000.'
+
+			格式化整数和浮点数还可以指定是否补0和整数与小数的位数
+			'%2d-%02d' % (3, 1)输出' 3-01'
+			'%.2f' % 3.1415926输出'3.14'
+			输出字符串中包含%时，用%%转义
+	3.使用list和tuple
+		list:Python内置的一种数据类型，list是一种有序的集合，可以随时添加和删除其中的元素
+			classmates = ['a','b','c']
+			打印：classmates 	输出['a','b','c']
+			访问：classmates[0]	输出‘a’，访问最后一个元素classmates[-1],访问倒数第二个元素:classmates[-2]
+			长度: len(classmates)输出3
+			添加: classmates.append('d')
+			删除: classmates.pop('a')
+			替换: classmates[1] = 'B'
+			二维: s = ['A','B',['c','d'],'e'],引用c可以这样:s[2][0]
+		tuple:另一种有序列表又叫元组,tuple和list非常相似,但是tuple一旦初始化就不能修改。
+			没有append(),insert()这样的方法，其他获取元素的方法和list是一样的，只是不能重新赋值
+			t = (1,2)，当tuple中只有一个元素时，必须加一个逗号,t=(1,)，用以区分小括号，防止歧义
+			当tuple中的元素包含list时，这个list中的元素是可变的，如
+			t2 = (1,2,[3,4]),t2[2][0] = 5,t2[2][1] = 6;这样t2的值就变成了(1,2,[5,6])
+			结论：tuple的指向永远不变，但如果指向的内容(如list)中的元素本身是可变的，但指向了list就不能再指向list1
+	4.条件判断:根据Python的缩进规则，如果if语句判断是True就执行该条件缩进的全部语句，否则什么也不执行
+		简写形式:x是非零数值，非空字符串，非空list就判断为True，否则为False
+			if x:
+			print('True')
+		完整形式:
+			if a>3:
+				print('a>3')
+				print(a)
+			elif a>2:
+				print('a>2')
+			else:
+				print('else')
+		input读取用户的输入，返回的数据是str，不能喝整数比较，可以用int()函数将str转换成整数	
+			
+	5.循环:依次把list或者tuple中的每个元素迭代出来。range(n)函数可以生成一个0-n-1的整数序列，如计算0-100累加
+		方式1:for x in ...:
+			for x in range(101):
+				sum = sum+x
+			print(sum)
+		方式二:while ...:
+			sum = 0
+			n=99
+			while n>0:
+				sum=sum+n
+				n = n - 2
+			print(sum)
+			
+		可以使用break退出循环和continue提前结束本轮循环，当程序进入死循环时,可以用Ctrl+C退出程序
+			
+	6.使用dict和set
+		dict全称dictionary，如java中的map,dict内部存放的顺序和key放入的顺序是没有关系的
+			d = {'a':90,'B':80,'c':70}
+			d['a']输出90
+			
+			赋值:d['a'] = 60
+			为避免key不存在的错误，有两种方法:
+				一是通过in判断key是否存在:'x' in d 输出False，因为'x'不再d这个dict中
+				二是通过dict提供的get方法,如果key不存在,可以返回None，或者自己指定的value
+					d.get('x')		交互式命令行不显示结果
+					d.get('x',-1)	返回-1
+			增加：d['add'] = 100	增加一个key:add，对应的value赋值为100
+			删除key:pop(key)
+			和list比较,dict有以下几个特点:
+				1.查找和插入的速度极快,不会随着key的增加而变慢
+				2.需要占用大量的内存，内存浪费多
+			list则相反:查找和插入速度慢，但是占用内存小
+			dict中的key是不可变对象，通过key计算位置的算法称为哈希算法。字符串整型都可以作为key，而list可变就不可以作为key
+			
+		set，和dict类似，唯一区别就是不存储value,由于key不能重复，所以，没有重复的key。创建一个set需要提供一个list作为输入集合
+			赋值：s = set([1,2,3])
+			打印: s = set(1,2,1,3,4) 打印s输出{1,2,3,4}，自动过滤重复的key
+			添加: s.add(2) ，可以添加重复元素，但是不会有效果，打印中不会有重复key
+			删除: s.remove(1)
+			
+			set可以看成是数学意义上的无序和无重复元素的集合，可以作交集、并集操作
+			s1 = set([1,2,3,5])
+			s2 = set([1,2,3,4])
+			s1 & s2	输出{1,2,3}
+			s1 | s2 输出{1,2,3,4,5}
+			
+			>>> a = 'abc'
+			>>> b = a.replace('a', 'A')
+			输出a = 'abc'，输出b等于'Abc'
+			对于不变对象来说,调用自身的任何方法，不会改变对象自身的内容，相反，这些方法会创建新的对象指向改变后的内容并返回
+			这样就保证了不可变对象本身永远是不可变的。
+
+四、函数
+	1.调用函数
+		官方文档:http://docs.python.org/3/library/functions.html#abs
+		基本函数:abs(x),max(x1,x2,...)
+		数据类型转换:int(),可以把其他数据类型转换成整数
+		把函数名赋值给一个变量，相当于给函数齐了一个变量 
+			a = abs
+			a(-1)输出1
+	2.定义函数
+		标准格式：def 函数名(参数1,参数2...):
+					  ...
+					  return ...
+		在Python交互环境中定义函数时，注意Python会出现...的提示。函数定义结束后需要按两次回车重新回到>>>提示符下：
+		如果你已经把my_abs()的函数定义保存为abstest.py文件了，那么，可以在该文件的当前目录下启动Python解释器，
+		用from abstest import my_abs来导入my_abs()函数，注意abstest是文件名（不含.py扩展名）
+	
+		空函数：即函数内部什么也不做，可以在内部放个pass
+			def nop()
+				pass
+			if age >18:
+				pass    #如果缺少了pass，代码运行就会有语法错误
+		参数检查:
+			调用函数数，参数个数不对，Python解释器会自动检查出来，但参数类型不对，就需要自己在函数内部做参数检查了
+			if not isinstance(x,(int,float)):		#检查参数x是不是int或者float类型
+				raise TypeError('bad operand type')	
+		返回多个值：其实是返回了一个tuple
+			x, y = move(100, 100, 60, math.pi / 6)
+			print(x, y)
+			151.96152422706632 70.0
+
+	3.函数的参数
+		必选参数:普通的函数定义的参数,调用者调用函数时，必须传入的参数
+		默认参数:定义函数为:函数功能是实现x的n次方
+			def power(x,n=2):,调用时可以用power(5)
+			
+		可变参数:允许你传入0个或任意个参数，这些可变参数再函数调用时自动组装为一个tuple。
+			参数可以接收一个list(可变),比如函数cal求参数的平方和
+			def calc(numbers):
+			sum = 0
+			for n in numbers:
+				sum = sum + n * n
+			return sum
+			在函数接收参数前不加上一个星号*要组装一个list或者tuple这样调用calc([1,2,3])输出14,calc((1,3,5,7))输出84
+			当在函数接收参数前加上一个星号*，def calc(*numbers):，就可以这样调用了calc(1,3,5,7)
+			
+			可以传入calc()输出0，传入calc(1,2)输出5
+			如果已经有一个list或者tuple，可以这样写
+				nums = [1,2,3]
+				calc(*num)	表示传入nums这个list中的所有元素，输出14
+				
+		关键字参数：允许传入0个或任意个含参数名的参数，这些关键字参数再函数内部自动组装成一个dict
+			def person(name ,age,**kw)
+				print('name:', name, 'age:', age, 'other:', kw)
+			函数person除了必选参数name和age外，还接受关键字参数kw。调用函数时，可以只传入必选参数，也可以传入任意个数的关键字参数
+			person('Michael',30)
+			person('Bob',35,city='BeiJing')		print输出:name: Bob age: 35 other: {'city': 'Beijing'}
+			
+			和可变参数类似，调用的方式可以先组装dict，也可以直接传dict名
+			extra = {'city':'beijing','job':'Engineer'}
+			person('Jack',23,city=extra['city'],job=extra['job'])
+			person('Jack',23,**extra)
+				以上两种调用都输出:	name: Jack age: 24 other: {'city': 'Beijing', 'job': 'Engineer'}
+				
+		命名关键字参数:由于关键字参数调用者可以传入不受限制的参数，如果要求限制关键字参数的名字，就可以用命名关键字参数。
+			如果不用命名关键字参数，需要到函数内部检查是否有city参数
+				def person(name,age,**kw)
+					if 'city' in kw	
+						#有city参数
+						pass
+			
+			用命名关键字参数，如，只接收city和job作为关键字参数
+			def person(name,age,*,city,job)
+			和关键字**kw不同，命名关键字参数需要一个特殊分隔符*,分隔符后面的参数被视为命名关键字参数
+			调用方式:person(‘Jack’,24,city='shanghai',job='Engineer')
+			
+			如果函数定义中已经有一个可变参数,则后面跟着的命名关键字参数就不再需要一个特殊分割符*
+				person('jack',24,*args,city,job)
+				
+			命名关键字参数必须传入参数名。否则调用会报错
+			命名关键字参数可以有缺省值，从而简化调用
+				def person(name,age,*,city='beijing',job)
+				由于命名关键字参数city有默认值，调用时，可以不传入city参数 person('jack',23,job='Engineer')
+	
+		参数组合:在python中定义函数，可以用必选参数、默认参数、可变参数、命名关键字参数、关键字参数，这5中参数可以组合使用
+			但是要注意，参数定义的顺序必须是:必选参数、默认参数、可变参数、命名关键字参数、关键字参数
+			如 def f1(a,b,c=0,*args,**kw):
+					print('a =', a, 'b =', b, 'c =', c, 'args =', args, 'kw =', kw)
+			   def f2(a,b,c=0,*,d,**kw):
+					print('a =', a, 'b =', b, 'c =', c, 'd =', d, 'kw =', kw)
+					
+			 神奇的是:通过一个tuple和dict，也可以调用上述函数
+				args = (1,2,3,4)
+				kw = {'d':99,'x':'#'}
+				f1(*args,**kw)	输出a = 1 b = 2 c = 3 args = (4,) kw = {'d': 99, 'x': '#'}
+				
+				args = (1,2,3)
+				kw = {'d':88,'x':'#'}					
+				f1(*args,**kw)	输出a = 1 b = 2 c = 3 d = 88 kw = {'x': '#'}
+				
+			所以。对于任意函数，都可以通过类似func(*args,**kw)形式调用它，无论他的参数是如何的
+			
+	4.递归函数:比如求n的阶乘
+		def fact(n):
+			if n==1:
+				return 1
+			return n*fact(n-1)
+			
+		使用递归函数需要注意防止栈溢出。解决递归调用栈溢出的方法是通过尾递归优化。
+		尾递归:在函数返回的时候，调用自身，并且，retrun语句不能包含表达式，这样，编译器或者解释器就可以把尾递归做优化，使递归本身无论调用
+			多少次，都只占用一个栈帧，不会出现栈溢出的情况
+			def fact_iter(num,product):
+				if num == 1:
+					return product
+				return fact_iter(n-1,num*product)
+			
+五、高级特性
+	1.切片:对于经常取指定索引范围的操作，用循环十分繁琐，因此，Python提供了切片
+		如取list L中的前3个元素:L = ['Michael', 'Sarah', 'Tracy', 'Bob', 'Jack']
+		用切片:L[0:3],L[0:3]表示，从索引0开始取，直到索引3为止，但不包括索引3。如果第一个索引是0，还可以省略L[:3]
+		L[0:3]输出['Michael', 'Sarah', 'Tracy']
+		
+		也可以从后面开始取,记住最后一个元素索引是-1:
+			L[-1]    输出['Tracy']
+			L[-2:-1] 输出['Bob', 'Jack']
+		如创建一个0-99的list：L = list(range(100))
+			取0-9的前10个数:					L[:10]		
+			取后10个数							L[-10:]		输出[90, 91, 92, 93, 94, 95, 96, 97, 98, 99]
+			取前10个数，每两个取一个			L[:10:2]	输出[0, 2, 4, 6, 8]
+			所有数，每5个取一个					L[::5]		输出[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95]
+			取所有数							L[:]		
+		tuple也可以用切片，输出结果也是一个tuple
+			(0,1,2,3)[:3]输出(0,1,2)
+		字符串也可以用切片
+			'ABCDEFG'[::2]输出'ACEG'
+		
+	2.迭代:任何可迭代对象都可以作用于for循环，包括我们自定义的数据类型，只要符合迭代条件，就可以使用for循环
+		d = {'a': 1, 'b': 2, 'c': 3}
+		迭代dict: 			for value in d.values()	输出a c b
+		迭代字符串:			for ch in 'ABC'			输出ABC
+		
+		如何判断一个对象是可迭代对象呢?方法是通过collections模块的Iterable类型判断
+			from collections import Iterable
+			isinstance('abc',Iterable)		输出True
+			isinstance([1,2,3],Iterable)	输出True
+		
+		如何实现类似java那样的下标循环？通过Python内置的enumerate函数可以把list变成索引-元素对
+		for i,value in enumerate(['A','B','C']):
+			print(i,value)
+			0 A
+			1 B
+		for x,y in((1,1),(2,4):
+			print(x,y)
+			1 1
+			2 4
+		
+	3.列表生成式:即List Comprehensions，是Python内置的简单却强大的可以用来创建list的生成式
+		[x*x for x in range(1,11)]  输出：[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+		[x*x for x in range(1,11) if x%2 ==0] 输出：[4, 16, 36, 64, 100]		
+		[m+n for m in 'ABC' for n in 'XYZ'] 输出：['AX', 'AY', 'AZ', 'BX', 'BY', 'BZ', 'CX', 'CY', 'CZ']
+		
+		列出当前目录下的所有文件和目录名
+			import os
+			[d for d in os.listdir('.')]
+		for 循环可以同时使用两个或多个变量，比如dict的items可以同时迭代key和value
+			d={'x':'A','y':'B','z':'C'}
+			for k,v in d.items:
+				print(k,'=',v)
+				y = B
+				x = A
+				z = C
+			[k+'='+v for k,v in d.items]  输出['y=B','x=A','z=C']
+		把一个list中所有字符串变成小写
+			L = ['Hello', 'World', 'IBM', 'Apple']
+			[s.lower() for s in L]   输出['hello', 'world', 'ibm', 'apple']
+			
+	4.生成器:通过列表生成式直接创建列表会受到内存限制，一边循环一边计算的机制，称为生成器
+		方法1:只要把一个列表生成式的[]改成()，就创建了一个generator
+			g = (x * x for x in range(10)) 通过next()函数可以获得generator的下一个返回值:next(g)
+			g = (x*x for x in range(10)
+			
+		方法2:如果一个函数定义中包含yield关键字，那这个函数就是一个generator
+			def fib(max):
+				n,a,b = 0,0,1
+				while n<max：
+					yield b
+					a,b = b,a+bad
+					n=n+1
+				return 'done'
+		generator的函数，在每次调用next()的时候执行，遇到yield就返回，再次执行时从上次返回yield语句处继续执行
+			例:定义一个generator，依次返回数字1，3，5
+			def odd():
+				print('step 1')
+				yield 1
+				print('step 2')
+				yield(3)
+				print('step 3')
+				yield(5)
+			 o = odd()
+			 next(o)	输出step1
+			 next(o)	输出step2
+			 next(o)	输出step3
+			 next(o)	报错StopIteration
+			 
+			 用for循环调用generator时，发现拿不到generator的return语句的返回值，如果想要拿到返回值，必须捕获StopIteration
+		返回值包含再StopIteration的value中，以斐波拉基数列为例
+			g = fib(6)
+			while True:
+				try:
+					x = next(g)
+					print('g:',x)
+				except StopIteration as e:
+					print('Genarator return value:',e.value)
+					break
+			g:1
+			g:1			
+			g:2
+			...
+			g:8
+			Generator return value: done
+			
+	5.迭代器：凡是可作用于next()函数的对象都是Iterator类型，它们表示一个惰性计算的序列
+		可以直接作用于for循环的对象(集合数据类型和generator)统称为可迭代对象Iterable
+		可以使用isinstance判断一个对象是否是Iterable对象.	isinstance([],Iterable) 返回true
+		而生成器不但可以作用于for循环，还可以被next函数不断调用并返回下一个值，直到抛出StopIteration错误表示无法继续返回下一个值
+		可以被next函数调用并不断返回下一个值的对象称为迭代器Iterator
+		可以使用isinstance判断一个对象是否是Iterator对象	isnstance([],Iterator) 返回false
+	
+		生成器都是Iterator对象，但list,dict,str虽然是Iterable,却不是Iterator，把list，dict,str变成Iterator可以使用iter函数
+		isinstance(iter([]),Iterator) 返回true
+
+		Iterator的计算是惰性的，只有在需要返回下一个数据时它才会计算.
+
+六、函数式编程
+		函数式编程的一个特点就是，允许把函数本身作为参数传入另一个函数，还允许返回一个函数
+	Python对函数式编程提供部分支持。由于Python允许使用变量，因此，Python不是纯函数式编程语言
+	
+	1.高阶函数：一个函数就可以接收另一个函数作为参数
+		变量可以指向函数：即函数本身也可以赋值给变量。
+			x = abs(-10) ，求x，输出10
+			f = abs ,求f(-10)， 输出10
+		
+		函数名也是变量：
+			abs = 10,求abs(-10)的时候就会报错，因为abs现在已经指向了10
+			注：由于abs函数实际上是定义在import builtins模块中的，所以要让修改abs变量的指向在其它模块也生效，
+			要用import builtins; builtins.abs = 10。			
+			要恢复abs的指向，需要重启Python交互环境
+		
+		传入函数:
+			既然变量可以指向函数，函数的参数可以接收变量，那么一个函数就可以接收另一个函数作为参数，这种函数就叫做高阶函数
+			
+			def add(x,y,f)
+				return f(x)+f(y)
+				
+			求add(-5,6,abs)，就输出11。	f(x)+f(y) =>abs(-5)+abs(6) =>11
+			
+		map/reduce:	
+			map函数作为一个高阶函数，它接收两个参数，一个是函数，一个是Iterable,
+			map将传入的函数依次作用到序列的每个元素，并把结果作为新的Iterable返回
+				def f():
+					return x*x
+				list(map(f,[1,2,3,4,5]) 输出[1,4,9,16,25]
+			
+			reduce把一个函数作用在一个序列上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算
+				例1：将序列求和运算
+					from functools import reduce
+					def add(x,y):
+						return x+y
+					
+					reduce(add,[1,3,5,7,9])	输出25
+				例2：将字符串转换成int
+					def str2int(s):
+						def fn(x,y):
+							return x*10 +y
+						def char2num(s):
+							return {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}[s]
+						return reduce(fn,map(char2num,s))
+						如调用reduce(fn,map(char2num,'13579'))最终输出整数13579
+						
+					这个函数中的map(char2num,s)是将s中每个字符通过char2Num函数转换成一个整数，最终返回一个新的Iterable
+								reduce(fn,[1,3,5,7,9])可以理解为fn(fn(fn(fn(1,3),5),7),9)
+
+		filter:
+			和map类似，filter也接收一个函数和一个序列。和map不同的是，filter()把传入的函数依次作用于每个元素，
+			然后根据返回值是True还是False决定保留还是丢弃该元素
+			print(list(filter(lambda x:x%2 == 1,[1,2,3,4,5,6,7])))	输出[1,3,5,7]
+
+		sorted:
+			sorted也是一个高阶函数,它可以接收一个key函数来实现自定义的排序。
+			例如:按绝对值大小排序:sorted([36, 5, -12, 9, -21],key=abs)	输出[5, 9, -12, -21, 36]
+			例如:按字符串排序，忽略大小写：sorted(['bob', 'about', 'Zoo', 'Credit'], key=str.lower，reverse=True) 
+				加上reverse = True表示反向排序输出['Zoo', 'Credit', 'bob', 'about']
+
+	2.返回函数
+		一个函数可以返回一个计算结果，也可以返回一个函数。返回一个函数时，牢记该函数并未执行，返回函数中不要饮用任何可能会变化的变量
+		def lazy_sum(*args):
+			def sum():
+				ax = 0
+				for n in args:
+					ax = ax + n
+				return ax
+			return sum
+		闭包：如上函数，内部函数sum可以引用外部函数layz_sum的参数和局部变量，
+			当lazy_sum返回函数sum时，相关参数和变量都保存在返回的函数中，这种称为"闭包"的程序结构拥有极大威力
+			f1 = lazy_sum(1, 3, 5, 7, 9)
+			f2 = lazy_sum(1, 3, 5, 7, 9)
+			f1==f2返回False,f1()和f2()的调用结果互不影响
+			
+		def count():
+			fs = []
+			for i in range(1, 4):
+				def f():
+					 return i*i
+				fs.append(f)
+			return fs
+		f1, f2, f3 = count()
+		
+		执行f1()输出9，执行f2()输出9,执行f3输出9。原因是:返回的函数引用了变量i,并没有立即执行，
+		而是直到调用了f1()才执行，等到三个函数都返回时，他们所引用的变量i已经变成了3，因此最终结果为9
+		
+		结论:返回函数不要引用任何循环变量，或者后续会发生变化的变量。如果一定要引用循环变量,
+		方法是再创建一个函数，用该函数的参数绑定循环变量当前的值。将return i*i 改成
+		def count():
+			def f(j):
+				def g():
+					return j*j
+				return g
+			fs = []
+			for i in range(1, 4):
+				fs.append(f(i)) # f(i)立刻被执行，因此i的当前值被传入f()
+			return fs
+	3.匿名函数
+		list(map(lambda x: x * x, [1, 2, 3, 4, 5, 6, 7, 8, 9]))
+		这里关键字lambda表示匿名函数，冒号前面的x表示函数参数。
+	4.装饰器
+		def now():
+			print('2015-3-25')
+		f = def
+		函数可以赋值给变量，通过变量可以获取到函数名:f.__name__
+		
+		假设我们要增强now()函数的功能，比如，在函数调用前后自动打印日志，但又不希望修改now()函数的定义，
+		这种在代码运行期间动态增加功能的方式，称之为“装饰器”（Decorator）
+			def log(func):
+				def wrapper(*args, **kw):
+					print('call %s():' % func.__name__)
+					return func(*args, **kw)
+				return wrapper
+		
+		通过@语法,把decorator置于now函数的定义处，相当于now = log(now)，创建一个now变量指向新的函数wrapper
+			@log
+			def now():
+				print('2015-3-25')	
+			输出
+			call now():
+			2015-3-25
+		
+		如果需要传入参数,输出自定义的文本，就需要再嵌套一层循环：
+			def log(text):
+				def decorator(func):
+					@functools.wraps(func)
+					def wrapper(*args, **kw):
+						print('%s %s():' % (text, func.__name__))
+						return func(*args, **kw)
+					return wrapper
+				return decorator
+		
+		@functools.wraps(func)的作用是：把原始函数的__name__等属性复制到wrapper()函数中，否则，有些依赖函数签名的代码执行就会出错
+			
+			调用时传入自定义的txt。
+			@log('execute')
+				def now():
+					print('2015-3-25')
+			输出
+				now()
+				execute now():
+				2015-3-25
+
+		在面向对象（OOP）的设计模式中，decorator被称为装饰模式。OOP的装饰模式需要通过继承和组合来实现，
+		而Python除了能支持OOP的decorator外，直接从语法层次支持decorator。Python的decorator可以用函数实现，也可以用类实现。
+		
+	5.偏函数
+		当函数的参数个数太多，需要简化时，使用functools.partial可以创建一个新的函数，
+		这个新函数可以固定住原函数的部分参数，从而在调用时更简单。
+		如int('12345',base=8)是把字符串变成整数的12345后再转换成8进制  输出74565
+		
+		def int2(x, base=2):	#创建一个偏函数，把字符串转换成int类型再转换成二进制
+			return int(x, base)
+			
+		functools.partial就是帮助我们创建偏函数的，不需要我们自己定义int2(),可以使用下面的方式
+		import functools
+		int2 = functools.partial(int,base=2)
+		int2('1000000')	输出64
+
+七、模块
+	在Python中，一个.py文件就称为一个模块
+	使用模块的好处是提高代码可维护性。其次是避免函数名冲突
+	为避免模块名冲突，Python引入按目录来组织模块的方法，称为包
+	
+	1.使用模块
+		Python本身内置了很多模块，只要安装完毕，这些模块就可以立即使用
+	2.安装第三方模块
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+

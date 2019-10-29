@@ -1,0 +1,55 @@
+gradlew clean  clean项目
+
+gradlew build  构建项目
+
+gradlew assembleDebug or /gradlew aD 编译并打Debug包
+
+gradlew assembleRelease or /gradlew aR 编译并打Release的包
+
+gradlew installRelease or /gradlew iR Release模式打包并安装
+
+gradlew installDebug or /gradlew iD Debug模式打包并安装
+
+gradlew uninstallRelease or ./gradlew uR 卸载Release模式包
+
+gradlew uninstallDebug or ./gradlew uD 卸载Debug模式包
+ 
+ 
+需要说明的是这些命令可以叠加使用，例如：
+ 
+./gradlew clean build --info > bugtags.log
+ 
+./gradlew uD iD
+
+
+项目中配置了多渠道的话可以这样使用
+gradlew assembleZhiyinDebug 编译并打包Flavor名为zhiyin的Debug apk包
+gradlew assembleHaiguanRelease 编译并打包Flavor名为haiguan的Release apk包
+
+gradle中执行Task任务
+1.打印一个字符串
+task mytest{
+	println("jni test")
+}
+2.执行一个python脚本
+task doPython(type:Exec){
+	commandLine('python','E:\AndroidProject\Studing\AndroidStudingProject\jni\src\main\java\tools\changeName.py')
+}
+3.run一个java文件的main方法
+//这是java文件HellWorld
+package com.test;
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, " + args[0] + "!");
+    }
+}
+//这是gradle脚本中的task任务
+task(runMain, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.test.HelloWorld'
+    classpath = sourceSets.main.runtimeClasspath
+    args 'CodeTutr'
+}
+4.复制文件
+task copyFile(type:Copy) {
+    from("C:\\Users\\admin\\Desktop\\entry")
+    into("C:\\Users\\admin\\Desktop\\decode")

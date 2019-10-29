@@ -1,0 +1,49 @@
+adb shell am start -n com.android.launcher3/.Launcher
+adb push <拖动桌面文件到这里> /sdcard/
+adb push <拖动桌面文件到这里> /sdcard/<可选修改文件名>
+adb pull /sdcard/ZhiYin/video/ <本地路径> 
+
+#rm -r xxx //删除名字为xxx的文件夹及其里面的所有文件
+#rm xxx //删除文件xxx
+#rmdir xxx //删除xxx的文件夹 
+#mkdir -p xxx //递归创建xxx的文件夹
+
+https://blog.csdn.net/mafei852213034/article/details/72757679
+adb logcat -s SANBAO  		//设置输出日志的标签，只显示该标签的日志
+adb logcat > c:\test.log 	//将日志保存到文件test.log
+adb logcat -f /sdcard/test.txt	//将日志输出到文件
+adb logcat -v time > e://log.txt //抓取日志，再次按下Ctrl+C就停止打印
+
+//将TAG为SANBAO的日志输出到桌面的log文件中的test.txt文件中
+adb logcat -s SANBAO >c:/Users/admin/Desktop/log/test.txt
+
+//远程调试
+adb tcpip 5555  //连接设备后执行此命令
+adb connect 10.10.13.69:5555	//查看设备当前IP值后连接，连接成功既可拔掉数据线查看日志
+adb disconnect 10.10.13.69
+
+强制刷机步骤
+   1.机器人关机
+   2.刷机软件选择刷机包
+   3.设备刷机接口短接，机器人连接电脑USB口
+   4.查看刷机软件是否有反应，若无反应，开/关机再尝试。
+   
+查看应用信息
+adb shell dumpsys package com.sunbo.main
+验证系统签名
+keytool -printcert -file META-INF/CERT.RSA
+
+查看手机的CPU信息
+adb shell cat /proc/cpuinfo
+
+查看单个应用占用系统内存信息
+adb shell dumpsys meminfo <包名或者PID>
+	其中Native/Dalvik 的heap信息分别是JNI和java层的命令
+	而Total的PSS信息就是应用真正占领的内存大小
+	
+查看整个系统应用的占用情况
+adb shell dumpsys meminfo
+adb shell top | grep <包名关键词>
+
+查看应用版本信息
+adb shell dumpsys package com.android.dialer | findstr “versionName”

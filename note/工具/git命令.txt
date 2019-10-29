@@ -1,0 +1,151 @@
+文章地址:https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/0013752340242354807e192f02a44359908df8a5643103a000
+https://www.jianshu.com/p/e0867ac2a261
+一、Git简介
+	
+二、创建版本库
+	1.选择一个合适的文件夹，创建一个空目录
+	mkdir learngit
+	cd learngit
+	pwd   			:显示当前目录
+	git init 		:目录创建好了，ls -ah命名后可以看到隐藏文件.git
+	
+	2.添加文件到Git仓库
+	git add <文件名称/目录>
+	git commit -m "提交的提示信息"
+	
+	3.新项目提交，正确的流程如下
+	1.git init
+	2.git config user.name "someone"
+	3.git config user.email "someone@someplace.com"
+	4.git add *
+	5.git commit -m "some init msg"
+	
+三、时光穿梭
+	1.git status查看仓库当前的状态，git diff 查看具体修改了什么内容(提交的提示信息)
+	2.版本回退
+		1.用git log命令查看提交的具体信息，git log --pretty=oneline
+		2.Git中用HEAD表示当前版本，上个版本就是HEAD^,...上一百个版本:HEAD~100。
+		3.回退到上一个版本:git reset --hard HEAD^
+		4.指定回退到未来的某个版本：git reset --hard commit_id(commit的id,可通过git log查询)
+	3.工作区和暂存区
+		1.工作区比如我们电脑上创建的文件夹learngit就是一个工作区
+		2.暂存区就是当修改文件后，执行git add <file>命令后，这个file文件就被放到了暂存区
+	4.管理修改
+		查看工作区和版本库里最新版本的区别:git diff HEAD -- <file>,只有add到暂存区后commit就被提交
+	5.撤销修改
+		1.git checkout -- <file>	表示丢弃工作区的修改
+		情况一：文件还没有被放到暂存区，撤销修改就回到和版本库一样的状态
+		情况二: 文件以及添加到暂存区后，又做了修改，撤销修改就回到添加到暂存区后的状态
+		2.把暂存区的修改撤销掉，重新放回工作区:git reset HEAD file
+	6.删除文件
+		1.删除文件也是一个修改操作,通常用git rm <file-name>就可以把文件删除了
+		2.通过git status 查看状态
+		3.git rm确认删掉，并commit
+		4.如果误删 使用git checkout --<file-name>,可以从版本库里面将误删的文件恢复
+		
+四、远程仓库
+	1.添加远程库
+		把GitHub当做一个Git仓库,如命名为learngit
+		把本地库和远程库相互关联:git remote add origin git@github.com:GitHub账号名/GitHub仓库名.git	
+		把本地内容(当前分支)推送到远程库上:git push -u origin master，加上了-u参数，Git不但会把本地的master分支内容推送到远程新的master分支，
+	还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。后面提交只需要:git push origin master	
+
+	2.从远程库克隆
+		git clone 库对应的网址 或者 git clone git@github.com:pengmeng5678/仓库名.git
+	3.查看远程仓库信息
+		git remote
+		git remote -v
+	
+五、分支管理
+	1.创建与合并分支
+		合并分支上的主要思想:将master指向dev分支的当前提交
+		1.创建并切换到新分支:git checkout -b dev，相当于一下两条命令
+			创建分支：git branch dev
+			切换分支：git checkout dev
+		2.查看当前所有分支:git branch 
+		3.合并某分支到当前分支：git merge <name>
+		4.删除分支：git branch -d <name>
+	2.解决冲突
+		不同分支对同一个文件做了修改，再合并时就可能会冲突，解决冲突需要重新修改冲突文件后再合并
+	
+	3.分支管理策略
+		合并分支时，Git会用Fast forward模式，但是删除分支后，会丢掉分支信息
+		所以我们合并某分支(如dev)到当前分支时采用以下这种模式可以避免丢失分支信息
+		git merge --no-ff -m "merge message" dev
+		
+	4.bug分支
+		当在开发过程中，被发现有个Bug要修复，但是当前工作没有做完不能合并，可以通过
+		git stash临时保存当前工作现场。然后新建一个Bug分支，修复后合并，再恢复工作现场
+		git stash list可以查看被保存的工作现场
+		git stash apply恢复工作现场
+		git stash drop 恢复工作现场同时把stash内容也删了
+		
+	5.Feature分支
+		开发过程中临时接到新需求，可以新增一个Feature分支，一切顺利的话，feature分支和Bug分支类似，合并、删除
+		但又临时接到需求取消任务。这个分支就需要就地销毁，此时强行丢弃一个未被合并的分支，使用：
+		git branch -D <branch-name>
+		
+	6.多人协作 
+		多人开发时，保证一个主线master是稳定的，还有一个开发分支是多名开发者共同合并的分支
+		此时这两个分支都需要同步到远程库，所以要创建远程origin的dev分支到本地
+		1.创建与本地dev分支对应的远程分支：git checkout -b dev origin/dev
+		2.这样我就可以直接提交本地内容到远程分支了:git push origin dev
+		3.提交失败可能是远程分支有新内容要先pull：git pull
+		4.如果git pull失败，可能是本地分支与远程分支没有建立链接，需要先建立链接后再pull：
+			git branch --set-upstream dev origin/dev
+		5.如果pull 后发现有冲突,需要解决冲突后再pull
+		
+六、标签管理:commit id号码不好记，可以用一个标签来管理版本，如v1.0
+	1.创建标签 git tag <name>
+		默认标签是打在当前分支最新提交的commit上的
+		1.可以查看所有标签：git tag
+		2.补上忘记打的标签
+			1.找到历史提交的commit id：git log --pretty=oneline --abbrev-commit
+			2.补上上一次的标签: git tag v0.9 <commit id>
+		3.查看标签信息：	
+			git show v0.9
+		4.创建带有说明信息的标签，用-a指定标签名，-m 指定说明信息
+			git tag -a v0.1 -m "说明信息" <commit id>
+		5.用PGP签名标签,用私钥签名一个标签：
+			git tag -s v0.2 -m "signed version 0.2 released" fec145c
+	2.操作标签
+		1.推送一个本地标签:git push origin <tag-name>
+		2.推送全部未推送的本地标签:git push origin --tags
+		3.删除一个本地标签:git tag -d <tagname>
+七.使用GitHub
+	要参与GitHub上面的开源项目，过程如下:
+	1.访问仓库主页，点击Fork将开源仓库的内容克隆到个人远程仓库
+	2.克隆个人仓库数据到本地:git clone git@github.com:pengmeng5678/<仓库名>.git
+	3.修改内容commit并push到远程库
+	4.在GitHub上点Pull requests等待
+八.自定义Git
+	1.忽略特殊文件
+		1.忽略某些文件时，需要编写.gitignore
+		2.gitignore文件本身要放到版本库里，并且可以对.gitignore做版本管理
+		3.Window系统下在资源管理器中新建.gitignore文件会提示需要输入文件名,可以再文本编辑器里另存为
+		4.有时候添加一个文件到Git，但是添加不了，原因是这个文件被.gitignore忽略了
+		5.添加一个文件到Git：git add -f <file-name>
+		
+	2.配置别名
+	3.搭建Git服务器
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
