@@ -14,4 +14,27 @@
         在gradle中添加两个依赖
             apply plugin: 'kotlin-android-extensions'
             apply plugin:'kotlin-android'
-    4.
+    4.带参数的接口回调
+        setOnXXXListener(object:XXX{
+            //override method
+        })
+    5.引用MyApplication中的静态常量报NullpointException
+        Kotlin类不支持静态方法和成员，但Kotlin支持全局函数和变量,陪伴对象（Companion Objects）就是Kotlin用来解决这个问题的语法糖
+    6.Parameter specified as non-null is null: method kotlin.jvm.internal.Intrinsics.checkParameterIsNotNull
+        自定义Dialog时,调用dialog.show方法时,提示Dialog的onCreate方法报错
+        解决方案:将Dialog方法的onCreate方法参数后面加个问号？表示，该参数可以为空
+
+    7.Assignments are not expressions, and only expressions are allowed in this context
+        修改前
+            while ((len = `is`.read(buffer)) != -1) {
+                 os.write(buffer, 0, len)
+            }
+        修改后
+            while (`is`.read(buffer).let { len = it;it != -1}){
+                os.write(buffer, 0, len)
+            }
+    8.One type argument expected. Use 'Holder<*>' if you don't want
+       修改前
+        class PlayListAdapter<T>(private val context: Context, private val mPlaylistData: List<T>
+       修改后
+        class PlayListAdapter(private val context: Context, private val mPlaylistData: List<Any>
