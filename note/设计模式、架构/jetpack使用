@@ -14,8 +14,141 @@ https://github.com/android/architecture-components-samples
             mutableLiveData.postValue("Android进阶三部曲");//setValue只能在主线程中使用
 
     3.ViewModel
-
+        1.自定义ViewModel
+           public class MyViewModel extends ViewModel {
+               private MutableLiveData<String> name;
+               public LiveData<String> getName() {
+                   if (name == null) {
+                       name = new MutableLiveData<String>();
+                       addName();
+                   }
+                   return name;
+               }
+               private void addName() {
+                   name.setValue("Android进阶解密");
+               }
+           }
+      2.Activity中使用ViewModel
+        MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
+        model.getName().observe(this,new Observer<String>{
+            @Override
+            public void onChange(@Nullable String s){
+                Log.d(TAG, "畅销书："+s);
+            }
+        })
     4.Room
+        1.创建实体类并添加相应注解
+            @Entity(tableName = "products")
+            public class ProductEntity implements Product {
+                @PrimaryKey
+                private int id;
+                ...
+            }
+            如果有多表级联时，子表要绑定外键
+                @Entity(tableName = "comments",
+                        foreignKeys = {
+                                @ForeignKey(entity = ProductEntity.class,
+                                        parentColumns = "id",
+                                        childColumns = "productId",
+                                        onDelete = ForeignKey.CASCADE)},
+                        indices = {@Index(value = "productId")
+                        })
+                public class CommentEntity implements Comment {
+                    @PrimaryKey(autoGenerate = true)
+                    private int id;
+                    private int productId;
+                        ...
+                }
+
+        2.创建抽象类AppDatabase继承RoomDatabase
+            @Database(entities = {ProductEntity.class, ProductFtsEntity.class, CommentEntity.class}, version = 2)
+            @TypeConverters(DateConverter.class)
+            public abstract class AppDatabase extends RoomDatabase {
+                private static AppDatabase sInstance;
+                @VisibleForTesting
+                public static final String DATABASE_NAME = "basic-sample-db";
+
+                public abstract ProductDao productDao();
+                public abstract CommentDao commentDao();
+            }
+        3.在AppDatabase中初始化表
+            private static AppDatabase buildDatabase(final Context appContext,
+                    final AppExecutors executors) {
+                return Room.databaseBuilder(appContext, AppDatabase.class, DATABASE_NAME)
+                        .addCallback(new Callback() {
+                            @Override
+                            public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                                super.onCreate(db);
+                                executors.diskIO().execute(() -> {
+                                    // Add a delay to simulate a long-running operation
+                                    addDelay();
+                                    // Generate the data for pre-population
+                                    AppDatabase database = AppDatabase.getInstance(appContext, executors);
+                                    List<ProductEntity> products = DataGenerator.generateProducts();
+                                    List<CommentEntity> comments =
+                                            DataGenerator.generateCommentsForProducts(products);
+
+                                    insertData(database, products, comments);
+                                    // notify that the database was created and it's ready to be used
+                                    database.setDatabaseCreated();
+                                });
+                            }
+                        })
+                    .addMigrations(MIGRATION_1_2)
+                    .build();
+
+        4.创建Dao查询接口
+           @Dao
+           public interface CommentDao {
+               @Query("SELECT * FROM comments where productId = :productId")
+               LiveData<List<CommentEntity>> loadComments(int productId);
+
+               @Query("SELECT * FROM comments where productId = :productId")
+               List<CommentEntity> loadCommentsSync(int productId);
+
+               @Insert(onConflict = OnConflictStrategy.REPLACE)
+               void insertAll(List<CommentEntity> comments);
+           }
+
+           @Dao
+           public interface ProductDao {
+               @Query("SELECT * FROM products")
+               LiveData<List<ProductEntity>> loadAllProducts();
+
+               @Insert(onConflict = OnConflictStrategy.REPLACE)
+               void insertAll(List<ProductEntity> products);
+
+               @Query("select * from products where id = :productId")
+               LiveData<ProductEntity> loadProduct(int productId);
+
+               @Query("select * from products where id = :productId")
+               ProductEntity loadProductSync(int productId);
+
+               @Query("SELECT products.* FROM products JOIN productsFts ON (products.id = productsFts.rowid) "
+                   + "WHERE productsFts MATCH :query")
+               LiveData<List<ProductEntity>> searchAllProducts(String query);
+           }
+
+        5.创建数据库仓库实现接口，供用户使用
+           public class DataRepository {
+               private static DataRepository sInstance;
+               ...
+               public LiveData<List<ProductEntity>> getProducts() {
+                   return mObservableProducts;
+               }
+
+               public LiveData<ProductEntity> loadProduct(final int productId) {
+                   return mDatabase.productDao().loadProduct(productId);
+               }
+
+               public LiveData<List<CommentEntity>> loadComments(final int productId) {
+                   return mDatabase.commentDao().loadComments(productId);
+               }
+
+               public LiveData<List<ProductEntity>> searchProducts(String query) {
+                   return mDatabase.productDao().searchAllProducts(query);
+               }
+           }
     5.Navigation
         https://developer.android.google.cn/guide/navigation/navigation-getting-started
         使用前添加依赖
