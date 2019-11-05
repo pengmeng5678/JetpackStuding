@@ -129,7 +129,11 @@ https://www.jianshu.com/p/e0867ac2a261
 	2.配置别名
 	3.搭建Git服务器
 
-
+九、常见问题
+    1.AndroidStudio git commit文件时报错fatal: Path 'directory/file' is in submodule 'directory''
+        解决方法：
+              git rm --cached directory
+              git add directory
 
 
 
