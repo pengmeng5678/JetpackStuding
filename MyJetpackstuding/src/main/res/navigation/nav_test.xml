@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/itemFragment">
+    <fragment
+        android:id="@+id/itemFragment"
+        android:name="www.qihan.cn.jetpackstuding.navigation.ItemFragment"
+        android:label="fragment_item_list"
+        tools:layout="@layout/fragment_item_list" >
+        <action
+            android:id="@+id/action_itemFragment_to_viewModelFragment"
+            app:destination="@id/viewModelFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:launchSingleTop="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewModelFragment"
+        android:name="www.qihan.cn.jetpackstuding.navigation.ViewModelFragment"
+        android:label="view_model_fragment"
+        tools:layout="@layout/view_model_fragment" >
+        <action
+            android:id="@+id/action_viewModelFragment_to_itemFragment"
+            app:destination="@id/itemFragment"
+            app:popUpTo="@id/itemFragment" />
+    </fragment>
+</navigation>
