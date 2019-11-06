@@ -38,3 +38,6 @@
         class PlayListAdapter<T>(private val context: Context, private val mPlaylistData: List<T>
        修改后
         class PlayListAdapter(private val context: Context, private val mPlaylistData: List<Any>
+		
+	9.Fragment中直接通过布局id引用报空指针
+        在onCreateView方法未执行完成就直接引用布局id就会报这种错误

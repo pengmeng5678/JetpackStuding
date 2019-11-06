@@ -12,6 +12,55 @@ https://github.com/android/architecture-components-samples
             });
         2.一般在ViewModel层更新数据
             mutableLiveData.postValue("Android进阶三部曲");//setValue只能在主线程中使用
+        3.更改LiveData的数据,Transformations
+            如果我们想在LiveData对象分发给观察者之前对其中存储的值进行更改，可以使用Transformations.map和Transformations.switchMap()
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged1:"+s);
+                }
+            });
+            LiveData transformedLiveData =Transformations.map(mutableLiveData, new Function<String, Object>() {
+                @Override
+                public Object apply(String name) {
+                   return name + "+Android进阶解密";
+                }
+            });
+            transformedLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged2:"+s);
+                }
+            });
+            mutableLiveData.postValue("Android进阶之光");
+            打印结果：
+                onChanged1:Android进阶之光
+                onChanged2:Android进阶解密
+        4.监听某个数据的变化，且能随时切换监听，可以使用Transformations.switchMap()
+            LiveData transformedLiveData= Transformations.switchMap(liveDataSwitch, new Function<Boolean, LiveData<String>>() {
+                @Override
+                public LiveData<String> apply(Boolean input) {
+                    if (input) {
+                        return mutableLiveData1;
+                    } else {
+                        return mutableLiveData2;
+                   }
+                }
+            });
+
+            transformedLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:" + s);
+                }
+            });
+            liveDataSwitch.postValue(false);//2
+            mutableLiveData1.postValue("Android进阶之光");
+            mutableLiveData2.postValue("Android进阶解密");
+
+        5.合并多个MutableLiveData,使用MediatorLiveData.addSource，将多个MutableLiveData合并到一起，
+        这样当任何一个MutableLiveData数据发生变化时,MediatorLiveData都能感知到
 
     3.ViewModel
         1.自定义ViewModel
@@ -28,14 +77,41 @@ https://github.com/android/architecture-components-samples
                    name.setValue("Android进阶解密");
                }
            }
-      2.Activity中使用ViewModel
-        MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
-        model.getName().observe(this,new Observer<String>{
-            @Override
-            public void onChange(@Nullable String s){
-                Log.d(TAG, "畅销书："+s);
-            }
-        })
+      2.使用ViewModel
+            Activity中简单初始化
+                MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
+                model.getName().observe(this,new Observer<String>{
+                    @Override
+                    public void onChange(@Nullable String s){
+                        Log.d(TAG, "畅销书："+s);
+                    }
+                })
+            另一种初始化方式(自定义Factory,为ViewModel注入数据仓库等对象)
+                ProductViewModel.Factory factory = new ProductViewModel.Factory(
+                        requireActivity().getApplication(), getArguments().getInt(KEY_PRODUCT_ID));
+
+                final ProductViewModel model = new ViewModelProvider(this, factory)
+                        .get(ProductViewModel.class);
+
+                这里创建ProductViewModel的时候,在Factory中就会注入productId,Respository等数据,Factory类如下所示
+                public static class Factory extends ViewModelProvider.NewInstanceFactory {
+                    ...
+                    private final DataRepository mRepository;
+                    public Factory(@NonNull Application application, int productId) {
+                        mApplication = application;
+                        mProductId = productId;
+                        mRepository = ((BasicApp) application).getRepository();
+                    }
+
+                    @Override
+                    public <T extends ViewModel> T create(Class<T> modelClass) {
+                        //noinspection unchecked
+                        return (T) new ProductViewModel(mApplication, mRepository, mProductId);
+                    }
+                }
+            Kotlin初始化ViewModel(自定义Factory)
+                private val viewmodel:MyViewModel by viewModels {ViewModelProvider.Factory实现类}
+                其中ViewModelProvider.Factory实现类会为MyViewModel的构造函数注入其所需的数据库对象等
     4.Room
         1.创建实体类并添加相应注解
             @Entity(tableName = "products")

@@ -1,0 +1,9 @@
+https://www.jianshu.com/p/488283f74e69
+1.CoordinatorLayout介绍
+    CoordinatorLayout is a super-powered FrameLayout
+    CoordinatorLayout is intended for two primary use cases:
+        As a top-level application decor or chrome layout
+        As a container for a specific interaction with one or more child views
+    Behavior描述
+        Interaction behavior plugin for child views of CoordinatorLayout
+    简单来说,CoordinatorLayout是用来协调其子View们之间动作的一个父View,而Behavior就是用来给CoordinatorLayout的子View来交互的

@@ -1,3 +1,4 @@
+https://www.jianshu.com/p/18f16aba79dd
 1.介绍
     Application Not Responding
     Andriod中,主线程如果在规定时间内没有处理完相应工作,就会出现ANR

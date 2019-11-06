@@ -66,3 +66,17 @@
         和依赖资源文件不同的是,
         对于Java文件,各个渠道文件夹和main文件夹之间的关系不是单纯的替换,而是优先使用渠道的东西
         编译时相当于是合并,xml等资源文件相当于是替换,而java文件不是
+
+2.编译超时
+    1.检查当前AndroidStudio插件版本和Gragdle版本是否匹配,如果不匹配可以手动设置Gradle使用本地的版本
+    2.Project依赖可以修改为依赖阿里的地址
+    3.app.gradle的依赖中包含Project.gradle相关的依赖项,应该删除
+        buildscript {
+            repositories {
+                jcenter()
+            }
+            dependencies {
+                classpath 'com.jakewharton:butterknife-gradle-plugin:8.8.1'
+                classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2' // add plugin
+            }
+        }

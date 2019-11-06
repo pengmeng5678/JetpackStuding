@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+	
+	<data>
+		<variable
+			name="hasPlantings"
+			type="boolean" />
+	</data>
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/garden_list"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:clipToPadding="false"
+			android:layout_marginStart="@dimen/card_side_margin"
+			android:layout_marginEnd="@dimen/card_side_margin"
+			android:layout_marginTop="@dimen/margin_normal"
+			app:isGone="@{!hasPlantings}"
+			app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+			app:spanCount="2"
+			tools:listitem="@layout/list_item_garden_planting"
+			/>
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:orientation="vertical"
+			app:isGone="@{hasPlantings}">
+			
+			<TextView
+				android:id="@+id/empty_garden"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="你的花园是空的"
+				android:textAppearance="?attr/textAppearanceHeadline5" />
+			
+			<com.google.android.material.button.MaterialButton
+				android:id="@+id/add_plant"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="?attr/colorPrimary"
+				android:text="请添加植物"
+				app:backgroundTint="?attr/colorOnPrimary"
+				app:shapeAppearance="@style/ShapeAppearance.Sunflower.Button.Add"/>
+		
+		</LinearLayout>
+		
+	</FrameLayout>
+</layout>
