@@ -142,8 +142,50 @@ https://developer.android.google.cn/topic/libraries/architecture
                 2、NavHost：一个空容器，用于显示导航图中的目的地。导航组件包含一个默认的NavHost实现NavHostFragment，它显示片段目标。
                 3、NavController：管理NavHost中应用导航的对象。当用户在整个应用程序中移动时，NavController会在NavHost中协调目标内容的交换。
              在浏览应用程序时，您告诉NavController您想要沿着导航图中的特定路径或直接导航到特定目的地。 NavController然后在NavHost中显示适当的目的地
-        2.
-    6.Databinding
+
+
+    6.workManager
+        1.特点
+            workManager适用于可推迟的任务,即不需要立即执行,并且即使应用程序退出或设备重新启动也必须可靠的运行
+            *向后兼容高达API 14
+            *在具有API 23+的设备上使用JobScheduler
+            *在具有API 14-22的设备上结合使用BroadcastReceiver + AlarmManager
+            *添加工作限制，例如网络可用性或充电状态
+            *安排异步一次性或定期任务
+            *监视和管理预定任务
+            *将任务链接在一起
+            *确保任务执行，即使应用或设备重启
+            *具备节电模式等节电功能
+        2.基本使用
+            1.创建任务
+                public class UploadWorker extends Worker {
+                    public UploadWorker(
+                        @NonNull Context context,
+                        @NonNull WorkerParameters params) {
+                        super(context, params);
+                    }
+                    @Override
+                    public Result doWork() {
+                      uploadImages()
+                      return Result.success()
+                    }
+                }
+            2.配置任务
+                如何或者何时运行，单次任务使用OneTimeWorkRequest,周期任务使用PeriodicWorkRequest
+                WorkRequest还可配置如，延迟、重试任务等
+                OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(UploadWorker.class)
+                        .build()
+            3.执行任务
+                WorkManager.getInstance(myContext).enqueue(uploadWorkRequest);
+            4.其他功能
+                1.定义WorkRequest
+                2.观察工作状态
+                3.链接多个工作
+                4.取消或者停止工作
+                5.处理重复工作
+                6.处理特有工作
+                ...
+    7.Databinding
         https://blog.csdn.net/LVXIANGAN/article/details/90176401
         介绍
             Databinding是谷歌官方发布的一种支持库，借助该库，可以使用声明式的语言(而非程序化的)

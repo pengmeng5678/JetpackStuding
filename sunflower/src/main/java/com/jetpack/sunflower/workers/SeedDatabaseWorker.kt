@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.samples.apps.sunflower.workers
+package com.jetpack.sunflower.workers
 
 import android.content.Context
 import android.util.Log
@@ -40,14 +40,13 @@ class SeedDatabaseWorker(
                     val plantList: List<Plant> = Gson().fromJson(jsonReader, plantType)
 
                     val database = AppDatabase.getInstance(applicationContext)
-                      //TODO
-//                    database.plantDao().insertAll(plantList)
+                    database.plantDao().insertAll(plantList)
 
                     Result.success()
                 }
             }
-        } catch (ex: Exception) {
-            Log.e(TAG, "Error seeding database", ex)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error seeding database", e)
             Result.failure()
         }
     }
