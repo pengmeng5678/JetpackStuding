@@ -17,7 +17,7 @@ class SunflowerPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
     }
 
     override fun createFragment(position: Int): Fragment {
-        return tabFragmentCreators[position]?.invoke()?:throw IndexOutOfBoundsException()
+        return tabFragmentCreators[position]?.invoke()?:throw IndexOutOfBoundsException() as Throwable
     }
 
 }

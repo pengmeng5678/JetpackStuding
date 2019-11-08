@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil.setContentView
 import com.jetpack.sunflower.databinding.ActivityGardenBinding
 
-class GardenActivity : AppCompatActivity(),HomeViewPagerFragment.OnFragmentInteractionListener,PlantListFragment.OnFragmentInteractionListener {
+class GardenActivity : AppCompatActivity(),HomeViewPagerFragment.OnFragmentInteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

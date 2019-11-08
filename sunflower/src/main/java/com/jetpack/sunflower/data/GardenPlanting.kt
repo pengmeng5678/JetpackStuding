@@ -17,6 +17,7 @@
 package com.google.samples.apps.sunflower.data
 
 import androidx.room.*
+import com.jetpack.sunflower.data.Plant
 import java.util.*
 
 /**

@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:context=".PlantListFragment">
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 	
-	<!-- TODO: Update blank fragment layout -->
-	<TextView
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" >
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/plant_list"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:text="PlantListFragment" />
-
-</FrameLayout>
+		android:clipToPadding="false"
+		android:paddingEnd="@dimen/card_side_margin"
+		android:paddingStart="@dimen/card_side_margin"
+		android:paddingTop="@dimen/header_margin"
+		app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+		app:spanCount="2"
+		tools:context="com.jetpack.sunflower.GardenActivity"
+		tools:listitem="@layout/list_item_plant"/>
+	</FrameLayout>
+</layout>

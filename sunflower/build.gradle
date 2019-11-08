@@ -18,6 +18,11 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    // work-runtime-ktx 2.1.0 and above now requires Java 8
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -33,21 +38,28 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     /*jetpack core*/
-    implementation deps.kotlin.stdlib
     implementation deps.lifecycle.viewmodel_ktx
+    implementation deps.lifecycle.livedata_ktx
+
     implementation deps.navigation.fragment_ktx
     implementation deps.navigation.runtime_ktx
     implementation deps.navigation.ui_ktx
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
     implementation deps.room.runtime
+    implementation deps.room.kt
     annotationProcessor deps.room.compiler
     implementation deps.work.runtime_ktx
     /*third library*/
     implementation "com.google.code.gson:gson:2.8.2"
     implementation "com.github.bumptech.glide:glide:4.9.0"
     /*kotlin annotation*/
-    kapt "androidx.room:room-compiler:2.1.0-alpha04"
+    implementation deps.kotlin.stdlib
+    kapt "androidx.room:room-compiler:2.1.0"
     kapt "com.github.bumptech.glide:compiler:4.9.0"
+    /*coroutines*/
+    implementation deps.coroutines.android
+    implementation deps.coroutines.core
 
     implementation deps.support.app_compat
     implementation deps.support.core_ktx

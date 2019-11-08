@@ -15,7 +15,7 @@
  */
 
 include ':NavigationBasicSample', ':BasicRoomSample'
-include ':workManagerSample',':workManagerLib'
+//include ':workManagerSample',':workManagerLib'
 include ':sunflower'
 include':MyJetpackstuding'
 include':LiveDataSample'

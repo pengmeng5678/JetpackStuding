@@ -3,7 +3,6 @@ package com.jetpack.sunflower.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.google.samples.apps.sunflower.data.GardenPlanting
-import com.google.samples.apps.sunflower.data.Plant
 
 @Dao
 interface GardenPlantingDao {

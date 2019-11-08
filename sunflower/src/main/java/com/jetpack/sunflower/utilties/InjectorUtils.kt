@@ -19,21 +19,40 @@ package com.jetpack.sunflower.utilties
 import android.content.Context
 import com.jetpack.sunflower.data.AppDatabase
 import com.jetpack.sunflower.data.GardenPlantingRepository
+import com.jetpack.sunflower.data.PlantRepository
 import com.jetpack.sunflower.viewmodels.GardenPlantingListViewModelFactory
+import com.jetpack.sunflower.viewmodels.PlantListViewModelFactory
 
 
 /**
  * Static methods used to inject classes needed for various Activities and Fragments.
  */
 object InjectorUtils {
+    private fun getPlantingListRepository(context: Context): PlantRepository {
+        val dao = AppDatabase.getInstance(context.applicationContext).plantDao()
+        return PlantRepository.getInstance(dao)
+    }
+    private fun getGardenPlantingRepository(context: Context): GardenPlantingRepository {
+        val dao = AppDatabase.getInstance(context.applicationContext).gardenPlantingDao()
+        return GardenPlantingRepository.getInstance(dao)
+    }
+
     fun provideGardenPlantingListViewModelFactory(context: Context): GardenPlantingListViewModelFactory {
         val repository = getGardenPlantingRepository(context)
         return GardenPlantingListViewModelFactory(repository)
     }
 
-    private fun getGardenPlantingRepository(context: Context): GardenPlantingRepository {
-        val dao = AppDatabase.getInstance(context.applicationContext).gardenPlantingDao()
-        return GardenPlantingRepository.getInstance(dao)
+    fun providePlantListViewModelModelFactory(context: Context): PlantListViewModelFactory {
+        val repository = getPlantingListRepository(context)
+        return PlantListViewModelFactory(repository)
     }
+
+    private fun getPlantAndGardenPlantingRepository(context: Context): PlantRepository {
+        val dao = AppDatabase.getInstance(context.applicationContext).plantDao()
+        return PlantRepository.getInstance(dao)
+    }
+
+
+
 
 }

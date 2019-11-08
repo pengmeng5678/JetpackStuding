@@ -5,7 +5,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.google.samples.apps.sunflower.data.Plant
 
 @Dao
 interface PlantDao {

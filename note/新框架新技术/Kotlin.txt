@@ -1,5 +1,7 @@
 本文主要记录Kotlin相关知识点
+https://www.kotlincn.net/docs/reference/android-overview.html
 https://juejin.im/post/591dd9f544d904006c9fbb96
+https://blog.csdn.net/u013064109/article/details/78786646
 第一章、Kotlin操作符
 	?操作符
 		表示这个对象可能为空
@@ -140,6 +142,89 @@ https://juejin.im/post/591dd9f544d904006c9fbb96
 			}
 		默认参数 fun sum(a:Int,b:Int = 3):Int
 
+        高阶函数与lambda表达式
+            高阶函数：是将函数作为参数或返回值的函数
+            lambda表达式
+                lambda表达式，只支持单抽象方法模型，也就是说设计的接口里面只有一个抽象方法
+
+            函数类型
+                kotlin使用类似(Int) -> String的一系列函数类型来处理函数的声明val onClick:() ->Unit = ...
+                这些类型具有与函数签名相对应的特殊表示法,即他们的参数与返回值；(A,B) -> C 表示接受类型分别是A与B两个参数并返回一个C类型值的函数类型
+                挂起函数属于特殊种类的函数类型，它的表示法中有一个suspend修饰符
+
+        内联函数
+            使用高阶函数会带来一些运行时的效率损失:每个函数都是一个对象，并且会捕获一个闭包，即在那些函数体内会访问到的变量。内存分配和虚拟调用会引入运行时间开销
+            但在许多情况下通过内联化lambda表达式可以消除这类的开销
+            let
+                let扩展函数实际上是一个作用域函数,当你需要去定义一个变量在特定作用域范围内，let函数时一个不错的选择；let函数另一个作用就是可以避免写一些非null的操作
+                let函数底层的inline扩展函数+lambda结构
+                       @kotlin.internal.InlineOnly
+                    public inline fun <T, R> T.let(block: (T) -> R): R = block(this)
+                    从源码let函数的结构来看它是只有一个lambda函数块block作为参数的函数,调用T类型对象的let函数，则该对象为函数的参数。
+                    在函数块内可以通过 it 指代该对象。返回值为函数块的最后一行或指定return表达式
+                let函数适用的场景
+                    场景一: 最常用的场景就是使用let函数处理需要针对一个可null的对象统一做判空处理。
+                    场景二: 然后就是需要去明确一个变量所处特定的作用域范围内可以使用，如
+                        不使用let函数
+                            mVideoPlayer?.setVideoView(activity.course_video_view)
+                            mVideoPlayer?.setControllerView(activity.course_video_controller_view)
+                            mVideoPlayer?.setCurtainView(activity.course_video_curtain_view)
+                        //使用let函数
+                            mVideoPlayer?.let {
+                               it.setVideoView(activity.course_video_view)
+                               it.setControllerView(activity.course_video_controller_view)
+                               it.setCurtainView(activity.course_video_curtain_view)
+                            }
+            with
+                with函数底层的inline扩展函数+lambda结构
+                    @kotlin.internal.InlineOnly
+                    public inline fun <T, R> with(receiver: T, block: T.() -> R): R = receiver.block()
+                with函数不是以扩展的形式存在的，它是将某对象作为函数的参数,在函数块内可以通过this指代该对象，返回值为函数块的最后一行或指定return表达式
+                可以看出with函数是接收了两个参数，分别为T类型的对象receiver和一个lambda函数块，所以with函数最原始样子如下:
+                    val result = with(user, {
+                        println("my name is $name, I am $age years old, my phone number is $phoneNum")
+                        1000
+                    })
+                但是由于with函数最后一个参数是一个函数，可以把函数提到圆括号的外部，所以最终with函数的调用形式如下:
+                    val result = with(user) {
+                        println("my name is $name, I am $age years old, my phone number is $phoneNum")
+                        1000
+                    }
+                with函数的kotlin表示法
+                    val user = User("Kotlin", 1, "1111111")
+                    val result = with(user) {
+                        println("my name is $name, I am $age years old, my phone number is $phoneNum")
+                        1000
+                    }
+                    println("result: $result")
+                with函数的Java表示法
+                      User user = new User("Kotlin", 1, "1111111");
+                      String var4 = "my name is " + user.getName() + ", I am " + user.getAge() + " years old, my phone number is " + user.getPhoneNum();
+                      System.out.println(var4);
+                      int result = 1000;
+                      String var3 = "result: " + result;
+                      System.out.println(var3);
+                with函数的使用场景
+                      适用于调用同一个类的多个方法时，可以省去类名重复，直接调用类的方法即可，经常用于Android中RecyclerView中onBinderViewHolder中，数据model的属性映射到UI上
+
+            run
+                run函数的inline+lambda结构
+                    @kotlin.internal.InlineOnly
+                    public inline fun <T, R> T.run(block: T.() -> R): R = block()
+                    run函数实际上可以说是let和with两个函数的结合体，run函数只接收一个lambda函数为参数，以闭包形式返回，返回值为最后一行的值或者指定的return的表达式
+            apply
+                apply函数底层的inline扩展函数+lambda结构
+                    @kotlin.internal.InlineOnly
+                    public inline fun <T> T.apply(block: T.() -> Unit): T { block(); return this }
+                    从结构上来看apply函数和run函数很像，唯一不同点就是它们各自返回的值不一样，run函数是以闭包形式返回最后一行代码的值，而apply函数的返回的是传入对象的本身
+                apply适用场景
+                    apply一般用于一个对象实例初始化的时候，需要对对象中的属性进行赋值。或者动态inflate出一个XML的View的时候需要给View绑定数据也会用到
+            also
+                also函数底层的inline扩展函数+lambda结构
+                    @kotlin.internal.InlineOnly
+                    also函数的结构实际上和let很像唯一的区别就是返回值的不一样，let是以闭包的形式返回，返回函数体内最后一行的值，如果最后一行为空就返回一个Unit类型的默认值。而also函数返回的则是传入对象的本身
+            let,with,run,apply,also函数的区别
+                见图
     延迟属性
         延迟属性或者延初始化可以帮助我们在需要的时候再进行初始化，不需要时不初始化，帮助程序节省内存空间和启动速度
         kotlin中使用lazy关键字来表示
@@ -337,6 +422,15 @@ https://juejin.im/post/591dd9f544d904006c9fbb96
                 print("eat")
             }
         }
+        companion object{
+            @Volatile private var instance:AppDatabase ?= null
+            fun getInstance(context: Context):AppDatabase{
+                return instance ?: synchronized(this){
+                    instance ?: buildDatabase(context).also{ instance = it}
+                }
+            }
+            ...
+        }
 
     7.对象表达式
         当需要修改一个类的部分功能，可以不通过显示实现一个该类的子类方式来实现，在java中，通过匿名内部类
@@ -411,6 +505,8 @@ https://juejin.im/post/591dd9f544d904006c9fbb96
         5.3.3空安全性
         在Java中，如果你调用的Kotlin方法参数声明了非空类型，如果你在java代码中传入一个空值，将在运行时抛出
         NullPointerException
+
+第六章 koltin内联扩展函数
 
 
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.jetpack.sunflower.data.GardenPlantingRepository
 /*
-*   通过这个Factory给ViewModel注入repository
+*   通过这个Factory给GardenPlantingListViewModel注入repository
 */
 class GardenPlantingListViewModelFactory(
         private val repository: GardenPlantingRepository

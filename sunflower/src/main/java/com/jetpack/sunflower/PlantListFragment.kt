@@ -1,12 +1,14 @@
 package com.jetpack.sunflower
 
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
+import com.jetpack.sunflower.adapters.PlantAdapter
+import com.jetpack.sunflower.databinding.FragmentPlantListBinding
+import com.jetpack.sunflower.utilties.InjectorUtils
+import com.jetpack.sunflower.viewmodels.PlantListViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,11 +24,12 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class PlantListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
 
+    private val viewModel: PlantListViewModel by viewModels {
+        InjectorUtils.providePlantListViewModelModelFactory(requireContext())
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -37,43 +40,41 @@ class PlantListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+        val binding = FragmentPlantListBinding.inflate(inflater, container, false)
+        val adapter = PlantAdapter()
+        binding.plantList.adapter = adapter
+        subscribeUi(adapter)
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_plant_list, container, false)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+    private fun subscribeUi(adapter: PlantAdapter) {
+        viewModel.plants.observe(viewLifecycleOwner){plants ->
+            adapter.submitList(plants)
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_plant_list,menu)
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.filter_zone ->{
+                updateData()
+                true
+            }else->super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun updateData() {
+        with(viewModel){
+            if(isFilter()){
+                clearGrowZoneNumber()
+            }else{
+                setGrowZoneNumber(9)
+            }
+        }
     }
 
     companion object {

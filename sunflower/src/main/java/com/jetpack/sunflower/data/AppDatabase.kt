@@ -9,11 +9,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.samples.apps.sunflower.data.GardenPlanting
-import com.google.samples.apps.sunflower.data.Plant
 import com.jetpack.sunflower.utilties.DATABASE_NAME
 import com.jetpack.sunflower.workers.SeedDatabaseWorker
 
-@Database(entities = [GardenPlanting::class,Plant::class],version = 1,exportSchema = false)
+@Database(entities = [GardenPlanting::class, Plant::class],version = 1,exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase :RoomDatabase(){
     abstract fun gardenPlantingDao(): GardenPlantingDao

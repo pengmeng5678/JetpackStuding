@@ -23,8 +23,8 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import com.google.samples.apps.sunflower.data.Plant
 import com.jetpack.sunflower.data.AppDatabase
+import com.jetpack.sunflower.data.Plant
 import com.jetpack.sunflower.utilties.PLANT_DATA_FILENAME
 import kotlinx.coroutines.coroutineScope
 
@@ -41,7 +41,7 @@ class SeedDatabaseWorker(
 
                     val database = AppDatabase.getInstance(applicationContext)
                     database.plantDao().insertAll(plantList)
-
+                    Log.e(TAG, "database insert plantList size:${plantList.size}")
                     Result.success()
                 }
             }

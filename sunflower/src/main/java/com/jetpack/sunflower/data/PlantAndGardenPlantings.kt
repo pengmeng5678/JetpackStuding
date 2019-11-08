@@ -19,7 +19,6 @@ package com.jetpack.sunflower.data
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.google.samples.apps.sunflower.data.GardenPlanting
-import com.google.samples.apps.sunflower.data.Plant
 
 
 /**

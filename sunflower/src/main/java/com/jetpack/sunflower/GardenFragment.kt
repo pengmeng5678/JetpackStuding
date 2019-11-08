@@ -29,6 +29,11 @@ class GardenFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var binding: FragmentGardenBinding
+    /*
+        1.通过provideGardenPlantingListViewModelFactory方法创建GardenPlantingListViewModel
+    *   2.GardenPlantingListViewModel构造方法接收GardenPlantingRepository,并通过这个数据仓库获取所有已经种植的植物的liveData
+    *   3.GardenFragment通过监听这个viewModel的liveData更新ui
+    */
     private val viewModel: GardenPlantingListViewModel by viewModels {
         InjectorUtils.provideGardenPlantingListViewModelFactory(requireContext())
     }
