@@ -205,7 +205,8 @@ https://blog.csdn.net/u013064109/article/details/78786646
                       String var3 = "result: " + result;
                       System.out.println(var3);
                 with函数的使用场景
-                      适用于调用同一个类的多个方法时，可以省去类名重复，直接调用类的方法即可，经常用于Android中RecyclerView中onBinderViewHolder中，数据model的属性映射到UI上
+                      适用于调用同一个类的多个方法时，可以省去类名重复，直接调用类的方法即可，
+                      经常用于Android中RecyclerView中onBinderViewHolder中，数据model的属性映射到UI上
 
             run
                 run函数的inline+lambda结构

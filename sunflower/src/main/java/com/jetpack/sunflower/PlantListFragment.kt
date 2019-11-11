@@ -45,7 +45,7 @@ class PlantListFragment : Fragment() {
         binding.plantList.adapter = adapter
         subscribeUi(adapter)
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.fragment_plant_list, container, false)
+        return binding.root
     }
 
     private fun subscribeUi(adapter: PlantAdapter) {

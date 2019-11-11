@@ -1,98 +1,125 @@
 package com.jetpack.sunflower
 
-import android.content.Context
-import android.net.Uri
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ShareCompat
+import androidx.core.widget.NestedScrollView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.jetpack.sunflower.data.Plant
+import com.jetpack.sunflower.databinding.FragmentPlantDetailBinding
+import com.jetpack.sunflower.utilties.InjectorUtils
+import com.jetpack.sunflower.viewmodels.PlantDetailViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [PlantDetailFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [PlantDetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PlantDetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
+    /*nav_garden.xml文件中定义了name为plantId的argument*/
+    private val args : PlantDetailFragmentArgs by navArgs()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private val plantDetailViewModel: PlantDetailViewModel by viewModels {
+        InjectorUtils.providePlantDetailViewModel(requireContext(),args.plantId)
     }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_plant_detail, container, false)
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PlantDetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-                PlantDetailFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
+        val binding = DataBindingUtil.inflate<FragmentPlantDetailBinding>(
+                inflater,R.layout.fragment_plant_detail,container,false
+        ).apply{
+            viewModel = plantDetailViewModel
+            lifecycleOwner = viewLifecycleOwner
+            callback = object:Callback{
+                override fun add(plant: Plant?) {
+                    plant?.let {
+                        hideAppBarFab(fab)
+                        plantDetailViewModel.addPlantToGarden()
+                        Snackbar.make(root,"Add plant to garden",Snackbar.LENGTH_LONG).show()
                     }
                 }
+
+            }
+            var isToolbarShown = false
+            plantDetailScrollview.setOnScrollChangeListener(
+                    NestedScrollView.OnScrollChangeListener{_,_,scrollY,_,_ ->
+                        // User scrolled past image to height of toolbar and the title text is
+                        // underneath the toolbar, so the toolbar should be shown.
+                        val shouldShowToolbar = scrollY > toolbar.height
+                        // The new state of the toolbar differs from the previous state; update
+                        // appbar and toolbar attributes.
+                        if (isToolbarShown != shouldShowToolbar) {
+                            isToolbarShown = shouldShowToolbar
+
+                            // Use shadow animator to add elevation if toolbar is shown
+                            appbar.isActivated = shouldShowToolbar
+
+                            // Show the plant name if toolbar is shown
+                            toolbarLayout.isTitleEnabled = shouldShowToolbar
+                        }
+                    }
+            )
+            toolbar.setNavigationOnClickListener{view ->
+                view.findNavController().navigateUp()
+            }
+            toolbar.setOnMenuItemClickListener { item->
+                when(item.itemId){
+                    R.id.action_share ->{
+                        createShareIntent()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+        setHasOptionsMenu(true)
+        return binding.root
+    }
+
+    // Helper function for calling a share functionality.
+    // Should be used when user presses a share button/menu item.
+    @Suppress("DEPRECATION")
+    private fun createShareIntent() {
+        val shareText = plantDetailViewModel.plant.value.let { plant ->
+            if (plant == null) {
+                ""
+            } else {
+                getString(R.string.share_text_plant, plant.name)
+            }
+        }
+        val shareIntent = ShareCompat.IntentBuilder.from(activity)
+                .setText(shareText)
+                .setType("text/plain")
+                .createChooserIntent()
+                .apply {
+                    // https://android-developers.googleblog.com/2012/02/share-with-intents.html
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        // If we're on Lollipop, we can open the intent as a document
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                    } else {
+                        // Else, we will use the old CLEAR_WHEN_TASK_RESET flag
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                    }
+                }
+        startActivity(shareIntent)
+    }
+
+    private fun hideAppBarFab(fab: FloatingActionButton) {
+        val params = fab.layoutParams as CoordinatorLayout.LayoutParams
+        val behavior = params.behavior as FloatingActionButton.Behavior
+        behavior.isAutoHideEnabled = false
+        fab.hide()
+    }
+
+    interface Callback {
+        fun add(plant: Plant?)
     }
 }

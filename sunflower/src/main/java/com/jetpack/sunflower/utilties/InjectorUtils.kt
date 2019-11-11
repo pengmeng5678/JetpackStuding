@@ -21,6 +21,7 @@ import com.jetpack.sunflower.data.AppDatabase
 import com.jetpack.sunflower.data.GardenPlantingRepository
 import com.jetpack.sunflower.data.PlantRepository
 import com.jetpack.sunflower.viewmodels.GardenPlantingListViewModelFactory
+import com.jetpack.sunflower.viewmodels.PlantDetailViewModelFactory
 import com.jetpack.sunflower.viewmodels.PlantListViewModelFactory
 
 
@@ -52,7 +53,9 @@ object InjectorUtils {
         return PlantRepository.getInstance(dao)
     }
 
-
+    fun providePlantDetailViewModel(context: Context, plantId: String): PlantDetailViewModelFactory {
+        return PlantDetailViewModelFactory(getPlantingListRepository(context), getGardenPlantingRepository(context),plantId)
+    }
 
 
 }
