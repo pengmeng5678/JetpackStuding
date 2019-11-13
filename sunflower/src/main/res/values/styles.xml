@@ -7,6 +7,7 @@
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 		<item name="colorAccent">@color/colorAccent</item>
 	</style>
+	
 	<style name="Base.Theme.Sunflower" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 		<item name="colorPrimary">@color/sunflower_green_500</item>
 		<item name="colorOnPrimary">@color/sunflower_yellow_500</item>
@@ -17,16 +18,19 @@
 		<item name="colorSecondary">@color/sunflower_yellow_500</item>
 		<item name="android:colorBackground">@color/sunflower_green_500</item>
 	</style>
-	<style name="Theme.Sunflower" parent="Base.Theme.Sunflower"/>
+	
+	<style name="Theme.Sunflower" parent="Base.Theme.Sunflower" />
 	
 	<style name="Theme.Sunflower.NoActionBar">
 		<item name="windowActionBar">false</item>
 		<item name="windowNoTitle">true</item>
 	</style>
 	
-	<style name="Theme.Sunflower.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+	<style name="Theme.Sunflower.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 	
-	<style name="TextAppearance.Sunflower.Toolbar.Text" parent="TextAppearance.MaterialComponents.Headline5" >
+	<style name="TextAppearance.Sunflower.Toolbar.Text" parent="TextAppearance.MaterialComponents.Headline5">
 		<item name="android:textColor">?attr/colorOnSurface</item>
 	</style>
+	
+	<style name="Theme.Sunflower.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

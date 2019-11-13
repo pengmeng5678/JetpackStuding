@@ -278,7 +278,10 @@ https://github.com/android/architecture-components-samples
             3.初始的Fragment在TitleScreen,定义一个id为action_title_screen_to_register的action
                 action中可以通过destination指定要跳转的目的地，同时设定跳转动画
             4.在TitleScreen就可以通过代码跳转到id为Register的Fragment中了.具体跳转逻辑如下
-                Navigation.findNavController(view).navigate(R.id.action_title_screen_to_register)
+                java写法
+                    Navigation.findNavController(view).navigate(R.id.action_title_screen_to_register)
+                kotlin写法：(自定义NavDirections)
+                    view.findNavController().navigate(direction:NavDirections)
 
                <navigation xmlns:android="http://schemas.android.com/apk/res/android"
                            xmlns:app="http://schemas.android.com/apk/res-auto"

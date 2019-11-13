@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.jetpack.sunflower.adapters.SunflowerPagerAdapter
 import com.jetpack.sunflower.databinding.FragmentHomeViewPagerBinding
@@ -48,11 +47,9 @@ class HomeViewPagerFragment : Fragment() {
         viewpager.adapter = SunflowerPagerAdapter(this)
         // Set the icon and text for each tab
         try {
-            TabLayoutMediator(tabLayout,viewpager,object :TabLayoutMediator.OnConfigureTabCallback{
-                override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
-                    tab.text = getTabTitle(position)
-                    tab.setIcon(getTabIcon(position))
-                }
+            TabLayoutMediator(tabLayout,viewpager, TabLayoutMediator.OnConfigureTabCallback { tab, position ->
+                tab.text = getTabTitle(position)
+                tab.setIcon(getTabIcon(position))
             }).attach()
         } catch (e: Exception) {
         }

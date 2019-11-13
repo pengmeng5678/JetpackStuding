@@ -15,7 +15,16 @@
 			app:defaultNavHost="true">
 			
 		</fragment>
-		
+		<Button
+			android:onClick="btShowScrollingActivity"
+			android:text="显示ScrollingActivity"
+			android:layout_gravity="bottom|right"
+			android:layout_margin="16dp"
+			android:textAllCaps="false"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+			
+		</Button>
 	</FrameLayout>
 
 </layout>

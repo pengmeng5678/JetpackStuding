@@ -1,7 +1,9 @@
 package com.jetpack.sunflower
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +19,11 @@ class GardenActivity : AppCompatActivity(),HomeViewPagerFragment.OnFragmentInter
     }
 
     override fun onFragmentInteraction(uri: Uri) {
-        Toast.makeText(this@GardenActivity,"GardenActivity onFragmentInteraction:"+uri.toString(),Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@GardenActivity, "GardenActivity onFragmentInteraction:$uri",Toast.LENGTH_SHORT).show()
+    }
+
+    fun btShowScrollingActivity(view: View) {
+        val intent = Intent(this@GardenActivity,ScrollingActivity::class.java)
+        startActivity(intent)
     }
 }

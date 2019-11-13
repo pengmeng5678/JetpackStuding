@@ -1,0 +1,18 @@
+1.ImageView配置src和background有什么区别
+    简单说src是原图显示,不改变图片的大小;用background的时候,按照组件的大小来放大或者缩小图
+
+    区别一：图片透明度
+        src:在设置ImageView的setAlpha时有效果
+        background：在设置ImageView的setAlpha没有效果
+    区别二
+        src存放原图大小，不进行拉伸
+        background:根据Imageview的宽高来放大或缩小图片
+
+2.gravity和layout_gravity区别
+    gravity
+        这个是针对控件里的元素来说的，用来控制元素在控件里的位置；如在一个Button按钮空间中设置如下属性
+        android:gravity="left"和android:text="提交"，这时Button上的文字“提交”将会位于Button的左部
+
+    layout_gravity
+        这个是针对控件本身来说的，用来控制该控件在父控件中的位置
+        如，android:layout_gravity="left"属性时，表示该Button按钮将位于界面的左部

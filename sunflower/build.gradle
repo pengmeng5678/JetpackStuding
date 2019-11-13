@@ -48,6 +48,7 @@ dependencies {
 
     implementation deps.room.runtime
     implementation deps.room.kt
+    implementation 'androidx.appcompat:appcompat:1.0.2'
     annotationProcessor deps.room.compiler
     implementation deps.work.runtime_ktx
     /*third library*/
