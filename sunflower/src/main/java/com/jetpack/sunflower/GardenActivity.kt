@@ -13,7 +13,7 @@ class GardenActivity : AppCompatActivity(),HomeViewPagerFragment.OnFragmentInter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContentView<ActivityGardenBinding>(this,R.layout.activity_garden)
+        val binding = setContentView<ActivityGardenBinding>(this, R.layout.activity_garden)
     }
 
     override fun onFragmentInteraction(uri: Uri) {

@@ -25,7 +25,6 @@
 		<argument
 			android:name="plantId"
 			app:argType="string">
-			
 		</argument>
 	</fragment>
 	
