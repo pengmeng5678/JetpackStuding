@@ -213,6 +213,10 @@ https://blog.csdn.net/u013064109/article/details/78786646
                     @kotlin.internal.InlineOnly
                     public inline fun <T, R> T.run(block: T.() -> R): R = block()
                     run函数实际上可以说是let和with两个函数的结合体，run函数只接收一个lambda函数为参数，以闭包形式返回，返回值为最后一行的值或者指定的return的表达式
+                run函数的使用场景
+                    适用于let,with函数任何场景。因为run函数是let,with两个函数结合体，
+                    准确来说它弥补了let函数在函数体内必须使用it参数替代对象，在run函数中可以像with函数一样可以省略，直接访问实例的公有属性和方法，
+                    另一方面它弥补了with函数传入对象判空问题，在run函数中可以像let函数一样做判空处理
             apply
                 apply函数底层的inline扩展函数+lambda结构
                     @kotlin.internal.InlineOnly
@@ -223,9 +227,15 @@ https://blog.csdn.net/u013064109/article/details/78786646
             also
                 also函数底层的inline扩展函数+lambda结构
                     @kotlin.internal.InlineOnly
-                    also函数的结构实际上和let很像唯一的区别就是返回值的不一样，let是以闭包的形式返回，返回函数体内最后一行的值，如果最后一行为空就返回一个Unit类型的默认值。而also函数返回的则是传入对象的本身
+                    also函数的结构实际上和let很像唯一的区别就是返回值的不一样，let是以闭包的形式返回，返回函数体内最后一行的值，如果最后一行为空就返回一个Unit类型的默认值。
+                    而also函数返回的则是传入对象的本身
             let,with,run,apply,also函数的区别
-                见图
+                let:it指代对象,返回函数最后一行或者return表达式结果
+                with:this指代对象，返回函数最后一行或者return表达式结果
+                run:this指代对象,返回函数最后一行或者return表达式结果，结合了let和with的优点
+                apply:this指代对象,返回this对象本身;和run唯一不同就是返回值不同
+                also:it指代对象,返回this对象本身；和let唯一不同就是返回值不同
+
     延迟属性
         延迟属性或者延初始化可以帮助我们在需要的时候再进行初始化，不需要时不初始化，帮助程序节省内存空间和启动速度
         kotlin中使用lazy关键字来表示

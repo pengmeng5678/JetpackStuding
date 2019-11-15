@@ -2,7 +2,7 @@
 ThreadLocal:https://www.jianshu.com/p/98b68c97df9b
 线程：https://www.jianshu.com/p/3d8f7ec1017a
 synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
-
+线程原理 https://www.jianshu.com/p/31a100fc945d
 并发编码的两大核心：JMM抽象内存模型和happens-before规则。三天性质：原子性、有序性和可见性
 
 1.进程、线程
@@ -148,5 +148,17 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         另一个用锁机制进行时间换空间。
             ThreadLocal不是用于解决共享变量的问题,不是为了协调线程同步而存在,
         而是为了方便每个线程处理自己的状态而引入的一个机制。
+
+7.HandlerThread和intentService
+    handlerThread
+        介绍
+            是一个内部封装了handler的Thread,调用start方法后该线程对应的Looper开始工作,使用该looper的handler在post任务后可以使任务在子线程串行执行
+        使用
+            HandlerThread thread = new HandlerThread("aa");
+            thread.start();
+            Handler handler = new Handler(thread.getLooper());
+    intentService
+        介绍
+            是一个封装了HandlerThread的Service,当队列中的任务执行完成后，该Service会杀死自己
 
 
