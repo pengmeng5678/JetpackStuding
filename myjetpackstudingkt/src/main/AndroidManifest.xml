@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.studing.myjetpackstudingkt">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/MyAppTheme">
+        <activity
+            android:name=".ui.masterdetail.ItemListActivity"
+            android:label="@string/title_item_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ui.masterdetail.ItemDetailActivity"
+            android:label="@string/title_item_detail"
+            android:parentActivityName=".ui.masterdetail.ItemListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.studing.myjetpackstudingkt.ui.masterdetail.ItemListActivity" />
+        </activity>
+        <activity
+            android:name=".ui.tabed.TabbedActivity"
+            android:label="@string/title_activity_tabbed"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.navigationdrawer.NavigationDrawerActivity"
+            android:label="@string/title_activity_navigation_drawer"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.buttonnavigation.ButtomNavigationActivity"
+            android:label="@string/title_activity_buttom_navigation" />
+        <activity
+            android:name=".ui.ScrollingActivity"
+            android:label="@string/title_activity_scrolling"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ButtomNavigationActivity"
+            android:label="@string/title_activity_buttom_navigation" />
+    </application>
+
+</manifest>
