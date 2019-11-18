@@ -518,6 +518,68 @@ https://blog.csdn.net/u013064109/article/details/78786646
         NullPointerException
 
 第六章 koltin内联扩展函数
+    let
+        it指代对象,返回函数最后一行或者return表达式,let?.{}
+    with
+        this指代对象，返回函数最后一行或者return表达式,执行with函数前要判空
+    run
+        this指代对象,返回函数最后一行或者return表达式,结合了let判空和with函数的this指代对象
+    apply
+        this指代对象,与run唯一区别就是返回函数自身
+    also
+        it指代对象,与let唯一区别就是返回函数自身
+
+第七章 协程
+    1.基础介绍
+        本质上，协程是轻量级的线程。它们在某些CoroutineScope上下文中与lauch协程构建器一起启动
+        示例1
+            fun main() {
+                GlobalScope.launch { // 在后台启动一个新的协程并继续
+                    delay(1000L) // 非阻塞的等待 1 秒钟（默认时间单位是毫秒）
+                    println("World!") // 在延迟后打印输出
+                }
+                println("Hello,") // 协程已在等待时主线程还在继续
+                Thread.sleep(2000L) // 阻塞主线程 2 秒钟来保证 JVM 存活
+            }
+        可以将GlobalScope.lauch替换为thread{...},将delay替换为Thread.sleep(...)达到同样的目的
+        如果只将GlobalScope.lauch替换为thread{...}编译器会报错,因为delay是一个特殊的挂起函数,它不会造成线程阻塞，但是会挂起协程，并且只能在协程中使用
+
+        示例二：等待一个作业
+           val job = GlobalScope.launch { // 启动一个新协程并保持对这个作业的引用
+               delay(1000L)
+               println("World!")
+           }
+           println("Hello,")
+           job.join() // 等待直到子协程执行结束
+
+        当我们使用GlobalScope.launche时，我们会创建一个顶层协程,它运行会消耗一些内存资源。
+        我们可以使用结构化并发来优化它，即在执行操作所在的指定作用域内启动协程
+        示例三：作用域构建器
+            //这里我们使用runBlocking将main函数转换为协程,包括runBlocking在内的每个协程构建器都将CoroutineScope的实例添加到其代码块所在作用域中
+            在这个作用域中启动协程无需显示join,因为外部协程(示例中的runBlocking)直到在其作用域启动的所有协议都执行完毕后才会结束
+            fun main() = runBlocking { // this: CoroutineScope
+                launch {
+                    delay(200L)
+                    println("Task from runBlocking")
+                }
+
+                coroutineScope { // 创建一个协程作用域
+                    launch {
+                        delay(500L)
+                        println("Task from nested launch")
+                    }
+
+                    delay(100L)
+                    println("Task from coroutine scope") // 这一行会在内嵌 launch 之前输出
+                }
+                println("Coroutine scope is over") // 这一行在内嵌 launch 执行完毕后才输出
+            }
+        runBlocking和coroutineScope的区别在于后者在等待所有子协程执行完毕时不会阻塞当前线程
+        示例三输出结果
+            Task from coroutine scope
+            Task from runBlocking
+            Task from nested launch
+            Coroutine scope is over
 
 
 
