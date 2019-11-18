@@ -159,6 +159,6 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             Handler handler = new Handler(thread.getLooper());
     intentService
         介绍
-            是一个封装了HandlerThread的Service,当队列中的任务执行完成后，该Service会杀死自己
+            是一个封装了HandlerThread的Service,当队列中的所有任务串行执行完成后，该Service会杀死自己
 
 
