@@ -518,15 +518,153 @@ https://blog.csdn.net/u013064109/article/details/78786646
         NullPointerException
 
 第六章 koltin内联扩展函数
+    let
+        it指代对象,返回函数最后一行或者return表达式,let?.{}
+    with
+        this指代对象，返回函数最后一行或者return表达式,执行with函数前要判空
+    run
+        this指代对象,返回函数最后一行或者return表达式,结合了let判空和with函数的this指代对象
+    apply
+        this指代对象,与run唯一区别就是返回函数自身
+    also
+        it指代对象,与let唯一区别就是返回函数自身
 
+第七章 协程
+    1.基础介绍
+        本质上，协程是轻量级的线程。它们在某些CoroutineScope上下文中与lauch协程构建器一起启动
+        示例1
+            fun main() {
+                GlobalScope.launch { // 在后台启动一个新的协程并继续
+                    delay(1000L) // 非阻塞的等待 1 秒钟（默认时间单位是毫秒）
+                    println("World!") // 在延迟后打印输出
+                }
+                println("Hello,") // 协程已在等待时主线程还在继续
+                Thread.sleep(2000L) // 阻塞主线程 2 秒钟来保证 JVM 存活
+            }
+        可以将GlobalScope.lauch替换为thread{...},将delay替换为Thread.sleep(...)达到同样的目的
+        如果只将GlobalScope.lauch替换为thread{...}编译器会报错,因为delay是一个特殊的挂起函数,它不会造成线程阻塞，但是会挂起协程，并且只能在协程中使用
 
+        示例二：等待一个作业
+           val job = GlobalScope.launch { // 启动一个新协程并保持对这个作业的引用
+               delay(1000L)
+               println("World!")
+           }
+           println("Hello,")
+           job.join() // 等待直到子协程执行结束
 
+        当我们使用GlobalScope.launche时，我们会创建一个顶层协程,它运行会消耗一些内存资源。
+        我们可以使用结构化并发来优化它，即在执行操作所在的指定作用域内启动协程
+        示例三：作用域构建器
+            //这里我们使用runBlocking将main函数转换为协程,包括runBlocking在内的每个协程构建器都将CoroutineScope的实例添加到其代码块所在作用域中
+            在这个作用域中启动协程无需显式join,因为外部协程(示例中的runBlocking)直到在其作用域启动的所有协程都执行完毕后才会结束
+            fun main() = runBlocking { // this: CoroutineScope
+                launch {
+                    delay(200L)
+                    println("Task from runBlocking")
+                }
 
+                coroutineScope { // 创建一个协程作用域
+                    launch {
+                        delay(500L)
+                        println("Task from nested launch")
+                    }
 
+                    delay(100L)
+                    println("Task from coroutine scope") // 这一行会在内嵌 launch 之前输出
+                }
+                println("Coroutine scope is over") // 这一行在内嵌 launch 执行完毕后才输出
+            }
+        runBlocking和coroutineScope的区别在于后者在等待所有子协程执行完毕时不会阻塞当前线程
+        示例三输出结果
+            Task from coroutine scope
+            Task from runBlocking
+            Task from nested launch
+            Coroutine scope is over
 
+        挂起函数
+            在协程内部可以向普通函数一样使用挂起函数,其额外特性是，同样可以使用其他挂起函数来挂起协程的执行
+            fun main() = runBlocking {
+                launch { doWorld() }
+                println("Hello,")
+            }
 
+            // 这是你的第一个挂起函数
+            suspend fun doWorld() {
+                delay(1000L)
+                println("World!")
+            }
+    2.协程的取消
+        val job = launch {
+            try{
+                repeat(1000) { i ->
+                        println("job: I'm sleeping $i ...")
+                    delay(500L)
+                }
+            }finally{
+                withContext(NonCanclellable){
+                   delay(1000L)
+                   println("job: And I've just delayed for 1 sec because I'm non-cancellable")
+                }
+            }
+        }
+        delay(1300L) // 延迟一段时间
+        println("main: I'm tired of waiting!")
+        job.cancel() // 取消该作业
+        job.join() // 等待作业执行结束,或者调用cancleAndJoin
+        println("main: Now I can quit.")
+        输出结果
+            job: I'm sleeping 0 ...
+            job: I'm sleeping 1 ...
+            job: I'm sleeping 2 ...
+            main: I'm tired of waiting!
+            job: And I've just delayed for 1 sec because I'm non-cancellable
+            main: Now I can quit.
 
+        当协程中有循环时,即使调用了cancleAndJoin，循环体仍然会执行，这时我们可以使用isActive代替循环条件
+        isActive是一个可以被使用在CoroutineScope中的扩展属性
 
+        运行不能取消的代码块
+            上个例子中finally中如果调用挂起函数会跑出CancllationException
+            但如果需要挂起一个被取消的协程，可以使用withContext(NonCancellable)包装
+
+        超时
+            val result = withTimeoutOrNull(1300L) {
+                repeat(1000) { i ->
+                        println("I'm sleeping $i ...")
+                    delay(500L)
+                }
+                "Done" // 在它运行得到结果之前取消它
+            }
+            println("Result is $result")
+
+    3.组合挂起函数
+        默认顺序调用
+           suspend fun doSomethingUsefulOne(): Int {
+               delay(1000L) // 假设我们在这里做了一些有用的事
+               return 13
+           }
+
+           suspend fun doSomethingUsefulTwo(): Int {
+               delay(1000L) // 假设我们在这里也做了一些有用的事
+               return 29
+           }
+        使用async并发
+            async类似于lanch，它启动了一个单独的协程,它与其他协程一起并发工作
+            不同之处在于launch返回一个job并不附带任何结果值，而async返回一个Deferred(一个轻量级的非阻塞future)
+            可以使用.await在一个延期的值上得到它的结果
+                val time = measureTimeMillis {
+                    val one = async { doSomethingUsefulOne() }
+                    val two = async { doSomethingUsefulTwo() }
+                    println("The answer is ${one.await() + two.await()}")
+                }
+                println("Completed in $time ms")
+
+            使用async结构化并发，以下这种情况如果在concurrentSum函数内部(任一子协程)发生错误,所有在作用域中启动的协程都会被取消
+                suspend fun concurrentSum(): Int = coroutineScope {
+                    val one = async { doSomethingUsefulOne() }
+                    val two = async { doSomethingUsefulTwo() }
+                    one.await() + two.await()
+                }
 
 
 
