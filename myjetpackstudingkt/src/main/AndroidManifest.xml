@@ -47,8 +47,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ButtomNavigationActivity"
-            android:label="@string/title_activity_buttom_navigation" />
+            android:name=".ui.SettingsActivity"
+            android:label="@string/title_activity_Setting" />
     </application>
 
 </manifest>

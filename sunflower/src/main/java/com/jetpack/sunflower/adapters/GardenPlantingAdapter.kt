@@ -23,7 +23,7 @@ class GardenPlantingAdapter : ListAdapter<PlantAndGardenPlantings,GardenPlanting
     }
 
     override fun onBindViewHolder(holder: GardenPlantingAdapter.ViewHolder, position: Int) {
-        getItem(position).let { plantings ->
+        getItem(position)?.let { plantings ->
             with(holder){
                 bind(plantings)
             }

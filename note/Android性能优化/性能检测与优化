@@ -34,9 +34,10 @@ https://www.jianshu.com/nb/8407779
         3.追求续航,防止损耗(电量优化)
         4.追求精简,防止臃肿(Apk瘦身)
     1.内存优化(追求稳定,防止闪退)
-        Memory Monitor
-        Memory Analyzer
-        leakCanary工具
+        1.明显问题初筛
+            Allocation Tracker查看堆内存分配情况，可以直接跳源码 https://www.jianshu.com/p/d8e994bfb382
+            Heap Viewer 查看堆内存分配数据，提供初步判断 https://www.jianshu.com/p/5035745da456
+
         具体优化内容见同级"内存优化"目录
 
     2.卡顿优化(追求流畅,防止卡顿)

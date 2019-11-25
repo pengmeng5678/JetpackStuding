@@ -91,6 +91,7 @@
     </string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_buttom_navigation">ButtomNavigationActivity</string>
+    <string name="title_activity_Setting">SettingActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
