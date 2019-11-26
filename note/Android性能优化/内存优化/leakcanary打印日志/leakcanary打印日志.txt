@@ -1,0 +1,1969 @@
+11-26 16:50:26.973 15974-15994/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/dea92f9a-092e-4e90-9e83-7d181b6e1a4d_pending.hprof" starting...
+11-26 16:50:31.386 16698-18221/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-26 16:50:31.398 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 2604(214KB) AllocSpace objects, 0(0B) LOS objects, 23% free, 2MB/3MB, paused 8.362ms total 13.171ms
+11-26 16:50:31.398 16698-18221/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-26 16:50:31.556 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:50:31.638 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 20017(1116KB) AllocSpace objects, 2(68KB) LOS objects, 0% free, 10MB/10MB, paused 5.231ms total 30.706ms
+11-26 16:50:31.730 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:50:31.998 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 48(553KB) AllocSpace objects, 9(852KB) LOS objects, 0% free, 32MB/32MB, paused 8.223ms total 140.130ms
+11-26 16:50:32.114 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 1027(943KB) AllocSpace objects, 5(1016KB) LOS objects, 30% free, 37MB/53MB, paused 3.822ms total 116.112ms
+11-26 16:50:32.522 16698-18221/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-26 16:50:33.557 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 439953(13MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 41MB/53MB, paused 5.034ms total 77.445ms
+11-26 16:50:34.072 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 429713(12MB) AllocSpace objects, 0(0B) LOS objects, 19% free, 42MB/53MB, paused 4.832ms total 114.815ms
+11-26 16:50:34.906 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 355690(10MB) AllocSpace objects, 0(0B) LOS objects, 17% free, 43MB/53MB, paused 5.556ms total 59.691ms
+11-26 16:50:35.327 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 360927(10MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 44MB/53MB, paused 9.475ms total 104.732ms
+11-26 16:50:35.687 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 326766(9MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 44MB/53MB, paused 12.549ms total 76.960ms
+11-26 16:50:36.068 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 324739(9MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 45MB/53MB, paused 12.973ms total 91.339ms
+11-26 16:50:36.812 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 285593(8MB) AllocSpace objects, 0(0B) LOS objects, 11% free, 47MB/53MB, paused 6.868ms total 114.587ms
+11-26 16:50:37.081 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 234389(7MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 47MB/53MB, paused 9.962ms total 76.014ms
+11-26 16:50:37.232 16698-18221/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-26 16:50:37.235 16698-18221/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-26 16:50:37.537 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 110295(4MB) AllocSpace objects, 0(0B) LOS objects, 2% free, 51MB/53MB, paused 4.516ms total 140.403ms
+11-26 16:50:37.800 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 179532(11MB) AllocSpace objects, 1(172KB) LOS objects, 27% free, 42MB/58MB, paused 3.064ms total 205.149ms
+11-26 16:50:38.438 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 562673(16MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 45MB/58MB, paused 6.884ms total 139.819ms
+11-26 16:50:39.014 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 539948(15MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 45MB/58MB, paused 8.523ms total 153.339ms
+11-26 16:50:39.570 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 485037(15MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 46MB/58MB, paused 1.200ms total 136.672ms
+11-26 16:50:40.021 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 448282(13MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 46MB/58MB, paused 5.275ms total 78.676ms
+11-26 16:50:40.350 16698-18221/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-26 16:50:40.607 16698-18302/com.qihancloud.zhiyin:leakcanary D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191126.
+    * com.qihancloud.zhiyin.ui.activity.MainActivity has leaked:
+    * static SanbotActionManagerImpl$SanbotActionManagerHolder.!(mHolder)!
+    * ↳ SanbotActionManagerImpl.!(mHardWareManager)!
+    * ↳ HardWareManager.!(context)!
+    * ↳ MainActivity
+11-26 16:50:40.608 16698-18302/com.qihancloud.zhiyin:leakcanary D/LeakCanary: * Reference Key: a1318f8c-89e2-4dfe-aa9f-1edccbdbaf7a
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=5092ms, gc=211ms, heap dump=4373ms, analysis=8978ms
+    * Details:
+    * Class com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl$SanbotActionManagerHolder
+    |   static mHolder = com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl@315484240 (0x12cde850)
+    |   static $classOverhead = byte[56]@315168321 (0x12c91641)
+    * Instance of com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl
+    |   static TAG = "ROBOT_ACTION"
+    |   static $classOverhead = byte[112]@315175409 (0x12c931f1)
+    |   handMotionManager = null
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@315402848 (0x12ccaa60)
+    |   mOnActionManagerListener = com.qihancloud.zhiyin.ui.activity.MainPresenter$14@315387344 (0x12cc6dd0)
+    |   shadow$_klass_ = com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.sanbot.opensdk.function.unit.HardWareManager
+    |   static $classOverhead = byte[168]@314808545 (0x12c398e1)
+    |   context = com.qihancloud.zhiyin.ui.activity.MainActivity@315274240 (0x12cab400)
+    |   listener = com.qihancloud.zhiyin.ui.activity.MainActivity@315274240 (0x12cab400)
+    |   listenerMap = android.support.v4.util.ArrayMap@315484216 (0x12cde838)
+    |   shadow$_klass_ = com.sanbot.opensdk.function.unit.HardWareManager
+    |   shadow$_monitor_ = 0
+    * Instance of com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   static COMMAND_START_NAVIGATION = 12
+    |   static COMMAND_PLAY_CHANGE_SOME_ONE = 10
+    |   static $classOverhead = byte[2192]@315195393 (0x12c98001)
+    |   static CHAT_TEXT_INPUT = 101
+    |   static TAG = "FRAGMENT"
+    |   static PERMISSION_EXIT_APP = "PERMISSION_EXIT_APP"
+    |   static PERMISSION_GO_TO_SETTING_ACTIVITY = "PERMISSION_GO_TO_SETTING_ACTIVITY"
+    |   static COMMAND_SET_INIT_POSITION = 13
+    |   static COMMAND_NEXT_ONE = 5
+    |   static UPDATE_CHAT_DATA = 1
+    |   static TAG1 = "MUSIC_SERVICE"
+    |   static COMMAND_OPEN_CAMERA = 14
+    |   static COMMAND_PREVIOUS_ONE = 6
+    |   static COMMAND_PLAYER_LIST = 11
+    |   static CHAT_VOICE_INPUT = 102
+    |   EXIT_HTML_TASK_MILLITIME = 30000
+    |   animationDisable = null
+    |   chat_et = android.support.v7.widget.AppCompatEditText@315395072 (0x12cc8c00)
+    |   chat_input_iv = android.support.v7.widget.AppCompatImageView@315396096 (0x12cc9000)
+    |   currentChatType = 102
+    |   delayExitHtmlTask = com.qihancloud.zhiyin.ui.activity.MainActivity$17@315385616 (0x12cc6710)
+    |   lastActionTime = 0
+    |   mBidner = com.qihancloud.zhiyin.service.MusicPlayerService$MusicBinder@315409728 (0x12ccc540)
+    |   mCommandQuestion = null
+    |   mConn = null
+    |   mCurrentDealResult = com.qihancloud.zhiyin.bean.DealResult@315346584 (0x12cbce98)
+    |   mCurrentfragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@314764960 (0x12c2eea0)
+    |   mCustomDialog = null
+    |   mFrameDrawablesListen = java.util.ArrayList@315402752 (0x12ccaa00)
+    |   mFrameDrawablesSpeak = java.util.ArrayList@315402776 (0x12ccaa18)
+    |   mFrameDrawablesWait = java.util.ArrayList@315402800 (0x12ccaa30)
+    |   mFrameLayout = android.widget.FrameLayout@315397120 (0x12cc9400)
+    |   mGuideStrTittle = "你好，请问有什么可以帮你?"
+    |   mHTMLLayout = android.widget.FrameLayout@315398144 (0x12cc9800)
+    |   mHandler = com.qihancloud.zhiyin.ui.activity.MainActivity$1@315409760 (0x12ccc560)
+    |   mHtml5WebView = null
+    |   mInput_container = android.widget.RelativeLayout@315399168 (0x12cc9c00)
+    |   mIsOnPause = true
+    |   mIvCloseActivity = null
+11-26 16:50:40.609 16698-18302/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mIvClosePage = android.support.v7.widget.AppCompatImageView@315421696 (0x12ccf400)
+    |   mIvPlayMusic = android.support.v7.widget.AppCompatImageView@315422720 (0x12ccf800)
+    |   mIvSetMore = android.support.v7.widget.AppCompatImageView@315423744 (0x12ccfc00)
+    |   mLlHintContainer = android.widget.LinearLayout@315424768 (0x12cd0000)
+    |   mMainPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@315348800 (0x12cbd740)
+    |   mManagerPassword = null
+    |   mMusicIntent = null
+    |   mRoundProgressBar = com.qihancloud.zhiyin.ui.widget.RoundProgressBar@314944144 (0x12c5aa90)
+    |   mTvFromUser = android.support.v7.widget.AppCompatTextView@315425792 (0x12cd0400)
+    |   mUsbDiskReceiver = null
+    |   robot_animation_iv = com.qihancloud.zhiyin.function.frameanimation.FrameAnimationView@315426816 (0x12cd0800)
+    |   text_input_ll = android.widget.LinearLayout@315427840 (0x12cd0c00)
+    |   handMotionManager = com.sanbot.opensdk.function.unit.HandMotionManager@315402824 (0x12ccaa48)
+    |   isUseSdkVoice = true
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@315402848 (0x12ccaa60)
+    |   mHdCameraManager = null
+    |   mOnActionManagerListener = null
+    |   mPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@315348912 (0x12cbd7b0)
+    |   mSpeechManager = com.sanbot.opensdk.function.unit.SpeechManager@315402704 (0x12cca9d0)
+    |   mSystemManager = com.sanbot.opensdk.function.unit.SystemManager@315409792 (0x12ccc580)
+    |   TAG = "SanbotOpenSDK"
+    |   alarmReceiver = com.sanbot.opensdk.base.BindBaseActivity$alarmReceiver$1@315402872 (0x12ccaa78)
+    |   clientClass = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   clientName = "com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   clientSocketUtil = com.sanbot.opensdk.utils.socket.ClientSocketUtil@315409824 (0x12ccc5a0)
+    |   currentFunction = "com.qihancloud.zhiyin"
+    |   executorService = java.util.concurrent.Executors$FinalizableDelegatedExecutorService@315385632 (0x12cc6720)
+    |   hfisonConn = com.sanbot.opensdk.base.BindBaseActivity$hfisonConn$1@315385648 (0x12cc6730)
+    |   iFaceInfoBinder = com.qihancloud.hfisone.IFaceInfoBinder$Stub$Proxy@315385664 (0x12cc6740)
+    |   iFaceInfoNotification = com.sanbot.opensdk.base.BindBaseActivity$iFaceInfoNotification$1@315409856 (0x12ccc5c0)
+    |   isFaceBind = false
+    |   isMainBind = false
+    |   mainThreadHandler = com.sanbot.opensdk.base.BindBaseActivity$mainThreadHandler$1@315409888 (0x12ccc5e0)
+    |   mainserviceVersion = "2.0.0"
+    |   managerMap = java.util.concurrent.ConcurrentHashMap@315413120 (0x12ccd280)
+    |   statusMap = java.util.concurrent.ConcurrentHashMap@315413184 (0x12ccd2c0)
+    |   subscriber = com.sanbot.opensdk.base.BindBaseActivity$subscriber$1@315385680 (0x12cc6750)
+    |   weakReference = java.lang.ref.WeakReference@315402896 (0x12ccaa90)
+    |   mDelegate = android.support.v7.app.AppCompatDelegateImplN@315108656 (0x12c82d30)
+    |   mResources = null
+    |   mThemeId = 2131624198
+    |   mCreated = true
+    |   mFragments = android.support.v4.app.FragmentController@315385696 (0x12cc6760)
+    |   mHandler = android.support.v4.app.FragmentActivity$1@315409952 (0x12ccc620)
+    |   mLoaderManager = null
+    |   mNextCandidateRequestIndex = 0
+    |   mPendingFragmentActivityResults = android.support.v4.util.SparseArrayCompat@315402920 (0x12ccaaa8)
+    |   mReallyStopped = true
+    |   mRequestedPermissionsFromFragment = false
+    |   mResumed = false
+    |   mRetaining = false
+    |   mStopped = true
+    |   mViewModelStore = null
+    |   mStartedActivityFromFragment = false
+    |   mStartedIntentSenderFromFragment = false
+    |   mExtraDataMap = android.support.v4.util.SimpleArrayMap@315402944 (0x12ccaac0)
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@315409984 (0x12ccc640)
+    |   mActionBar = null
+    |   mActionModeTypeStarting = 0
+    |   mActivityInfo = android.content.pm.ActivityInfo@315108800 (0x12c82dc0)
+    |   mActivityTransitionState = android.app.ActivityTransitionState@315406424 (0x12ccb858)
+11-26 16:50:40.610 16698-18302/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mApplication = com.qihancloud.zhiyin.MyApplication@315254032 (0x12ca6510)
+    |   mCalled = true
+    |   mChangeCanvasToTranslucent = false
+    |   mChangingConfigurations = false
+    |   mComponent = android.content.ComponentName@315385712 (0x12cc6770)
+    |   mConfigChangeFlags = 0
+    |   mCurrentConfig = android.content.res.Configuration@315283736 (0x12cad918)
+    |   mDecor = null
+    |   mDefaultKeyMode = 0
+    |   mDefaultKeySsb = null
+    |   mDestroyed = true
+    |   mDoReportFullyDrawn = false
+    |   mEatKeyUpEvent = false
+    |   mEmbeddedID = null
+    |   mEnableDefaultActionBarUp = false
+    |   mEnterTransitionListener = android.app.SharedElementCallback$1@1883688304 (0x7046cd70)
+    |   mExitTransitionListener = android.app.SharedElementCallback$1@1883688304 (0x7046cd70)
+    |   mFinished = true
+    |   mFragments = android.app.FragmentController@315385728 (0x12cc6780)
+    |   mHandler = android.os.Handler@315410016 (0x12ccc660)
+11-26 16:50:40.611 16698-18302/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mHasCurrentPermissionsRequest = false
+    |   mIdent = 23103990
+    |   mInstanceTracker = android.os.StrictMode$InstanceTracker@315385744 (0x12cc6790)
+    |   mInstrumentation = android.app.Instrumentation@314788808 (0x12c34bc8)
+    |   mIntent = android.content.Intent@315406480 (0x12ccb890)
+    |   mLastNonConfigurationInstances = null
+    |   mMainThread = android.app.ActivityThread@314585344 (0x12c03100)
+    |   mManagedCursors = java.util.ArrayList@315402968 (0x12ccaad8)
+    |   mManagedDialogs = null
+    |   mMenuInflater = null
+    |   mParent = null
+    |   mReferrer = "com.qihancloud.shopping"
+    |   mResultCode = 0
+    |   mResultData = null
+    |   mResumed = false
+    |   mSearchEvent = null
+    |   mSearchManager = null
+    |   mStartedActivity = false
+    |   mStopped = true
+    |   mTaskDescription = android.app.ActivityManager$TaskDescription@315410048 (0x12ccc680)
+    |   mTemporaryPause = false
+    |   mTitle = "知音"
+    |   mTitleColor = 0
+    |   mTitleReady = true
+    |   mToken = android.os.BinderProxy@315410080 (0x12ccc6a0)
+    |   mTranslucentCallback = null
+    |   mUiThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mVisibleBehind = false
+    |   mVisibleFromClient = true
+    |   mVisibleFromServer = true
+    |   mVoiceInteractor = null
+    |   mWindow = com.android.internal.policy.PhoneWindow@314838672 (0x12c40e90)
+    |   mWindowAdded = true
+    |   mWindowManager = android.view.WindowManagerImpl@315402992 (0x12ccaaf0)
+    |   mInflater = com.android.internal.policy.PhoneLayoutInflater@315336928 (0x12cba8e0)
+    |   mOverrideConfiguration = null
+    |   mResources = android.content.res.Resources@315256112 (0x12ca6d30)
+    |   mTheme = android.content.res.Resources$Theme@315385760 (0x12cc67a0)
+    |   mThemeResource = 2131624198
+    |   mBase = android.app.ContextImpl@315349024 (0x12cbd820)
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   shadow$_monitor_ = -2056534026
+    * Excluded Refs:
+    | Field: android.os.Message.obj
+    | Field: android.os.Message.next
+11-26 16:50:40.612 16698-18302/com.qihancloud.zhiyin:leakcanary D/LeakCanary: | Field: android.os.Message.target
+    | Field: android.view.inputmethod.InputMethodManager.mNextServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedInputConnection
+    | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Field: android.accounts.AccountManager$AmsTask$Response.this$1
+    | Field: android.os.UserManager.mContext
+    | Field: com.android.internal.policy.BackdropFrameRenderer.mDecorView
+    | Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Thread:main (always)
+    | Thread:LeakCanary-Heap-Dump (always)
+    | Class:java.lang.ref.WeakReference (always)
+    | Class:java.lang.ref.SoftReference (always)
+    | Class:java.lang.ref.PhantomReference (always)
+    | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)
+11-26 16:50:41.830 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Removing 1 heap dumps
+11-26 16:50:41.890 15974-15994/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/11c70e1a-ae97-453f-8f73-84842bbdc58b_pending.hprof" starting...
+11-26 16:50:46.136 16698-18335/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-26 16:50:46.140 16698-18335/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-26 16:50:46.224 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:50:46.381 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 28787(1500KB) AllocSpace objects, 1(24KB) LOS objects, 0% free, 9MB/9MB, paused 11.743ms total 42.520ms
+11-26 16:50:46.446 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 79(749KB) AllocSpace objects, 4(456KB) LOS objects, 39% free, 15MB/26MB, paused 5.826ms total 64.909ms
+11-26 16:50:46.717 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 10(344KB) AllocSpace objects, 3(540KB) LOS objects, 0% free, 29MB/29MB, paused 5.597ms total 83.947ms
+11-26 16:50:46.832 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 72(1007KB) AllocSpace objects, 8(1172KB) LOS objects, 31% free, 35MB/51MB, paused 7.346ms total 115.156ms
+11-26 16:50:47.300 16698-18335/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-26 16:50:47.329 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 544858(15MB) AllocSpace objects, 0(0B) LOS objects, 21% free, 40MB/51MB, paused 3.266ms total 169.225ms
+11-26 16:50:48.586 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 367791(10MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 42MB/51MB, paused 4.873ms total 107.079ms
+11-26 16:50:48.958 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 331896(9MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 43MB/51MB, paused 6.469ms total 87.551ms
+11-26 16:50:49.380 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 313925(9MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 44MB/51MB, paused 10.596ms total 111.922ms
+11-26 16:50:49.680 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 275103(8MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 43MB/51MB, paused 11.006ms total 75.929ms
+11-26 16:50:50.015 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 281880(8MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 44MB/51MB, paused 8.962ms total 86.767ms
+11-26 16:50:50.277 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 254773(7MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 44MB/51MB, paused 5.507ms total 47.791ms
+11-26 16:50:50.857 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 249022(7MB) AllocSpace objects, 0(0B) LOS objects, 11% free, 45MB/51MB, paused 12.801ms total 83.023ms
+11-26 16:50:51.162 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 247846(7MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 45MB/51MB, paused 13.133ms total 97.594ms
+11-26 16:50:51.443 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 177148(5MB) AllocSpace objects, 0(0B) LOS objects, 8% free, 46MB/51MB, paused 19.018ms total 65.438ms
+11-26 16:50:51.632 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 165127(4MB) AllocSpace objects, 0(0B) LOS objects, 7% free, 47MB/51MB, paused 6.701ms total 45.072ms
+11-26 16:50:51.858 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 170297(5MB) AllocSpace objects, 0(0B) LOS objects, 6% free, 47MB/51MB, paused 21.177ms total 91.292ms
+11-26 16:50:52.091 16698-18335/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-26 16:50:52.093 16698-18335/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-26 16:50:52.147 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 146329(6MB) AllocSpace objects, 2(260KB) LOS objects, 25% free, 45MB/61MB, paused 2.989ms total 177.389ms
+11-26 16:50:52.989 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 366377(11MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 52MB/61MB, paused 4.760ms total 116.426ms
+11-26 16:50:53.737 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 346251(10MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 53MB/61MB, paused 7.001ms total 93.113ms
+11-26 16:50:55.029 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 290463(8MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 55MB/61MB, paused 12.096ms total 106.737ms
+11-26 16:50:55.163 16698-18335/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-26 16:50:55.441 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191126.
+11-26 16:50:55.442 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: * android.widget.RelativeLayout has leaked:
+    * static FragmentFactory.mCurrentFragment
+    * ↳ DefaultGuideFragment.!(mView)!
+    * ↳ RelativeLayout
+    * Reference Key: 1fe4d716-7ab8-405e-a532-b77ea5c0b471
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=20011ms, gc=221ms, heap dump=3998ms, analysis=9044ms
+    * Details:
+    * Class com.qihancloud.zhiyin.ui.fragment.FragmentFactory
+    |   static isClearCache = true
+    |   static mCurrentFragmentType = -1
+    |   static $classOverhead = byte[65]@315158113 (0x12c8ee61)
+    |   static mCacheFragment = java.util.HashMap@315786672 (0x12d285b0)
+    |   static mCurrentFragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@314764960 (0x12c2eea0)
+    * Instance of com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   static $classOverhead = byte[712]@315163649 (0x12c90401)
+    |   mAttachDisposable = null
+    |   mDataList = java.util.LinkedList@315511064 (0x12ce5118)
+    |   mFlGuideContainer = android.widget.LinearLayout@315573248 (0x12cf4400)
+    |   mIsAdded = false
+    |   mTvDefaultGuide = android.support.v7.widget.AppCompatTextView@315574272 (0x12cf4800)
+    |   mView = android.widget.RelativeLayout@315575296 (0x12cf4c00)
+    |   mCompositeDisposable = null
+    |   mAdded = false
+    |   mAnimationInfo = android.support.v4.app.Fragment$AnimationInfo@315560352 (0x12cf11a0)
+    |   mArguments = null
+    |   mBackStackNesting = 0
+    |   mCalled = true
+    |   mChildFragmentManager = null
+    |   mChildNonConfig = null
+    |   mContainer = null
+    |   mContainerId = 0
+    |   mDeferStart = false
+    |   mDetached = false
+    |   mFragmentId = 0
+    |   mFragmentManager = null
+    |   mFromLayout = false
+    |   mHasMenu = false
+    |   mHidden = false
+    |   mHiddenChanged = false
+    |   mHost = null
+    |   mInLayout = false
+    |   mIndex = -1
+    |   mInnerView = null
+11-26 16:50:55.443 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mIsCreated = false
+    |   mIsNewlyAdded = false
+    |   mLayoutInflater = null
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@315553312 (0x12cef620)
+    |   mLoaderManager = null
+    |   mMenuVisible = true
+    |   mParentFragment = null
+    |   mPerformedCreateView = false
+    |   mPostponedAlpha = 0.0
+    |   mRemoving = false
+11-26 16:50:55.444 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mRestored = false
+    |   mRetainInstance = false
+    |   mRetaining = false
+    |   mSavedFragmentState = null
+    |   mSavedUserVisibleHint = null
+    |   mSavedViewState = null
+    |   mState = 0
+    |   mTag = null
+    |   mTarget = null
+    |   mTargetIndex = -1
+    |   mTargetRequestCode = 0
+    |   mUserVisibleHint = true
+    |   mView = null
+    |   mViewModelStore = null
+    |   mWho = null
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   shadow$_monitor_ = 0
+    * Instance of android.widget.RelativeLayout
+    |   static ALIGN_LEFT = 5
+    |   static ALIGN_TOP = 6
+    |   static CENTER_VERTICAL = 15
+    |   static ALIGN_BOTTOM = 8
+    |   static DEFAULT_WIDTH = 65536
+    |   static VERB_COUNT = 22
+    |   static ALIGN_BASELINE = 4
+    |   static START_OF = 16
+    |   static ABOVE = 2
+    |   static RIGHT_OF = 1
+    |   static RULES_HORIZONTAL = int[8]@1883858368 (0x704965c0)
+    |   static TRUE = -1
+    |   static ALIGN_START = 18
+    |   static END_OF = 17
+    |   static ALIGN_PARENT_RIGHT = 11
+    |   static ALIGN_RIGHT = 7
+    |   static ALIGN_END = 19
+    |   static CENTER_IN_PARENT = 13
+    |   static ALIGN_PARENT_BOTTOM = 12
+    |   static $classOverhead = byte[3620]@1884602425 (0x7054c039)
+    |   static LEFT_OF = 0
+    |   static ALIGN_PARENT_LEFT = 9
+    |   static RULES_VERTICAL = int[5]@1883858416 (0x704965f0)
+    |   static ALIGN_PARENT_TOP = 10
+    |   static ALIGN_PARENT_END = 21
+    |   static BELOW = 3
+    |   static ALIGN_PARENT_START = 20
+    |   static VALUE_NOT_SET = -2147483648
+    |   static CENTER_HORIZONTAL = 14
+    |   mAllowBrokenMeasureSpecs = false
+    |   mBaselineView = android.widget.LinearLayout@315573248 (0x12cf4400)
+    |   mContentBounds = android.graphics.Rect@315543360 (0x12cecf40)
+    |   mDirtyHierarchy = false
+    |   mGraph = android.widget.RelativeLayout$DependencyGraph@315543384 (0x12cecf58)
+    |   mGravity = 8388659
+    |   mIgnoreGravity = -1
+    |   mMeasureVerticalWithPaddingMargin = true
+    |   mSelfBounds = android.graphics.Rect@315543408 (0x12cecf70)
+    |   mSortedHorizontalChildren = android.view.View[2]@315543432 (0x12cecf88)
+    |   mSortedVerticalChildren = android.view.View[2]@315543456 (0x12cecfa0)
+    |   mTopToBottomLeftToRightSet = null
+    |   mAnimationListener = null
+    |   mCachePaint = null
+    |   mChildCountWithTransientState = 0
+    |   mChildTransformation = null
+    |   mChildren = android.view.View[12]@315529856 (0x12ce9a80)
+    |   mChildrenCount = 2
+    |   mChildrenInterestedInDrag = null
+11-26 16:50:55.445 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mCurrentDragChild = null
+    |   mCurrentDragStartEvent = null
+    |   mDisappearingChildren = null
+    |   mFirstHoverTarget = null
+    |   mFirstTouchTarget = null
+    |   mFocused = null
+    |   mGroupFlags = 2244691
+    |   mHoveredSelf = false
+    |   mInvalidateRegion = null
+    |   mInvalidationTransformation = null
+    |   mIsInterestedInDrag = false
+    |   mLastTouchDownIndex = -1
+    |   mLastTouchDownTime = 0
+    |   mLastTouchDownX = 0.0
+    |   mLastTouchDownY = 0.0
+    |   mLayoutAnimationController = null
+    |   mLayoutCalledWhileSuppressed = false
+    |   mLayoutMode = -1
+    |   mLayoutTransitionListener = android.view.ViewGroup$2@315568304 (0x12cf30b0)
+    |   mLocalPoint = null
+    |   mNestedScrollAxes = 0
+    |   mOnHierarchyChangeListener = null
+    |   mPersistentDrawingCache = 2
+    |   mPreSortedChildren = null
+    |   mSuppressLayout = false
+    |   mTempPoint = null
+    |   mTransientIndices = null
+    |   mTransientViews = null
+    |   mTransition = null
+    |   mTransitioningViews = null
+    |   mVisibilityChangingChildren = null
+    |   mAccessibilityCursorPosition = -1
+    |   mAccessibilityDelegate = null
+    |   mAccessibilityTraversalAfterId = -1
+    |   mAccessibilityTraversalBeforeId = -1
+    |   mAccessibilityViewId = -1
+    |   mAnimator = null
+    |   mAttachInfo = null
+    |   mAttributes = null
+    |   mBackground = android.graphics.drawable.BitmapDrawable@315538232 (0x12cebb38)
+    |   mBackgroundRenderNode = android.view.RenderNode@315543480 (0x12cecfb8)
+    |   mBackgroundResource = 0
+    |   mBackgroundSizeChanged = false
+    |   mBackgroundTint = null
+    |   mBottom = 700
+    |   mCachingFailed = false
+    |   mClipBounds = null
+    |   mContentDescription = null
+    |   mContext = com.qihancloud.zhiyin.ui.activity.MainActivity@315274240 (0x12cab400)
+    |   mCurrentAnimation = null
+    |   mDrawableState = int[2]@1883759176 (0x7047e248)
+    |   mDrawingCache = null
+    |   mDrawingCacheBackgroundColor = 0
+    |   mFloatingTreeObserver = null
+    |   mForegroundInfo = null
+    |   mFrameMetricsObservers = null
+    |   mGhostView = null
+    |   mHasPerformedLongPress = false
+    |   mID = -1
+    |   mIgnoreNextUpEvent = false
+    |   mInContextButtonPress = false
+    |   mInputEventConsistencyVerifier = null
+    |   mKeyedTags = null
+    |   mLabelForId = -1
+    |   mLastIsOpaque = false
+    |   mLayerPaint = null
+    |   mLayerType = 0
+11-26 16:50:55.446 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mLayoutInsets = null
+    |   mLayoutParams = android.widget.FrameLayout$LayoutParams@315550792 (0x12ceec48)
+    |   mLeft = 0
+    |   mLeftPaddingDefined = false
+    |   mListenerInfo = android.view.View$ListenerInfo@315538304 (0x12cebb80)
+    |   mLongClickX = NaN
+    |   mLongClickY = NaN
+    |   mMatchIdPredicate = null
+    |   mMatchLabelForPredicate = null
+    |   mMeasureCache = android.util.LongSparseLongArray@315543504 (0x12cecfd0)
+    |   mMeasuredHeight = 700
+    |   mMeasuredWidth = 1620
+    |   mMinHeight = 0
+    |   mMinWidth = 0
+    |   mNestedScrollingParent = null
+    |   mNextFocusDownId = -1
+    |   mNextFocusForwardId = -1
+    |   mNextFocusLeftId = -1
+    |   mNextFocusRightId = -1
+    |   mNextFocusUpId = -1
+    |   mOldHeightMeasureSpec = 1073742524
+    |   mOldWidthMeasureSpec = 1073743444
+    |   mOutlineProvider = android.view.ViewOutlineProvider$1@1883834568 (0x704908c8)
+    |   mOverScrollMode = 1
+    |   mOverlay = null
+    |   mPaddingBottom = 0
+    |   mPaddingLeft = 0
+11-26 16:50:55.450 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mPaddingRight = 0
+    |   mPaddingTop = 0
+    |   mParent = null
+    |   mPendingCheckForLongPress = null
+11-26 16:50:55.451 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mPendingCheckForTap = null
+    |   mPerformClick = null
+    |   mPointerIcon = null
+    |   mPrivateFlags = -2128607184
+    |   mPrivateFlags2 = 1610819112
+    |   mPrivateFlags3 = 0
+    |   mRecreateDisplayList = false
+    |   mRenderNode = android.view.RenderNode@315543528 (0x12cecfe8)
+    |   mResources = android.content.res.Resources@315256112 (0x12ca6d30)
+    |   mRight = 1620
+    |   mRightPaddingDefined = false
+    |   mRoundScrollbarRenderer = null
+    |   mRunQueue = null
+    |   mScrollCache = null
+    |   mScrollIndicatorDrawable = null
+    |   mScrollX = 0
+    |   mScrollY = 0
+    |   mSendViewScrolledAccessibilityEvent = null
+    |   mSendViewStateChangedAccessibilityEvent = null
+    |   mSendingHoverAccessibilityEvents = false
+    |   mStartActivityRequestWho = null
+    |   mStateListAnimator = null
+    |   mSystemUiVisibility = 0
+    |   mTag = null
+    |   mTempNestedScrollConsumed = null
+    |   mTop = 0
+    |   mTouchDelegate = null
+    |   mTouchSlop = 11
+    |   mTransformationInfo = android.view.View$TransformationInfo@315580528 (0x12cf6070)
+    |   mTransientStateCount = 0
+    |   mTransitionName = null
+    |   mUnscaledDrawingCache = null
+11-26 16:50:55.453 16698-18381/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mUnsetPressedState = null
+    |   mUserPaddingBottom = 0
+    |   mUserPaddingEnd = -2147483648
+    |   mUserPaddingLeft = 0
+    |   mUserPaddingLeftInitial = 0
+    |   mUserPaddingRight = 0
+    |   mUserPaddingRightInitial = 0
+    |   mUserPaddingStart = -2147483648
+    |   mVerticalScrollFactor = 0.0
+    |   mVerticalScrollbarPosition = 0
+    |   mViewFlags = 939524224
+    |   mWindowAttachCount = 1
+    |   shadow$_klass_ = android.widget.RelativeLayout
+    |   shadow$_monitor_ = -2116365136
+    * Excluded Refs:
+    | Field: android.os.Message.obj
+    | Field: android.os.Message.next
+    | Field: android.os.Message.target
+    | Field: android.view.inputmethod.InputMethodManager.mNextServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedInputConnection
+    | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Field: android.accounts.AccountManager$AmsTask$Response.this$1
+    | Field: android.os.UserManager.mContext
+    | Field: com.android.internal.policy.BackdropFrameRenderer.mDecorView
+    | Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Thread:main (always)
+    | Thread:LeakCanary-Heap-Dump (always)
+    | Class:java.lang.ref.WeakReference (always)
+    | Class:java.lang.ref.SoftReference (always)
+    | Class:java.lang.ref.PhantomReference (always)
+    | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)
+11-26 16:51:06.569 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Removing 1 heap dumps
+11-26 16:51:06.664 15974-15994/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/39ed5968-9c50-4207-b788-9951a5dbf7a9_pending.hprof" starting...
+11-26 16:51:10.308 16698-18452/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-26 16:51:10.313 16698-18452/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-26 16:51:10.616 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 15385(1255KB) AllocSpace objects, 2(68KB) LOS objects, 0% free, 15MB/15MB, paused 22.347ms total 84.841ms
+11-26 16:51:11.059 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 13585(1211KB) AllocSpace objects, 8(1300KB) LOS objects, 0% free, 37MB/37MB, paused 4.905ms total 148.495ms
+11-26 16:51:11.175 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 113743(3MB) AllocSpace objects, 3(412KB) LOS objects, 29% free, 38MB/54MB, paused 1.060ms total 116.114ms
+11-26 16:51:11.439 16698-18452/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-26 16:51:11.663 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 554985(16MB) AllocSpace objects, 0(0B) LOS objects, 24% free, 40MB/54MB, paused 1.947ms total 133.884ms
+11-26 16:51:12.215 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 487478(14MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 41MB/54MB, paused 3.028ms total 110.889ms
+11-26 16:51:13.224 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 442840(13MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 43MB/54MB, paused 4.047ms total 102.032ms
+11-26 16:51:13.759 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 438269(13MB) AllocSpace objects, 0(0B) LOS objects, 18% free, 44MB/54MB, paused 8.872ms total 144.213ms
+11-26 16:51:14.151 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 385170(11MB) AllocSpace objects, 0(0B) LOS objects, 19% free, 43MB/54MB, paused 8.377ms total 78.548ms
+11-26 16:51:14.608 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 373849(11MB) AllocSpace objects, 0(0B) LOS objects, 17% free, 44MB/54MB, paused 7.293ms total 84.756ms
+11-26 16:51:15.011 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 363285(10MB) AllocSpace objects, 0(0B) LOS objects, 17% free, 44MB/54MB, paused 6.788ms total 83.452ms
+11-26 16:51:15.457 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 329351(9MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 46MB/54MB, paused 11.261ms total 101.682ms
+11-26 16:51:15.772 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 293899(8MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 46MB/54MB, paused 6.833ms total 68.668ms
+11-26 16:51:16.115 16698-18452/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-26 16:51:16.117 16698-18452/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-26 16:51:17.128 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 94252(2MB) AllocSpace objects, 0(0B) LOS objects, 3% free, 52MB/54MB, paused 6.670ms total 45.408ms
+11-26 16:51:17.397 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 349885(16MB) AllocSpace objects, 0(0B) LOS objects, 27% free, 43MB/59MB, paused 3.914ms total 213.416ms
+11-26 16:51:18.053 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 581372(17MB) AllocSpace objects, 0(0B) LOS objects, 23% free, 45MB/59MB, paused 6.379ms total 140.558ms
+11-26 16:51:18.665 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 547736(16MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 46MB/59MB, paused 1.418ms total 148.593ms
+11-26 16:51:18.770 16698-18452/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-26 16:51:18.860 16698-18494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191126.
+    * com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment has leaked:
+    * static FragmentFactory.!(mCurrentFragment)!
+    * ↳ DefaultGuideFragment
+    
+    * Reference Key: bb1c44d1-eb49-42ee-baff-97493782c9bb
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=44676ms, gc=281ms, heap dump=3660ms, analysis=8466ms
+    
+    * Details:
+    * Class com.qihancloud.zhiyin.ui.fragment.FragmentFactory
+    |   static isClearCache = true
+    |   static mCurrentFragmentType = -1
+    |   static $classOverhead = byte[65]@315158113 (0x12c8ee61)
+    |   static mCacheFragment = java.util.HashMap@315786672 (0x12d285b0)
+    |   static mCurrentFragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@314764960 (0x12c2eea0)
+    * Instance of com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   static $classOverhead = byte[712]@315163649 (0x12c90401)
+    |   mAttachDisposable = null
+    |   mDataList = java.util.LinkedList@315511064 (0x12ce5118)
+    |   mFlGuideContainer = android.widget.LinearLayout@315573248 (0x12cf4400)
+    |   mIsAdded = false
+    |   mTvDefaultGuide = android.support.v7.widget.AppCompatTextView@315574272 (0x12cf4800)
+    |   mView = android.widget.RelativeLayout@315575296 (0x12cf4c00)
+    |   mCompositeDisposable = null
+    |   mAdded = false
+    |   mAnimationInfo = android.support.v4.app.Fragment$AnimationInfo@315560352 (0x12cf11a0)
+    |   mArguments = null
+    |   mBackStackNesting = 0
+    |   mCalled = true
+    |   mChildFragmentManager = null
+    |   mChildNonConfig = null
+    |   mContainer = null
+    |   mContainerId = 0
+    |   mDeferStart = false
+    |   mDetached = false
+    |   mFragmentId = 0
+    |   mFragmentManager = null
+    |   mFromLayout = false
+    |   mHasMenu = false
+    |   mHidden = false
+    |   mHiddenChanged = false
+    |   mHost = null
+    |   mInLayout = false
+    |   mIndex = -1
+    |   mInnerView = null
+    |   mIsCreated = false
+    |   mIsNewlyAdded = false
+    |   mLayoutInflater = null
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@315553312 (0x12cef620)
+    |   mLoaderManager = null
+    |   mMenuVisible = true
+    |   mParentFragment = null
+    |   mPerformedCreateView = false
+    |   mPostponedAlpha = 0.0
+    |   mRemoving = false
+    |   mRestored = false
+    |   mRetainInstance = false
+    |   mRetaining = false
+    |   mSavedFragmentState = null
+    |   mSavedUserVisibleHint = null
+    |   mSavedViewState = null
+    |   mState = 0
+    |   mTag = null
+    |   mTarget = null
+    |   mTargetIndex = -1
+    |   mTargetRequestCode = 0
+    |   mUserVisibleHint = true
+    |   mView = null
+    |   mViewModelStore = null
+    |   mWho = null
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   shadow$_monitor_ = 0
+    * Excluded Refs:
+    | Field: android.os.Message.obj
+    | Field: android.os.Message.next
+    | Field: android.os.Message.target
+    | Field: android.view.inputmethod.InputMethodManager.mNextServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedInputConnection
+    | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Field: android.accounts.AccountManager$AmsTask$Response.this$1
+    | Field: android.os.UserManager.mContext
+    | Field: com.android.internal.policy.BackdropFrameRenderer.mDecorView
+    | Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Thread:main (always)
+    | Thread:LeakCanary-Heap-Dump (always)
+    | Class:java.lang.ref.WeakReference (always)
+    | Class:java.lang.ref.SoftReference (always)
+    | Class:java.lang.ref.PhantomReference (always)
+    | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)
+11-26 16:52:26.628 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Removing 1 heap dumps
+11-26 16:52:26.704 15974-15994/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/8af0f6a5-370e-4581-bc8b-827f3982aae9_pending.hprof" starting...
+11-26 16:52:30.425 16698-18832/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-26 16:52:30.427 16698-18832/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-26 16:52:30.585 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:30.730 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 22758(1668KB) AllocSpace objects, 5(224KB) LOS objects, 0% free, 17MB/17MB, paused 28.478ms total 125.829ms
+11-26 16:52:30.801 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:31.027 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:31.220 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:31.223 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 68081(2MB) AllocSpace objects, 5(800KB) LOS objects, 29% free, 37MB/53MB, paused 2.030ms total 130.412ms
+11-26 16:52:31.411 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:31.518 16698-18832/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-26 16:52:31.598 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:31.635 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 539569(15MB) AllocSpace objects, 0(0B) LOS objects, 24% free, 40MB/53MB, paused 966us total 108.375ms
+11-26 16:52:31.816 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:32.003 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:52:32.215 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 474865(14MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 41MB/53MB, paused 8.474ms total 136.940ms
+11-26 16:52:32.744 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 469645(14MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 42MB/53MB, paused 5.049ms total 116.244ms
+11-26 16:52:33.196 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 440830(13MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 41MB/53MB, paused 7.471ms total 73.917ms
+11-26 16:52:34.164 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 396916(11MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 44MB/53MB, paused 11.065ms total 116.040ms
+11-26 16:52:34.562 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 363893(10MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 44MB/53MB, paused 8.375ms total 93.727ms
+11-26 16:52:34.953 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 361501(10MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 44MB/53MB, paused 13.190ms total 95.525ms
+11-26 16:52:35.360 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 346842(10MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 46MB/53MB, paused 10.336ms total 97.247ms
+11-26 16:52:35.765 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 300811(8MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 46MB/53MB, paused 14.608ms total 106.933ms
+11-26 16:52:36.117 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 283104(8MB) AllocSpace objects, 0(0B) LOS objects, 11% free, 47MB/53MB, paused 17.142ms total 110.183ms
+11-26 16:52:36.243 16698-18832/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-26 16:52:36.246 16698-18832/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-26 16:52:36.614 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 74205(3MB) AllocSpace objects, 0(0B) LOS objects, 2% free, 52MB/53MB, paused 2.923ms total 115.674ms
+11-26 16:52:36.898 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 297526(14MB) AllocSpace objects, 0(0B) LOS objects, 27% free, 42MB/58MB, paused 3.662ms total 182.221ms
+11-26 16:52:38.156 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 560254(16MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 46MB/58MB, paused 7.776ms total 164.147ms
+11-26 16:52:38.658 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 520231(15MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 45MB/58MB, paused 1.321ms total 114.495ms
+11-26 16:52:39.227 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 486690(15MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 46MB/58MB, paused 11.433ms total 138.574ms
+11-26 16:52:39.753 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 467434(14MB) AllocSpace objects, 0(0B) LOS objects, 19% free, 46MB/58MB, paused 8.446ms total 133.350ms
+11-26 16:52:40.282 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 453000(13MB) AllocSpace objects, 0(0B) LOS objects, 18% free, 47MB/58MB, paused 10.501ms total 142.846ms
+11-26 16:52:40.749 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 421680(12MB) AllocSpace objects, 0(0B) LOS objects, 18% free, 47MB/58MB, paused 10.686ms total 107.435ms
+11-26 16:52:41.278 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 436606(13MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 48MB/58MB, paused 11.678ms total 159.174ms
+11-26 16:52:41.697 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 377455(11MB) AllocSpace objects, 0(0B) LOS objects, 17% free, 48MB/58MB, paused 5.747ms total 94.355ms
+11-26 16:52:42.553 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 379809(11MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 49MB/58MB, paused 7.351ms total 121.993ms
+11-26 16:52:42.958 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 352766(11MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 49MB/58MB, paused 9.518ms total 114.666ms
+11-26 16:52:43.434 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 384698(11MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 50MB/58MB, paused 9.964ms total 178.972ms
+11-26 16:52:44.054 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 617497(21MB) AllocSpace objects, 0(0B) LOS objects, 25% free, 45MB/61MB, paused 5.051ms total 366.556ms
+11-26 16:52:44.717 16698-18832/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-26 16:52:44.776 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 623853(19MB) AllocSpace objects, 0(0B) LOS objects, 25% free, 46MB/61MB, paused 9.904ms total 189.359ms
+11-26 16:52:45.101 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191126.
+    * com.qihancloud.zhiyin.ui.fragment.FromUserFragment has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+    * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[1]
+    * ↳ FromUserFragment
+    * Reference Key: e4f6bc02-7e3c-43d0-bf5b-e08ebae62abc
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=328653ms, gc=278ms, heap dump=3657ms, analysis=14325ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@315107360 (0x12c82820)
+    |   static $classOverhead = byte[56]@315205953 (0x12c9a941)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314827393 (0x12c3e281)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+    |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+11-26 16:52:45.102 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+    |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@314578256 (0x12c01550)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@314852288 (0x12c443c0)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@314578272 (0x12c01560)
+    |   mOnRepeat = android.view.animation.Animation$2@314578288 (0x12c01570)
+    |   mOnStart = android.view.animation.Animation$1@314578304 (0x12c01580)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@314592728 (0x12c04dd8)
+    |   mPreviousTransformation = android.view.animation.Transformation@314852320 (0x12c443e0)
+    |   mRegion = android.graphics.RectF@314592752 (0x12c04df0)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 2341783
+    |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@314852352 (0x12c44400)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@314652240 (0x12c13650)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314581088 (0x12c02060)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314572896 (0x12c00060)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl
+    |   static MSG_CHECK_FOCUS = 13
+    |   static TAG = "ViewRootImpl"
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_RESIZED_REPORT = 5
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+    |   static DEBUG_FPS = false
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static MSG_INVALIDATE_WORLD = 22
+    |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static LOCAL_LOGV = false
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+11-26 16:52:45.103 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static MSG_DIE = 3
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static DBG = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_IMF = false
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static DEBUG_LAYOUT = false
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static USE_MT_RENDERER = true
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static DEBUG_ORIENTATION = false
+    |   static sFirstDrawComplete = true
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static DEBUG_DIALOG = false
+    |   static DEBUG_INPUT_RESIZE = false
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   mAccessibilityFocusedHost = null
+    |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@314578352 (0x12c015b0)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@314847392 (0x12c430a0)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+    |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@315144192 (0x12c8b800)
+    |   mAudioManager = android.media.AudioManager@314787440 (0x12c34670)
+    |   mBasePackageName = "com.qihancloud.zhiyin"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+    |   mChoreographer = android.view.Choreographer@314776536 (0x12c31bd8)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@314578368 (0x12c015c0)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@314578384 (0x12c015d0)
+    |   mContext = com.android.internal.policy.DecorContext@314848832 (0x12c43640)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@314592824 (0x12c04e38)
+    |   mDispatchContentInsets = android.graphics.Rect@314592848 (0x12c04e50)
+    |   mDispatchStableInsets = android.graphics.Rect@314592872 (0x12c04e68)
+    |   mDisplay = android.view.Display@314787512 (0x12c346b8)
+    |   mDisplayListener = android.view.ViewRootImpl$1@314578400 (0x12c015e0)
+    |   mDisplayManager = android.hardware.display.DisplayManager@314852384 (0x12c44420)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@314578416 (0x12c015f0)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@314852416 (0x12c44440)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@314780896 (0x12c32ce0)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@314592896 (0x12c04e80)
+11-26 16:52:45.104 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@314852288 (0x12c443c0)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@314578432 (0x12c01600)
+    |   mInLayout = false
+    |   mInputChannel = null
+    |   mInputEventConsistencyVerifier = null
+    |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@314852448 (0x12c44460)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@314657256 (0x12c149e8)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@314592920 (0x12c04e98)
+    |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 4096
+    |   mLastTouchPoint = android.graphics.PointF@314578448 (0x12c01610)
+    |   mLastTouchSource = 4098
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@314852480 (0x12c44480)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@314592944 (0x12c04eb0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@314852512 (0x12c444a0)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+    |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@314592968 (0x12c04ec8)
+    |   mPendingConfiguration = android.content.res.Configuration@314657360 (0x12c14a50)
+    |   mPendingContentInsets = android.graphics.Rect@314592992 (0x12c04ee0)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@314593016 (0x12c04ef8)
+    |   mPendingOverscanInsets = android.graphics.Rect@314593040 (0x12c04f10)
+    |   mPendingStableInsets = android.graphics.Rect@314593064 (0x12c04f28)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@314593088 (0x12c04f40)
+    |   mPointerIconType = 1
+    |   mPreviousTransparentRegion = android.graphics.Region@314578464 (0x12c01620)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = android.view.ViewRootImpl$QueuedInputEvent@314593112 (0x12c04f58)
+    |   mQueuedInputEventPoolSize = 1
+    |   mRemoved = true
+11-26 16:52:45.105 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@314852544 (0x12c444c0)
+    |   mSeq = 1
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@314776984 (0x12c31d98)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@314780936 (0x12c32d08)
+    |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@314578480 (0x12c01630)
+    |   mTempRect = android.graphics.Rect@314593136 (0x12c04f70)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@314593160 (0x12c04f88)
+    |   mTmpValue = android.util.TypedValue@314780976 (0x12c32d30)
+    |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@314578496 (0x12c01640)
+    |   mTraversalBarrier = 481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@314578512 (0x12c01650)
+    |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@314790464 (0x12c35240)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+    |   mVisRect = android.graphics.Rect@314593184 (0x12c04fa0)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@314593208 (0x12c04fb8)
+    |   mWindow = android.view.ViewRootImpl$W@314852576 (0x12c444e0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@314762496 (0x12c2e500)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@314593232 (0x12c04fd0)
+    |   mWindowDrawCountDown = null
+    |   mWindowSession = android.view.IWindowSession$Stub$Proxy@314577600 (0x12c012c0)
+    |   shadow$_klass_ = android.view.ViewRootImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.DecorContext
+    |   static $classOverhead = byte[688]@1884378873 (0x705156f9)
+    |   mActivityResources = android.content.res.Resources@315253112 (0x12ca6178)
+    |   mPhoneWindow = com.android.internal.policy.PhoneWindow@314838304 (0x12c40d20)
+    |   mWindowManager = null
+    |   mInflater = null
+    |   mOverrideConfiguration = null
+    |   mResources = null
+    |   mTheme = android.content.res.Resources$Theme@315863248 (0x12d3b0d0)
+    |   mThemeResource = 2131624198
+    |   mBase = com.qihancloud.zhiyin.MyApplication@315254032 (0x12ca6510)
+    |   shadow$_klass_ = com.android.internal.policy.DecorContext
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.PhoneWindow
+    |   static PANELS_TAG = "android:Panels"
+    |   static USE_DEFAULT_TRANSITION = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   static CUSTOM_TITLE_COMPATIBLE_FEATURES = 13505
+    |   static $classOverhead = byte[849]@1883356401 (0x7041bcf1)
+    |   static FLAG_RESOURCE_SET_LOGO = 2
+    |   static TAG = "PhoneWindow"
+    |   static ACTION_BAR_TAG = "android:ActionBar"
+    |   static FLAG_RESOURCE_SET_ICON = 1
+11-26 16:52:45.106 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   static FOCUSED_ID_TAG = "android:focusedViewId"
+    |   static VIEWS_TAG = "android:views"
+    |   static DEFAULT_BACKGROUND_FADE_DURATION_MS = 300
+    |   static FLAG_RESOURCE_SET_ICON_FALLBACK = 4
+    |   static DEBUG = false
+    |   static sRotationWatcher = com.android.internal.policy.PhoneWindow$RotationWatcher@1956828552 (0x74a2d588)
+    |   mActionMenuPresenterCallback = null
+    |   mAllowEnterTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAllowReturnTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAlwaysReadCloseOnTouchAttr = false
+    |   mAudioManager = null
+    |   mBackgroundDrawable = null
+    |   mBackgroundFadeDurationMillis = 300
+    |   mBackgroundFallbackResource = 17170670
+    |   mBackgroundResource = 17170670
+    |   mCircularProgressBar = null
+    |   mClipToOutline = true
+    |   mClosingActionMenu = false
+    |   mContentParent = android.widget.FrameLayout@315259904 (0x12ca7c00)
+    |   mContentParentExplicitlySet = true
+    |   mContentScene = null
+    |   mContextMenu = null
+    |   mContextMenuCallback = com.android.internal.policy.PhoneWindow$PhoneWindowMenuCallback@315267728 (0x12ca9a90)
+    |   mContextMenuHelper = null
+    |   mDecor = com.android.internal.policy.DecorView@315257856 (0x12ca7400)
+    |   mDecorCaptionShade = 0
+    |   mDecorContentParent = null
+    |   mDrawables = null
+    |   mElevation = 0.0
+    |   mEnterTransition = android.transition.Fade@315107648 (0x12c82940)
+    |   mExitTransition = null
+    |   mFixedHeightMajor = android.util.TypedValue@315253752 (0x12ca63f8)
+    |   mFixedHeightMinor = android.util.TypedValue@315253792 (0x12ca6420)
+    |   mFixedWidthMajor = android.util.TypedValue@315253832 (0x12ca6448)
+    |   mFixedWidthMinor = android.util.TypedValue@315253872 (0x12ca6470)
+    |   mForceDecorInstall = false
+    |   mForcedNavigationBarColor = false
+    |   mForcedStatusBarColor = false
+    |   mFrameResource = 0
+    |   mHorizontalProgressBar = null
+    |   mIconRes = 0
+    |   mInvalidatePanelMenuFeatures = 0
+    |   mInvalidatePanelMenuPosted = false
+    |   mInvalidatePanelMenuRunnable = com.android.internal.policy.PhoneWindow$1@314578880 (0x12c017c0)
+    |   mIsFloating = false
+    |   mIsStartingWindow = false
+    |   mIsTranslucent = false
+    |   mKeyguardManager = null
+    |   mLayoutInflater = com.android.internal.policy.PhoneLayoutInflater@314849648 (0x12c43970)
+    |   mLeftIconView = null
+    |   mLoadElevation = true
+    |   mLogoRes = 0
+    |   mMediaController = null
+    |   mMinWidthMajor = android.util.TypedValue@315253912 (0x12ca6498)
+    |   mMinWidthMinor = android.util.TypedValue@315253952 (0x12ca64c0)
+    |   mNavigationBarColor = -16777216
+    |   mPanelChordingKey = 0
+    |   mPanelMenuPresenterCallback = null
+    |   mPanels = com.android.internal.policy.PhoneWindow$PanelFeatureState[1]@314578896 (0x12c017d0)
+    |   mPreparedPanel = null
+    |   mReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mResourcesSetFlags = 0
+    |   mReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mRightIconView = null
+    |   mSharedElementEnterTransition = android.transition.TransitionSet@314632800 (0x12c0ea60)
+    |   mSharedElementExitTransition = android.transition.TransitionSet@314632960 (0x12c0eb00)
+    |   mSharedElementReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementsUseOverlay = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mStatusBarColor = -9079435
+11-26 16:52:45.107 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mSupportsPictureInPicture = false
+    |   mTakeInputQueueCallback = null
+    |   mTakeSurfaceCallback = null
+    |   mCallback = android.support.v7.app.AppCompatDelegateImplN$AppCompatWindowCallbackN@314854208 (0x12c44b40)
+    |   static COMMAND_NEXT_ONE = 5
+11-26 16:52:45.108 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   EXIT_HTML_TASK_MILLITIME = 30000
+    |   animationDisable = null
+    |   chat_et = android.support.v7.widget.AppCompatEditText@315260928 (0x12ca8000)
+    |   chat_input_iv = android.support.v7.widget.AppCompatImageView@315261952 (0x12ca8400)
+    |   mMainPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@314645184 (0x12c11ac0)
+    |   robot_animation_iv = com.qihancloud.zhiyin.function.frameanimation.FrameAnimationView@315317248 (0x12cb5c00)
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@315306336 (0x12cb3160)
+    |   alarmReceiver = com.sanbot.opensdk.base.BindBaseActivity$alarmReceiver$1@315306384 (0x12cb3190)
+11-26 16:52:45.109 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   currentFunction = "com.qihancloud.zhiyin"
+    |   iFaceInfoBinder = com.qihancloud.hfisone.IFaceInfoBinder$Stub$Proxy@314579520 (0x12c01a40)
+    |   mainThreadHandler = com.sanbot.opensdk.base.BindBaseActivity$mainThreadHandler$1@315303296 (0x12cb2580)
+    |   subscriber = com.sanbot.opensdk.base.BindBaseActivity$subscriber$1@314579536 (0x12c01a50)
+    |   mResources = null
+    |   mThemeId = 2131624198
+11-26 16:52:45.112 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mRetaining = false
+    |   mTargetIndex = -1
+    |   mUserVisibleHint = true
+11-26 16:52:45.113 16698-18905/com.qihancloud.zhiyin:leakcanary D/LeakCanary: | Class:java.lang.ref.FinalizerReference (always)
+11-26 16:57:50.944 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Removing 1 heap dumps
+11-26 16:57:51.074 15974-15994/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/6290fcb4-7e20-4b42-b339-7fc3a74e6c0d_pending.hprof" starting...
+11-26 16:57:55.065 16698-20417/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-26 16:57:55.067 16698-20417/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-26 16:57:55.229 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:55.307 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 15112(993KB) AllocSpace objects, 2(68KB) LOS objects, 0% free, 12MB/12MB, paused 9.209ms total 52.538ms
+11-26 16:57:55.415 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:55.617 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:55.714 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 45(473KB) AllocSpace objects, 6(696KB) LOS objects, 0% free, 33MB/33MB, paused 3.833ms total 160.758ms
+11-26 16:57:55.825 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:55.841 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 40986(2MB) AllocSpace objects, 7(1212KB) LOS objects, 29% free, 37MB/53MB, paused 2.576ms total 125.762ms
+11-26 16:57:56.026 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:56.201 16698-20417/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-26 16:57:56.253 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:56.255 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 524498(15MB) AllocSpace objects, 0(0B) LOS objects, 25% free, 39MB/53MB, paused 5.808ms total 86.440ms
+11-26 16:57:56.449 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 16:57:58.276 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 402165(12MB) AllocSpace objects, 0(0B) LOS objects, 17% free, 43MB/53MB, paused 5.966ms total 94.586ms
+11-26 16:57:58.673 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 372336(11MB) AllocSpace objects, 0(0B) LOS objects, 17% free, 44MB/53MB, paused 7.382ms total 86.954ms
+11-26 16:57:59.829 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 339791(10MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 45MB/53MB, paused 6.201ms total 95.038ms
+11-26 16:58:00.220 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 281832(8MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 46MB/53MB, paused 10.276ms total 76.100ms
+11-26 16:58:00.523 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 266998(7MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 46MB/53MB, paused 13.970ms total 73.570ms
+11-26 16:58:00.846 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 242161(7MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 46MB/53MB, paused 3.836ms total 104.813ms
+11-26 16:58:00.864 16698-20417/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-26 16:58:00.867 16698-20417/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-26 16:58:01.786 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 309552(14MB) AllocSpace objects, 1(88KB) LOS objects, 27% free, 43MB/59MB, paused 4.056ms total 189.038ms
+11-26 16:58:03.563 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 558578(17MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 45MB/59MB, paused 9.213ms total 183.197ms
+11-26 16:58:04.583 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 483805(14MB) AllocSpace objects, 0(0B) LOS objects, 20% free, 46MB/59MB, paused 4.803ms total 101.149ms
+11-26 16:58:05.143 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 472535(14MB) AllocSpace objects, 0(0B) LOS objects, 19% free, 47MB/59MB, paused 7.824ms total 153.087ms
+11-26 16:58:05.623 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 430263(13MB) AllocSpace objects, 0(0B) LOS objects, 19% free, 47MB/59MB, paused 5.866ms total 97.778ms
+11-26 16:58:06.111 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 434135(13MB) AllocSpace objects, 0(0B) LOS objects, 18% free, 48MB/59MB, paused 5.834ms total 117.734ms
+11-26 16:58:06.627 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 430552(13MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 49MB/59MB, paused 6.559ms total 159.236ms
+11-26 16:58:07.054 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 412817(12MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 49MB/59MB, paused 5.216ms total 133.926ms
+11-26 16:58:07.504 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 361840(11MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 50MB/59MB, paused 5.565ms total 128.423ms
+11-26 16:58:07.897 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 376870(11MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 49MB/59MB, paused 6.183ms total 112.784ms
+11-26 16:58:08.274 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 336657(10MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 49MB/59MB, paused 5ms total 64.509ms
+11-26 16:58:08.745 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 382118(11MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 50MB/59MB, paused 11.895ms total 161.879ms
+11-26 16:58:09.180 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 363049(11MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 50MB/59MB, paused 10.233ms total 143.742ms
+11-26 16:58:09.634 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 356857(10MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 51MB/59MB, paused 13.200ms total 172.596ms
+11-26 16:58:09.640 16698-20417/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-26 16:58:10.070 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191126.
+    * android.widget.LinearLayout has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+    * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[2]
+    * ↳ ToUserFragment.mSvContainer
+    * ↳ ScrollView.mParent
+    * ↳ LinearLayout
+    * Reference Key: 4cf2d7ac-779a-413a-b8df-e0d8e0ce5c63
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=653016ms, gc=233ms, heap dump=3991ms, analysis=14602ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@315107360 (0x12c82820)
+11-26 16:58:10.071 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   static $classOverhead = byte[56]@315205953 (0x12c9a941)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314827393 (0x12c3e281)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+    |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+    |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+    |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@314578256 (0x12c01550)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@314852288 (0x12c443c0)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@314578272 (0x12c01560)
+    |   mOnRepeat = android.view.animation.Animation$2@314578288 (0x12c01570)
+    |   mOnStart = android.view.animation.Animation$1@314578304 (0x12c01580)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@314592728 (0x12c04dd8)
+    |   mPreviousTransformation = android.view.animation.Transformation@314852320 (0x12c443e0)
+    |   mRegion = android.graphics.RectF@314592752 (0x12c04df0)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 2341783
+    |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@314852352 (0x12c44400)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@314652240 (0x12c13650)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314581088 (0x12c02060)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314572896 (0x12c00060)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl
+    |   static MSG_CHECK_FOCUS = 13
+    |   static TAG = "ViewRootImpl"
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_RESIZED_REPORT = 5
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+    |   static DEBUG_FPS = false
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static MSG_INVALIDATE_WORLD = 22
+11-26 16:58:10.072 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static LOCAL_LOGV = false
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+    |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static MSG_DIE = 3
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static DBG = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_IMF = false
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static DEBUG_LAYOUT = false
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static USE_MT_RENDERER = true
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static DEBUG_ORIENTATION = false
+    |   static sFirstDrawComplete = true
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static DEBUG_DIALOG = false
+    |   static DEBUG_INPUT_RESIZE = false
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   mAccessibilityFocusedHost = null
+    |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@314578352 (0x12c015b0)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@314847392 (0x12c430a0)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+    |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@315144192 (0x12c8b800)
+    |   mAudioManager = android.media.AudioManager@314787440 (0x12c34670)
+    |   mBasePackageName = "com.qihancloud.zhiyin"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+    |   mChoreographer = android.view.Choreographer@314776536 (0x12c31bd8)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@314578368 (0x12c015c0)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@314578384 (0x12c015d0)
+    |   mContext = com.android.internal.policy.DecorContext@314848832 (0x12c43640)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@314592824 (0x12c04e38)
+    |   mDispatchContentInsets = android.graphics.Rect@314592848 (0x12c04e50)
+    |   mDispatchStableInsets = android.graphics.Rect@314592872 (0x12c04e68)
+    |   mDisplay = android.view.Display@314787512 (0x12c346b8)
+    |   mDisplayListener = android.view.ViewRootImpl$1@314578400 (0x12c015e0)
+11-26 16:58:10.073 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mDisplayManager = android.hardware.display.DisplayManager@314852384 (0x12c44420)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@314578416 (0x12c015f0)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@314852416 (0x12c44440)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@314780896 (0x12c32ce0)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@314592896 (0x12c04e80)
+    |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@314852288 (0x12c443c0)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@314578432 (0x12c01600)
+    |   mInLayout = false
+    |   mInputChannel = null
+    |   mInputEventConsistencyVerifier = null
+    |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@314852448 (0x12c44460)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@314657256 (0x12c149e8)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@314592920 (0x12c04e98)
+    |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 4096
+    |   mLastTouchPoint = android.graphics.PointF@314578448 (0x12c01610)
+    |   mLastTouchSource = 4098
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@314852480 (0x12c44480)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@314592944 (0x12c04eb0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@314852512 (0x12c444a0)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+    |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@314592968 (0x12c04ec8)
+    |   mPendingConfiguration = android.content.res.Configuration@314657360 (0x12c14a50)
+    |   mPendingContentInsets = android.graphics.Rect@314592992 (0x12c04ee0)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@314593016 (0x12c04ef8)
+    |   mPendingOverscanInsets = android.graphics.Rect@314593040 (0x12c04f10)
+    |   mPendingStableInsets = android.graphics.Rect@314593064 (0x12c04f28)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@314593088 (0x12c04f40)
+    |   mPointerIconType = 1
+11-26 16:58:10.074 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mPreviousTransparentRegion = android.graphics.Region@314578464 (0x12c01620)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = android.view.ViewRootImpl$QueuedInputEvent@314593112 (0x12c04f58)
+    |   mQueuedInputEventPoolSize = 1
+    |   mRemoved = true
+    |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@314852544 (0x12c444c0)
+    |   mSeq = 1
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@314776984 (0x12c31d98)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@314780936 (0x12c32d08)
+    |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@314578480 (0x12c01630)
+    |   mTempRect = android.graphics.Rect@314593136 (0x12c04f70)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@314593160 (0x12c04f88)
+    |   mTmpValue = android.util.TypedValue@314780976 (0x12c32d30)
+    |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@314578496 (0x12c01640)
+    |   mTraversalBarrier = 481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@314578512 (0x12c01650)
+    |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@314790464 (0x12c35240)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+    |   mVisRect = android.graphics.Rect@314593184 (0x12c04fa0)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@314593208 (0x12c04fb8)
+    |   mWindow = android.view.ViewRootImpl$W@314852576 (0x12c444e0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@314762496 (0x12c2e500)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@314593232 (0x12c04fd0)
+    |   mWindowDrawCountDown = null
+    |   mWindowSession = android.view.IWindowSession$Stub$Proxy@314577600 (0x12c012c0)
+    |   shadow$_klass_ = android.view.ViewRootImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.DecorContext
+    |   static $classOverhead = byte[688]@1884378873 (0x705156f9)
+    |   mActivityResources = android.content.res.Resources@315253112 (0x12ca6178)
+    |   mPhoneWindow = com.android.internal.policy.PhoneWindow@314838304 (0x12c40d20)
+    |   mWindowManager = null
+    |   mInflater = null
+    |   mOverrideConfiguration = null
+    |   mResources = null
+    |   mTheme = android.content.res.Resources$Theme@315863248 (0x12d3b0d0)
+    |   mThemeResource = 2131624198
+    |   mBase = com.qihancloud.zhiyin.MyApplication@315254032 (0x12ca6510)
+    |   shadow$_klass_ = com.android.internal.policy.DecorContext
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.PhoneWindow
+    |   static PANELS_TAG = "android:Panels"
+    |   static USE_DEFAULT_TRANSITION = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   static CUSTOM_TITLE_COMPATIBLE_FEATURES = 13505
+11-26 16:58:10.075 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   static $classOverhead = byte[849]@1883356401 (0x7041bcf1)
+    |   static FLAG_RESOURCE_SET_LOGO = 2
+    |   static TAG = "PhoneWindow"
+    |   static ACTION_BAR_TAG = "android:ActionBar"
+    |   static FLAG_RESOURCE_SET_ICON = 1
+    |   static FOCUSED_ID_TAG = "android:focusedViewId"
+    |   static VIEWS_TAG = "android:views"
+    |   static DEFAULT_BACKGROUND_FADE_DURATION_MS = 300
+    |   static FLAG_RESOURCE_SET_ICON_FALLBACK = 4
+    |   static DEBUG = false
+    |   static sRotationWatcher = com.android.internal.policy.PhoneWindow$RotationWatcher@1956828552 (0x74a2d588)
+    |   mActionMenuPresenterCallback = null
+    |   mAllowEnterTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAllowReturnTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAlwaysReadCloseOnTouchAttr = false
+    |   mAudioManager = null
+    |   mBackgroundDrawable = null
+    |   mBackgroundFadeDurationMillis = 300
+    |   mBackgroundFallbackResource = 17170670
+    |   mBackgroundResource = 17170670
+    |   mCircularProgressBar = null
+    |   mClipToOutline = true
+    |   mClosingActionMenu = false
+    |   mContentParent = android.widget.FrameLayout@315259904 (0x12ca7c00)
+    |   mContentParentExplicitlySet = true
+    |   mContentScene = null
+    |   mContextMenu = null
+    |   mContextMenuCallback = com.android.internal.policy.PhoneWindow$PhoneWindowMenuCallback@315267728 (0x12ca9a90)
+    |   mContextMenuHelper = null
+    |   mDecor = com.android.internal.policy.DecorView@315257856 (0x12ca7400)
+    |   mDecorCaptionShade = 0
+    |   mDecorContentParent = null
+    |   mDrawables = null
+    |   mElevation = 0.0
+    |   mEnterTransition = android.transition.Fade@315107648 (0x12c82940)
+    |   mExitTransition = null
+    |   mFixedHeightMajor = android.util.TypedValue@315253752 (0x12ca63f8)
+    |   mFixedHeightMinor = android.util.TypedValue@315253792 (0x12ca6420)
+    |   mFixedWidthMajor = android.util.TypedValue@315253832 (0x12ca6448)
+    |   mFixedWidthMinor = android.util.TypedValue@315253872 (0x12ca6470)
+    |   mForceDecorInstall = false
+    |   mForcedNavigationBarColor = false
+    |   mForcedStatusBarColor = false
+    |   mFrameResource = 0
+    |   mHorizontalProgressBar = null
+    |   mIconRes = 0
+    |   mInvalidatePanelMenuFeatures = 0
+    |   mInvalidatePanelMenuPosted = false
+    |   mInvalidatePanelMenuRunnable = com.android.internal.policy.PhoneWindow$1@314578880 (0x12c017c0)
+    |   mIsFloating = false
+    |   mIsStartingWindow = false
+    |   mIsTranslucent = false
+    |   mKeyguardManager = null
+    |   mLayoutInflater = com.android.internal.policy.PhoneLayoutInflater@314849648 (0x12c43970)
+    |   mLeftIconView = null
+    |   mLoadElevation = true
+    |   mLogoRes = 0
+    |   mMediaController = null
+    |   mMinWidthMajor = android.util.TypedValue@315253912 (0x12ca6498)
+    |   mMinWidthMinor = android.util.TypedValue@315253952 (0x12ca64c0)
+    |   mNavigationBarColor = -16777216
+    |   mPanelChordingKey = 0
+    |   mPanelMenuPresenterCallback = null
+    |   mPanels = com.android.internal.policy.PhoneWindow$PanelFeatureState[1]@314578896 (0x12c017d0)
+    |   mPreparedPanel = null
+    |   mReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mResourcesSetFlags = 0
+    |   mReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mRightIconView = null
+    |   mSharedElementEnterTransition = android.transition.TransitionSet@314632800 (0x12c0ea60)
+11-26 16:58:10.076 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mSharedElementExitTransition = android.transition.TransitionSet@314632960 (0x12c0eb00)
+    |   mSharedElementReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementsUseOverlay = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mStatusBarColor = -9079435
+    |   mSupportsPictureInPicture = false
+    |   mTakeInputQueueCallback = null
+    |   mTakeSurfaceCallback = null
+    |   mTextColor = 0
+    |   mTheme = 2131624198
+    |   mTitle = "知音"
+    |   mTitleColor = 0
+    |   mTitleView = null
+    |   mTransitionManager = android.transition.TransitionManager@314578912 (0x12c017e0)
+    |   mUiOptions = 0
+    |   mUseDecorContext = true
+    |   mVolumeControlStreamType = -2147483648
+    |   mActiveChild = null
+    |   mAppName = "com.qihancloud.zhiyin/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mAppToken = android.os.BinderProxy@314852608 (0x12c44500)
+    |   mCallback = android.support.v7.app.AppCompatDelegateImplN$AppCompatWindowCallbackN@314854208 (0x12c44b40)
+    |   mCloseOnSwipeEnabled = false
+    |   mCloseOnTouchOutside = false
+    |   mContainer = null
+    |   mContext = com.qihancloud.zhiyin.ui.activity.MainActivity@315273728 (0x12cab200)
+    |   mDefaultWindowFormat = -1
+    |   mDestroyed = true
+    |   mFeatures = 8259
+    |   mForcedWindowFlags = -2139029120
+    |   mHardwareAccelerated = true
+    |   mHasChildren = false
+    |   mHasSoftInputMode = true
+    |   mHaveDimAmount = false
+    |   mHaveWindowFormat = false
+    |   mIsActive = true
+    |   mLocalFeatures = 8259
+    |   mOnRestrictedCaptionAreaChangedListener = null
+    |   mOnWindowDismissedCallback = com.qihancloud.zhiyin.ui.activity.MainActivity@315273728 (0x12cab200)
+    |   mOnWindowSwipeDismissedCallback = null
+    |   mOverlayWithDecorCaptionEnabled = false
+    |   mRestrictedCaptionAreaRect = null
+    |   mSetCloseOnTouchOutside = false
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@314762848 (0x12c2e660)
+    |   mWindowControllerCallback = com.qihancloud.zhiyin.ui.activity.MainActivity@315273728 (0x12cab200)
+    |   mWindowManager = android.view.WindowManagerImpl@315267752 (0x12ca9aa8)
+    |   mWindowStyle = android.content.res.TypedArray@314849696 (0x12c439a0)
+    |   shadow$_klass_ = com.android.internal.policy.PhoneWindow
+    |   shadow$_monitor_ = 0
+    * Instance of com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   static COMMAND_START_NAVIGATION = 12
+    |   static COMMAND_PLAY_CHANGE_SOME_ONE = 10
+    |   static $classOverhead = byte[2192]@315195393 (0x12c98001)
+    |   static CHAT_TEXT_INPUT = 101
+    |   static TAG = "FRAGMENT"
+    |   static PERMISSION_EXIT_APP = "PERMISSION_EXIT_APP"
+    |   static PERMISSION_GO_TO_SETTING_ACTIVITY = "PERMISSION_GO_TO_SETTING_ACTIVITY"
+    |   static COMMAND_SET_INIT_POSITION = 13
+    |   static COMMAND_NEXT_ONE = 5
+    |   static UPDATE_CHAT_DATA = 1
+    |   static TAG1 = "MUSIC_SERVICE"
+    |   static COMMAND_OPEN_CAMERA = 14
+    |   static COMMAND_PREVIOUS_ONE = 6
+    |   static COMMAND_PLAYER_LIST = 11
+    |   static CHAT_VOICE_INPUT = 102
+    |   EXIT_HTML_TASK_MILLITIME = 30000
+    |   animationDisable = null
+11-26 16:58:10.077 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   chat_et = android.support.v7.widget.AppCompatEditText@315260928 (0x12ca8000)
+    |   chat_input_iv = android.support.v7.widget.AppCompatImageView@315261952 (0x12ca8400)
+    |   currentChatType = 102
+    |   delayExitHtmlTask = com.qihancloud.zhiyin.ui.activity.MainActivity$17@314579472 (0x12c01a10)
+    |   lastActionTime = 0
+    |   mBidner = com.qihancloud.zhiyin.service.MusicPlayerService$MusicBinder@315303136 (0x12cb24e0)
+    |   mCommandQuestion = null
+    |   mConn = null
+    |   mCurrentDealResult = com.qihancloud.zhiyin.bean.DealResult@314788736 (0x12c34b80)
+    |   mCurrentfragment = com.qihancloud.zhiyin.ui.fragment.ToUserFragment@314633760 (0x12c0ee20)
+    |   mCustomDialog = null
+    |   mFrameDrawablesListen = java.util.ArrayList@315306240 (0x12cb3100)
+    |   mFrameDrawablesSpeak = java.util.ArrayList@315306264 (0x12cb3118)
+    |   mFrameDrawablesWait = java.util.ArrayList@315306288 (0x12cb3130)
+    |   mFrameLayout = android.widget.FrameLayout@315262976 (0x12ca8800)
+    |   mGuideStrTittle = "你好，请问有什么可以帮你?"
+    |   mHTMLLayout = android.widget.FrameLayout@315264000 (0x12ca8c00)
+    |   mHandler = com.qihancloud.zhiyin.ui.activity.MainActivity$1@315303168 (0x12cb2500)
+    |   mHtml5WebView = null
+    |   mInput_container = android.widget.RelativeLayout@315311104 (0x12cb4400)
+    |   mIsOnPause = true
+    |   mIvCloseActivity = null
+    |   mIvClosePage = android.support.v7.widget.AppCompatImageView@315312128 (0x12cb4800)
+    |   mIvPlayMusic = android.support.v7.widget.AppCompatImageView@315313152 (0x12cb4c00)
+    |   mIvSetMore = android.support.v7.widget.AppCompatImageView@315314176 (0x12cb5000)
+    |   mLlHintContainer = android.widget.LinearLayout@315315200 (0x12cb5400)
+    |   mMainPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@314645184 (0x12c11ac0)
+    |   mManagerPassword = null
+    |   mMusicIntent = null
+    |   mRoundProgressBar = com.qihancloud.zhiyin.ui.widget.RoundProgressBar@314943680 (0x12c5a8c0)
+11-26 16:58:10.080 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mAdded = false
+    |   mHidden = false
+11-26 16:58:10.081 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mIsCreated = false
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@315305856 (0x12cb2f80)
+    |   mLoaderManager = null
+    |   mSavedUserVisibleHint = null
+    |   mView = null
+    |   mActivePointerId = -1
+    |   mEdgeGlowTop = android.widget.EdgeEffect@314793584 (0x12c35e70)
+    |   mLastScroll = 0
+11-26 16:58:10.082 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mScrollStrictSpan = null
+    |   mForegroundPaddingLeft = 0
+    |   mChildCountWithTransientState = 0
+    |   mChildrenCount = 1
+    |   mInvalidateRegion = null
+    |   mLayoutCalledWhileSuppressed = false
+    |   mLocalPoint = null
+11-26 16:58:10.085 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mIsInterestedInDrag = false
+    |   mLayoutMode = -1
+    |   mOnHierarchyChangeListener = null
+    |   mTransitioningViews = null
+    |   mAccessibilityViewId = 23
+    |   mBackgroundSizeChanged = false
+11-26 16:58:10.086 16698-20492/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mCurrentAnimation = null
+    |   mForegroundInfo = null
+11-26 16:58:10.095 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 992410(50MB) AllocSpace objects, 226(7MB) LOS objects, 35% free, 29MB/45MB, paused 447us total 126.728ms
+11-26 17:08:35.621 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Removing 1 heap dumps
+11-26 17:08:35.754 15974-15994/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/6251f778-6ea0-4277-9b41-f69fda5eb2b5_pending.hprof" starting...
+11-26 17:08:39.169 16698-23494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-26 17:08:39.172 16698-23494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-26 17:08:39.309 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 17:08:39.497 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 23311(1670KB) AllocSpace objects, 2(68KB) LOS objects, 0% free, 15MB/15MB, paused 63.239ms total 124.040ms
+11-26 17:08:39.511 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 17:08:39.713 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 17:08:39.797 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 9(256KB) AllocSpace objects, 2(368KB) LOS objects, 0% free, 29MB/29MB, paused 5.447ms total 70.778ms
+11-26 17:08:39.888 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 17:08:39.964 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 76(815KB) AllocSpace objects, 9(1344KB) LOS objects, 30% free, 36MB/52MB, paused 19.364ms total 165.937ms
+11-26 17:08:40.069 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 17:08:40.268 15974-15994/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-26 17:08:40.354 16698-23494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-26 17:08:40.873 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 459958(13MB) AllocSpace objects, 0(0B) LOS objects, 22% free, 40MB/52MB, paused 2.068ms total 106.040ms
+11-26 17:08:42.647 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 360668(10MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 44MB/52MB, paused 7.574ms total 96.047ms
+11-26 17:08:43.006 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 333282(9MB) AllocSpace objects, 0(0B) LOS objects, 15% free, 44MB/52MB, paused 8.108ms total 77.550ms
+11-26 17:08:43.385 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 314995(9MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 44MB/52MB, paused 13.604ms total 99.783ms
+11-26 17:08:43.758 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 321296(9MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 45MB/52MB, paused 11.970ms total 109.615ms
+11-26 17:08:44.119 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 303505(9MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 45MB/52MB, paused 11.857ms total 99.614ms
+11-26 17:08:44.523 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 280968(8MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 47MB/52MB, paused 15.495ms total 131.027ms
+11-26 17:08:44.991 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 424159(14MB) AllocSpace objects, 2(260KB) LOS objects, 26% free, 45MB/61MB, paused 7.100ms total 289.595ms
+11-26 17:08:45.039 16698-23494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-26 17:08:45.040 16698-23494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-26 17:08:46.320 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 420975(12MB) AllocSpace objects, 0(0B) LOS objects, 16% free, 50MB/61MB, paused 6.733ms total 93.077ms
+11-26 17:08:47.225 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 413661(12MB) AllocSpace objects, 0(0B) LOS objects, 14% free, 52MB/61MB, paused 8.314ms total 160.211ms
+11-26 17:08:48.004 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 376223(11MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 52MB/61MB, paused 11.867ms total 131.324ms
+11-26 17:08:48.408 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 372843(11MB) AllocSpace objects, 0(0B) LOS objects, 13% free, 52MB/61MB, paused 6.478ms total 126.586ms
+11-26 17:08:48.801 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 325741(10MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 53MB/61MB, paused 12.929ms total 126.689ms
+11-26 17:08:49.160 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 311281(9MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 53MB/61MB, paused 9.593ms total 108.293ms
+11-26 17:08:49.468 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 276854(8MB) AllocSpace objects, 0(0B) LOS objects, 12% free, 53MB/61MB, paused 7.220ms total 59.203ms
+11-26 17:08:49.826 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 287159(8MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 54MB/61MB, paused 6.050ms total 98.510ms
+11-26 17:08:50.127 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 268204(8MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 54MB/61MB, paused 7.889ms total 83.720ms
+11-26 17:08:50.437 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 259917(7MB) AllocSpace objects, 0(0B) LOS objects, 10% free, 54MB/61MB, paused 5.881ms total 81.386ms
+11-26 17:08:50.965 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 227414(7MB) AllocSpace objects, 0(0B) LOS objects, 9% free, 55MB/61MB, paused 5.599ms total 54.789ms
+11-26 17:08:51.288 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 253272(7MB) AllocSpace objects, 0(0B) LOS objects, 8% free, 55MB/61MB, paused 9.540ms total 121.945ms
+11-26 17:08:51.745 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background partial concurrent mark sweep GC freed 535467(22MB) AllocSpace objects, 0(0B) LOS objects, 25% free, 45MB/61MB, paused 5.209ms total 285.039ms
+11-26 17:08:52.412 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 571514(17MB) AllocSpace objects, 0(0B) LOS objects, 24% free, 46MB/61MB, paused 10.356ms total 133.036ms
+11-26 17:08:53.081 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 593940(18MB) AllocSpace objects, 0(0B) LOS objects, 23% free, 47MB/61MB, paused 14.956ms total 175.693ms
+11-26 17:08:53.519 16698-23494/com.qihancloud.zhiyin:leakcanary D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-26 17:08:53.849 16698-16709/com.qihancloud.zhiyin:leakcanary I/art: Background sticky concurrent mark sweep GC freed 479878(18MB) AllocSpace objects, 117(2MB) LOS objects, 0% free, 62MB/62MB, paused 1.410ms total 109.813ms
+11-26 17:08:53.853 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191126.
+    * com.qihancloud.zhiyin.ui.fragment.ToUserFragment has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+    * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[2]
+    * ↳ ToUserFragment
+    * Reference Key: 527999f4-ff37-466e-83d3-ceb279478082
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+11-26 17:08:53.854 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: * Durations: watch=1297654ms, gc=275ms, heap dump=3474ms, analysis=14374ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@315107360 (0x12c82820)
+    |   static $classOverhead = byte[56]@315205953 (0x12c9a941)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314827393 (0x12c3e281)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+    |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+    |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+    |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@314578256 (0x12c01550)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@314852288 (0x12c443c0)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@314578272 (0x12c01560)
+    |   mOnRepeat = android.view.animation.Animation$2@314578288 (0x12c01570)
+    |   mOnStart = android.view.animation.Animation$1@314578304 (0x12c01580)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@314592728 (0x12c04dd8)
+    |   mPreviousTransformation = android.view.animation.Transformation@314852320 (0x12c443e0)
+    |   mRegion = android.graphics.RectF@314592752 (0x12c04df0)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 2341783
+    |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@314852352 (0x12c44400)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@314652240 (0x12c13650)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314581088 (0x12c02060)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314572896 (0x12c00060)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl
+    |   static MSG_CHECK_FOCUS = 13
+    |   static TAG = "ViewRootImpl"
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_RESIZED_REPORT = 5
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+11-26 17:08:53.855 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   static DEBUG_FPS = false
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static MSG_INVALIDATE_WORLD = 22
+    |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static LOCAL_LOGV = false
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+    |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static MSG_DIE = 3
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static DBG = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_IMF = false
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static DEBUG_LAYOUT = false
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static USE_MT_RENDERER = true
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static DEBUG_ORIENTATION = false
+    |   static sFirstDrawComplete = true
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static DEBUG_DIALOG = false
+    |   static DEBUG_INPUT_RESIZE = false
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   mAccessibilityFocusedHost = null
+    |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@314578352 (0x12c015b0)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@314847392 (0x12c430a0)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+11-26 17:08:53.856 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@315144192 (0x12c8b800)
+    |   mAudioManager = android.media.AudioManager@314787440 (0x12c34670)
+    |   mBasePackageName = "com.qihancloud.zhiyin"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+    |   mChoreographer = android.view.Choreographer@314776536 (0x12c31bd8)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@314578368 (0x12c015c0)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@314578384 (0x12c015d0)
+    |   mContext = com.android.internal.policy.DecorContext@314848832 (0x12c43640)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@314592824 (0x12c04e38)
+    |   mDispatchContentInsets = android.graphics.Rect@314592848 (0x12c04e50)
+    |   mDispatchStableInsets = android.graphics.Rect@314592872 (0x12c04e68)
+    |   mDisplay = android.view.Display@314787512 (0x12c346b8)
+    |   mDisplayListener = android.view.ViewRootImpl$1@314578400 (0x12c015e0)
+    |   mDisplayManager = android.hardware.display.DisplayManager@314852384 (0x12c44420)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@314578416 (0x12c015f0)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@314852416 (0x12c44440)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@314780896 (0x12c32ce0)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@314592896 (0x12c04e80)
+    |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@314852288 (0x12c443c0)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@314578432 (0x12c01600)
+    |   mInLayout = false
+    |   mInputChannel = null
+    |   mInputEventConsistencyVerifier = null
+    |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@314852448 (0x12c44460)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@314657256 (0x12c149e8)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@314592920 (0x12c04e98)
+11-26 17:08:53.857 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 4096
+    |   mLastTouchPoint = android.graphics.PointF@314578448 (0x12c01610)
+    |   mLastTouchSource = 4098
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@314852480 (0x12c44480)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@314592944 (0x12c04eb0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@314852512 (0x12c444a0)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+    |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@314592968 (0x12c04ec8)
+    |   mPendingConfiguration = android.content.res.Configuration@314657360 (0x12c14a50)
+    |   mPendingContentInsets = android.graphics.Rect@314592992 (0x12c04ee0)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@314593016 (0x12c04ef8)
+    |   mPendingOverscanInsets = android.graphics.Rect@314593040 (0x12c04f10)
+    |   mPendingStableInsets = android.graphics.Rect@314593064 (0x12c04f28)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@314593088 (0x12c04f40)
+    |   mPointerIconType = 1
+    |   mPreviousTransparentRegion = android.graphics.Region@314578464 (0x12c01620)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = android.view.ViewRootImpl$QueuedInputEvent@314593112 (0x12c04f58)
+    |   mQueuedInputEventPoolSize = 1
+    |   mRemoved = true
+    |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@314852544 (0x12c444c0)
+    |   mSeq = 1
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@314776984 (0x12c31d98)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@314780936 (0x12c32d08)
+    |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@314578480 (0x12c01630)
+    |   mTempRect = android.graphics.Rect@314593136 (0x12c04f70)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@314593160 (0x12c04f88)
+    |   mTmpValue = android.util.TypedValue@314780976 (0x12c32d30)
+    |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@314578496 (0x12c01640)
+    |   mTraversalBarrier = 481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@314578512 (0x12c01650)
+    |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@314790464 (0x12c35240)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+11-26 17:08:53.858 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mVisRect = android.graphics.Rect@314593184 (0x12c04fa0)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@314593208 (0x12c04fb8)
+    |   mWindow = android.view.ViewRootImpl$W@314852576 (0x12c444e0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@314762496 (0x12c2e500)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@314593232 (0x12c04fd0)
+    |   mWindowDrawCountDown = null
+    |   mWindowSession = android.view.IWindowSession$Stub$Proxy@314577600 (0x12c012c0)
+    |   shadow$_klass_ = android.view.ViewRootImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.DecorContext
+    |   static $classOverhead = byte[688]@1884378873 (0x705156f9)
+    |   mActivityResources = android.content.res.Resources@315253112 (0x12ca6178)
+    |   mPhoneWindow = com.android.internal.policy.PhoneWindow@314838304 (0x12c40d20)
+    |   mWindowManager = null
+11-26 17:08:53.859 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mLogoRes = 0
+    |   mSharedElementReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+11-26 17:08:53.861 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mStartedActivityFromFragment = false
+11-26 17:08:53.862 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mHost = android.support.v4.app.FragmentActivity$HostCallbacks@315303680 (0x12cb2700)
+11-26 17:08:53.864 16698-23565/com.qihancloud.zhiyin:leakcanary D/LeakCanary: |   mChildNonConfig = null
