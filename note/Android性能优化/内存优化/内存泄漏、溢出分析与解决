@@ -60,11 +60,32 @@ https://www.jianshu.com/p/2d47d1cf5ccf
                 界面会显示可能发生泄漏的点Leak Suspects,点击某个Leaks可以看到对象占用的内存和引用链
 
 二、检测内存泄漏方式
-    1.shell命令+LeakCanary+MAT
-        运行程序所有功能全部跑一遍,手动触发GC,
-        然后使用 adb shell dumpsys meminfo packageName -d   查看退出界面后Objects下的Views和Activitys数目是否为0.
-        如果不为0就通过LeakCanary检测可能存在可能内存泄漏的地方，然后dump堆内存快照文件.hprof文件并转换成标准文件后再使用MAT分析,具体过程如下
+    1.shell命令+AndroidStudio工具Profiler(As3.0以下是Monitor)
+        1.shell
+            运行程序所有功能全部跑一遍,手动触发GC,
+            然后使用 adb shell dumpsys meminfo packageName -d   查看退出界面后Objects下的Views和Activitys数目是否为0.如果数量不为0则可能是发生了内存泄漏
+            如果不为0就通过LeakCanary检测可能存在可能内存泄漏的地方，然后dump堆内存快照文件.hprof文件并转换成标准文件后再使用MAT分析,具体过程如下
+        2.Memory Profiler
+            https://mp.weixin.qq.com/s/flvC4b2kW3731eP9jsI8zA
+            1.工具介绍
+                垃圾篓图标：触发GC
+                下载图标:捕获堆转储,即输出堆内存快照文件.hprof
+                ○形图标(Allocation Tracker):用于记录内存分配情况,Android7.1及以下版本会显示该图标,,8.0以上可以直接鼠标选择区域
+                    start 和stop后会有这段时间的堆内存数据，查看方式可以选择Arrange by class/package/class/callstack
+                    我们可以单击列表中的某一项,点击"jump to the source"查看代码
+                Heap Dump(Android Device Monitor工具)
+                    Heap Dump的主要功能就是查看不同的数据类型在内存中的使用情况,它可以帮助你找到大对象,也可以通过数据的变化发现内存泄漏
+                    可以结合GC和某个对象占用的内存量判断该对象是否发生了内存泄漏
+            2.如何使用工具检测内存泄漏
+                运行程序,反复打开关闭页面5次,关闭时点击GC此时看total内存还没有恢复到之前的数值,如果一直在递增,就可能发生了内存泄漏
+                此时再点击"下载"按钮导出当前进程的内存堆栈文件.hprof,并转换成标准hprof文件,再通过MAT进行分析
 
+    2.LeakCanary
+        排除Activity和Fragment的内存泄漏,具体使用方式及原理见leakcanary分析
+        leakCanary打印的内存泄漏日志,或者输出的hprof文件(结合MAT分析)可以很方便的找出内存泄漏的位置
+        leakCanary的缺点
+            1.leakCanary是在onDestrory中检测内存泄漏的,如果onDestroy不执行就无法检测到
+            2.无法检测到Service的内存泄漏
     2.通过AndroidStudio的Android Profiler(As3.0以上)或者Android Monitor(AS3.0以下)进行简单分析
         运行程序,反复打开关闭页面5次,然后点击GC此时看total内存还没有恢复到之前的数值,就可能发生了内存泄漏
         此时再点击dump java heap按钮导出当前进程的内存堆栈文件.hprof,并转换成标准hprof文件
