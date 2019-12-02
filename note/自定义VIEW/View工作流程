@@ -1,0 +1,43 @@
+一、View基础
+    1.View坐标系
+        View获取自身的宽高
+            width = getRight()-getLeft()
+            height = getBottom()-getTop()
+        View自身的坐标
+            getTop获取View自身顶边到其父布局顶边的距离
+            getLeft获取view自身左边到父布局左边的距离
+            getRight获取view自身右边到父布局左边的距离
+            getBottom获取View底部到父布局顶边的距离
+        MotionEvent提供的方法
+            getX获取当前点击点的x坐标到距离控件左边的距离,即视图坐标
+            getY获取当前点击点的Y坐标到距离控件顶边的距离,即视图坐标
+            getRawX获取点击事件距离整个屏幕左边的距离,即绝对坐标
+            getRawY获取点击事件距离整个屏幕顶边的距离,即绝对坐标
+    2.Activity、Window和View的关系(Activity的构成)
+           Activity的setContentView会调用getWindow().setContentView(),其中getVindow会返回一个Window的实现类对象PhoneWindow
+        PhoneWindow的setContentView会创建一个DecorView(通过installDecor方法会调用generateDecor方法)，DecorView是PhoneWindow的内部类,继承了FrameLayout
+        而这个DecorView就是Activity的根View,这个DecorView将屏幕划分为两个区域:一个TitleView；一个ContentView
+           故,简单说就是:
+           一个Activity包含一个Window对象，这个Window对象是由PhoneWindow实现的;PhoneWindow创建了一个DecorView作为Activity的根View
+二、View的工作流程
+        上面我们讲到了Activity的构成是由PhoneWindow对象创建了一个DecorView作为Activity的根View,但是这时DecorView的内容还无法显示,
+    因为这个时候DecorView还没有被加入到Window中，DecorView要显示出来需要经历以下几个步骤
+
+    1.DecorView(读音:[ˈdeɪkɔː(r)])被加载到Window中
+        DecorView创建完毕,要加载到Window中，我们需要理解Activity的创建过程
+            1.performLaunchActivity方法创建Activity,完成DecorView的创建
+                我们调用Activity的startActivity方法时,最终要调用ActivityThread的handleLaunchActivity,这个方法会调用performLaunchActivity获取这个activity实例，并生成DecorView
+            2.handleResumeActivity将DecorView添加到windowManager中
+                handleResumeActivity回调Activity的onResume方法后执行wm.addView(decor,l),这个wm是一个继承自ViewManager的接口,这个l就是windowmanager.layoutParas
+                而wm.addView的实现是WindowManagerImpl的addView,这里又调用了WindowManagerGlobal的addView方法,具体代码如下
+                    root = new ViewRootImpl(view.getContext(),display)
+                    view.setLayoutParams(wparams)
+                    mViews.add(view)
+                    mRoots.add(root)
+                    mParas.add(wparams)
+                    root.setView(view,wparams,panelParentView)
+                这样,通过root.setView就将DecorView加载到window中了,但是此时界面还不会显示出来,因为还要经过measure、layout、draw方法
+
+    2.ViewRootImpl的PerformTraversals(读音:[trəˈvərs(ə)l])方法执行performMeasure、performLayout、performDraw
+
+    3.viewTree开始View的工作流程,根据childWidthMeasureSpec和childHeightMeasureSpec参数执行所有View的measure、layout和draw方法

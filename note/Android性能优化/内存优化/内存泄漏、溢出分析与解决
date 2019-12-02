@@ -47,13 +47,23 @@ https://www.jianshu.com/p/2d47d1cf5ccf
             注意MAT需要标准的.hprof文件,一次在as的Profiler中GC后dump出的内存快照文件需要手动使用android sdk platform-tools下的prof-conv程序进行转换后才能被打开(打开命令行->prof-conv 把hprof文件拖动到这里)
             或者使用AndroidStudio-Captures栏-Export standard.hprof
         2.使用MAT打开堆内存快照文件.hprofile,点击leak Suspects Reports
+
             overView栏
-                会展示四个Actions:
-                1.Histogram：直方图展示可以和另一个hprof快速对比,compare to another heap dumps
-                    Shollow Heap就是对象本身占用内存的大小
-                    Retained Heap就是对象自己的Shollow Heap加上该对象能直接或间接访问到的对象Shollow Heap之和
-                    Histogram是可以显示对象数量的，如果我们怀疑MainActivity泄漏可以在第一行正则表达式搜索MainActivity
-                2.Dominator Tree:支配树,按对象大小降序列出对象和其引用的对象，注重引用关系分析，选择Group by package,找到要检测的类，查看该类引用链
+                Class Name:对象名
+                Objects:该对象存在的实例个数
+                Shollow Heap就是对象本身占用内存的大小
+                Retained Heap就是对象自己的Shollow Heap加上该对象能直接或间接访问到的对象Shollow Heap之和
+                展示四个Actions:
+                1.Histogram：
+                    直方图，注重从类的角度进行分析,如果我们怀疑MainActivity泄漏可以在第一行正则表达式搜索MainActivity
+                    然后在MainActivity右键Merge Shortest to GC roots(表示从GC roots到一个或一组对象的公共路径)，在根据exclude all phantom/weak/soft排除虚引用，弱引用
+                    然后根据该对象的实例个数判断是否出现泄露,以及查看泄露的类的引用关系分析泄露原因
+
+                2.Dominator Tree:支配树,注重对象的引用关系分析，如果我们怀疑MainActivity泄漏可以在第一行正则表达式搜索MainActivity
+                    我们MainActivity右键Path to GC Roots(表示从对象到GC roots的路径)找到从对象到GC Roots的路径,在根据exclude all phantom/weak/soft排除虚引用，弱引用，再通过泄露的类的引用关系分析泄露原因
+                    复杂的分析我们可以通过和另一个hprof快速对比,compare to another heap dumps,再通过对比不同的引用链进行分析
+
+
                 3.Top Consumers:消耗内存最大的对象
                 4.Duplicate Classes
             default_report...栏
@@ -98,13 +108,23 @@ https://www.jianshu.com/p/2d47d1cf5ccf
     1.内存泄漏的本质
         无法回收无用的对象，长生命周期的对象持有了短生命周期对象的引用
     2.常见的内存泄漏场景
-        1.单例造成的内存泄漏(单例对象持有了Activity的引用,将context用ApplicationContext代替)
-        2.非静态内部类创建了静态实例
+        1.Context造成的内存泄漏
+            泄露原因:如单例对象持有了Activity的引用,当Activity销毁时,因为单例持有了Activity引用导致Activity无法被回收
+            解决方案:可以将context用ApplicationContext代替
+        2.非静态内部类(匿名内部类)创建了静态实例
             泄漏原因：非静态内部类默认持有外部类的引用(因为只有存在隐式引用才能调用外部类的方法),且非静态内部类的生命周期不可控，它创建静态实例,导致静态实例会一直持有外部类的引用。
             解决方案:将非静态内部类改为静态内部类或者将静态内部类抽取成一个单例，为什么静态内部类不会持有外部类的引用？
-        3.Handler造成的内存泄漏(将Handler使用一个类包装起来,或者使用静态内部类)
-        4.Bitmap或者IO资源未关闭
-        5.BroadcastReceiver未反注册
+        3.Handler造成的内存泄漏
+            泄露原因:Handler的MeassageQueue中可能存在很多message不能被马上处理,如果Handler非静态会导致引用它的Activity或Service无法被回收
+            解决方案:
+                1.或者使用静态内部类,Handler持有的对象要使用弱引用
+                2.Activity的Destroy方法中移除MessageQueue中的消息handler.removeCallbackAndMessages(null)//该方法可能导致Handler任务无法被全部处理完
+        4.静态View
+            泄露原因:静态View可以避免每次启动Activity都会读取被渲染View,但是静态View会持有Activity的引用，可能导致内存泄露
+            解决方案:onDestroy方法中将静态View置为Null
+        5.Bitmap或者IO资源未关闭
+        6.BroadcastReceiver未反注册
+        7.监听未关闭
 
     3.常见的内存优化点
         1.UI只提供一套高分辨率的图,图片建议放在drawable-xxhdpi文件夹下，这样在低分辨率设备中图片大小只是压缩，不会存在内存增大的情况

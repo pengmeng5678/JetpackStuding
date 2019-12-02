@@ -153,3 +153,13 @@ https://www.jianshu.com/p/1e7e9b576391
                 }
             }
         }
+    5.Leakcanary的缺点
+        1.由于leakCanary只是在Activity的onDestroy方法中触发检测的,所以默认情况只检测Activity的泄露问题
+        如果需要检测其他对象的泄露，需要使用RefWatcher
+          1.在Application中初始化LeakCanary和RefWatcher
+              if (LeakCanary.isInAnalyzerProcess(this)) {
+                  return RefWatcher.DISABLED;
+              }
+              RefWatcher refWatcher = LeakCanary.install(this);
+          2.在其他对象中通过RefWatcher检测内存泄露,如在Fragment的onDestroy方法中检测
+            MyAppclication.getRefWatcher().watch(this)
