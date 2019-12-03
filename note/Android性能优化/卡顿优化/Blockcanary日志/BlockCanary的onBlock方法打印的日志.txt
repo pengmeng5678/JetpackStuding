@@ -1,0 +1,76 @@
+12-02 15:32:45.694 12980-12980/? D/TIME_TEST: MyApplication attachBaseContext
+12-02 15:32:45.715 12980-12980/? D/TIME_TEST: MyApplication onCreate start
+12-02 15:32:46.045 12980-12980/? D/TIME_TEST: MyApplication onCreate complete
+12-02 15:32:46.842 12980-12980/? D/TIME_TEST: testBlockCanary sleepThreadName=main
+12-02 15:32:48.549 12980-13023/? D/TIME_TEST: onBlock:qua = unknown
+    versionName = v2.4.0.1-debug
+    versionCode = 20191202
+    imei = empty_imei
+    uid = uid
+    network = unknown
+    model = rk3399-all
+    api-level = 25 7.1.2
+    cpu-core = 6
+    process = com.qihancloud.zhiyin.desklaw
+    freeMemory = 2591252
+    totalMemory = 3936580
+    time = 2418
+    thread-time = 218
+    time-start = 12-02 15:32:46.045
+    time-end = 12-02 15:32:48.463
+    cpu-busy = false
+    cpu-rate = 12-02 15:32:47.930 cpu:27% app:0% [user:20% system:5% ioWait:0% ]
+    
+    stack = 12-02 15:32:46.887
+    
+    java.lang.Thread.sleep(Native Method)
+    java.lang.Thread.sleep(Thread.java:371)
+    java.lang.Thread.sleep(Thread.java:313)
+    com.qihancloud.zhiyin.MyApplication.testBlockCanary(MyApplication.kt:73)
+    com.qihancloud.zhiyin.MyApplication.access$testBlockCanary(MyApplication.kt:28)
+    com.qihancloud.zhiyin.MyApplication$callback$1.onActivityResumed(MyApplication.kt:40)
+    android.app.Application.dispatchActivityResumed(Application.java:216)
+    android.app.Activity.onResume(Activity.java:1265)
+    android.support.v4.app.FragmentActivity.onResume(FragmentActivity.java:485)
+    com.qihancloud.zhiyin.ui.base.BaseActivity.onResume(BaseActivity.kt:19)
+    com.qihancloud.zhiyin.ui.activity.FaceDetectActivity.onResume(FaceDetectActivity.kt:70)
+    android.app.Instrumentation.callActivityOnResume(Instrumentation.java:1269)
+    android.app.Activity.performResume(Activity.java:6813)
+    android.app.ActivityThread.performResumeActivity(ActivityThread.java:3416)
+    android.app.ActivityThread.handleResumeActivity(ActivityThread.java:3491)
+    android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2742)
+    android.app.ActivityThread.-wrap12(ActivityThread.java)
+    android.app.ActivityThread$H.handleMessage(ActivityThread.java:1487)
+    android.os.Handler.dispatchMessage(Handler.java:102)
+    android.os.Looper.loop(Looper.java:154)
+    android.app.ActivityThread.main(ActivityThread.java:6157)
+    java.lang.reflect.Method.invoke(Native Method)
+    com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:912)
+    com.android.internal.os.ZygoteInit.main(ZygoteInit.java:802)
+    
+    12-02 15:32:47.928
+    
+    java.lang.Thread.sleep(Native Method)
+    java.lang.Thread.sleep(Thread.java:371)
+    java.lang.Thread.sleep(Thread.java:313)
+    com.qihancloud.zhiyin.MyApplication.testBlockCanary(MyApplication.kt:73)
+    com.qihancloud.zhiyin.MyApplication.access$testBlockCanary(MyApplication.kt:28)
+    com.qihancloud.zhiyin.MyApplication$callback$1.onActivityResumed(MyApplication.kt:40)
+    android.app.Application.dispatchActivityResumed(Application.java:216)
+    android.app.Activity.onResume(Activity.java:1265)
+    android.support.v4.app.FragmentActivity.onResume(FragmentActivity.java:485)
+    com.qihancloud.zhiyin.ui.base.BaseActivity.onResume(BaseActivity.kt:19)
+    com.qihancloud.zhiyin.ui.activity.FaceDetectActivity.onResume(FaceDetectActivity.kt:70)
+    android.app.Instrumentation.callActivityOnResume(Instrumentation.java:1269)
+    android.app.Activity.performResume(Activity.java:6813)
+    android.app.ActivityThread.performResumeActivity(ActivityThread.java:3416)
+    android.app.ActivityThread.handleResumeActivity(ActivityThread.java:3491)
+    android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2742)
+    android.app.ActivityThread.-wrap12(ActivityThread.java)
+    android.app.ActivityThread$H.handleMessage(ActivityThread.java:1487)
+    android.os.Handler.dispatchMessage(Handler.java:102)
+    android.os.Looper.loop(Looper.java:154)
+    android.app.ActivityThread.main(ActivityThread.java:6157)
+    java.lang.reflect.Method.invoke(Native Method)
+    com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:912)
+    com.android.internal.os.ZygoteInit.main(ZygoteInit.java:802)

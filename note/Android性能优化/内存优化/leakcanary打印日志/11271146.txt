@@ -1,0 +1,2574 @@
+11-27 11:40:33.502 8093-15169/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:40:33.504 8093-15169/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:40:42.530 8093-15169/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:40:42.961 8093-15409/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+    * android.widget.RelativeLayout has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+    * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[0]
+    * ↳ DefaultGuideFragment.mView
+    * ↳ RelativeLayout
+    * Reference Key: e4d06b98-01a8-4d4d-9b48-8f3d20ccfbad
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=17235ms, gc=144ms, heap dump=1791ms, analysis=15046ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@316250288 (0x12d998b0)
+    |   static INSTANCE = com.qihancloud.zhiyin.util.LoadingAnimationUtil@314589488 (0x12c04130)
+    |   static $classOverhead = byte[76]@315920177 (0x12d48f31)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314600321 (0x12c06b81)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+11-27 11:40:42.962 8093-15409/? D/LeakCanary: |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+    |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+    |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@316339808 (0x12daf660)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@316340512 (0x12daf920)
+    |   mOnRepeat = android.view.animation.Animation$2@316340496 (0x12daf910)
+    |   mOnStart = android.view.animation.Animation$1@316340480 (0x12daf900)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@316270936 (0x12d9e958)
+    |   mPreviousTransformation = android.view.animation.Transformation@316085888 (0x12d71680)
+    |   mRegion = android.graphics.RectF@316270960 (0x12d9e970)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 3174222
+    |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@316085920 (0x12d716a0)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@315218976 (0x12c9dc20)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314646272 (0x12c11f00)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314594776 (0x12c055d8)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+    |   shadow$_monitor_ = -1902163521
+    * Instance of android.view.ViewRootImpl
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   static USE_MT_RENDERER = true
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static DEBUG_INPUT_RESIZE = false
+11-27 11:40:42.963 8093-15409/? D/LeakCanary: |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static sFirstDrawComplete = true
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_DIE = 3
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static TAG = "ViewRootImpl"
+    |   static LOCAL_LOGV = false
+    |   static MSG_CHECK_FOCUS = 13
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static DEBUG_DIALOG = false
+    |   static DBG = false
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static DEBUG_FPS = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_INVALIDATE_WORLD = 22
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+    |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static DEBUG_IMF = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_RESIZED_REPORT = 5
+    |   static DEBUG_LAYOUT = false
+    |   static DEBUG_ORIENTATION = false
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   mAccessibilityFocusedHost = null
+    |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@318378352 (0x12fa1170)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@315344640 (0x12cbc700)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+    |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@318769664 (0x13000a00)
+    |   mAudioManager = null
+    |   mBasePackageName = "com.qihancloud.zhiyin.deskmedical"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+11-27 11:40:42.964 8093-15409/? D/LeakCanary: |   mChoreographer = android.view.Choreographer@315971896 (0x12d55938)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@318377872 (0x12fa0f90)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@318377856 (0x12fa0f80)
+    |   mContext = com.android.internal.policy.DecorContext@316121248 (0x12d7a0a0)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@318440712 (0x12fb0508)
+    |   mDispatchContentInsets = android.graphics.Rect@318440592 (0x12fb0490)
+    |   mDispatchStableInsets = android.graphics.Rect@318440616 (0x12fb04a8)
+    |   mDisplay = android.view.Display@314660032 (0x12c154c0)
+    |   mDisplayListener = android.view.ViewRootImpl$1@318377824 (0x12fa0f60)
+    |   mDisplayManager = android.hardware.display.DisplayManager@315923808 (0x12d49d60)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@318377792 (0x12fa0f40)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@318428192 (0x12fad420)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@318436904 (0x12faf628)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@318441672 (0x12fb08c8)
+    |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@318378368 (0x12fa1180)
+    |   mInLayout = false
+    |   mInputChannel = null
+    |   mInputEventConsistencyVerifier = null
+    |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@318428000 (0x12fad360)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@318232752 (0x12f7d8b0)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@318440520 (0x12fb0448)
+    |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 9216
+    |   mLastTouchPoint = android.graphics.PointF@318377808 (0x12fa0f50)
+11-27 11:40:42.965 8093-15409/? D/LeakCanary: |   mLastTouchSource = 0
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@318928960 (0x13027840)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@318440640 (0x12fb04c0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@318428032 (0x12fad380)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+    |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@318440496 (0x12fb0430)
+    |   mPendingConfiguration = android.content.res.Configuration@318232856 (0x12f7d918)
+    |   mPendingContentInsets = android.graphics.Rect@318440448 (0x12fb0400)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin.deskmedical/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@318440472 (0x12fb0418)
+    |   mPendingOverscanInsets = android.graphics.Rect@318440376 (0x12fb03b8)
+    |   mPendingStableInsets = android.graphics.Rect@318440424 (0x12fb03e8)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@318440400 (0x12fb03d0)
+    |   mPointerIconType = 1
+    |   mPreviousTransparentRegion = android.graphics.Region@318377904 (0x12fa0fb0)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = null
+    |   mQueuedInputEventPoolSize = 0
+    |   mRemoved = true
+    |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@319043072 (0x13043600)
+    |   mSeq = 0
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@318421640 (0x12faba88)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@318436704 (0x12faf560)
+    |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@318909808 (0x13022d70)
+    |   mTempRect = android.graphics.Rect@318440736 (0x12fb0520)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@318440304 (0x12fb0370)
+    |   mTmpValue = android.util.TypedValue@318435904 (0x12faf240)
+    |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@318377888 (0x12fa0fa0)
+    |   mTraversalBarrier = 1481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@318377840 (0x12fa0f70)
+11-27 11:40:42.966 8093-15409/? D/LeakCanary: |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@315226800 (0x12c9fab0)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+    |   mVisRect = android.graphics.Rect@318440760 (0x12fb0538)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@318440784 (0x12fb0550)
+    |   mWindow = android.view.ViewRootImpl$W@318428064 (0x12fad3a0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@316261984 (0x12d9c660)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@318440280 (0x12fb0358)
+    |   mWindowDrawCountDown = null
+    |   mWindowSession = android.view.IWindowSession$Stub$Proxy@315942976 (0x12d4e840)
+    |   shadow$_klass_ = android.view.ViewRootImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.DecorContext
+    |   static $classOverhead = byte[688]@1884378873 (0x705156f9)
+    |   mActivityResources = android.content.res.Resources@316206864 (0x12d8ef10)
+    |   mPhoneWindow = com.android.internal.policy.PhoneWindow@316771984 (0x12e18e90)
+    |   mWindowManager = null
+    |   mInflater = null
+    |   mOverrideConfiguration = null
+    |   mResources = null
+    |   mTheme = android.content.res.Resources$Theme@319265760 (0x13079be0)
+    |   mThemeResource = 2131624198
+    |   mBase = com.qihancloud.zhiyin.MyApplication@314596576 (0x12c05ce0)
+    |   shadow$_klass_ = com.android.internal.policy.DecorContext
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.PhoneWindow
+    |   static VIEWS_TAG = "android:views"
+    |   static DEFAULT_BACKGROUND_FADE_DURATION_MS = 300
+    |   static USE_DEFAULT_TRANSITION = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   static ACTION_BAR_TAG = "android:ActionBar"
+    |   static TAG = "PhoneWindow"
+    |   static FOCUSED_ID_TAG = "android:focusedViewId"
+    |   static FLAG_RESOURCE_SET_LOGO = 2
+    |   static sRotationWatcher = com.android.internal.policy.PhoneWindow$RotationWatcher@1956828552 (0x74a2d588)
+    |   static PANELS_TAG = "android:Panels"
+    |   static FLAG_RESOURCE_SET_ICON_FALLBACK = 4
+    |   static CUSTOM_TITLE_COMPATIBLE_FEATURES = 13505
+    |   static FLAG_RESOURCE_SET_ICON = 1
+    |   static DEBUG = false
+    |   static $classOverhead = byte[849]@1883356401 (0x7041bcf1)
+    |   mActionMenuPresenterCallback = null
+11-27 11:40:42.967 8093-15409/? D/LeakCanary: |   mAllowEnterTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAllowReturnTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAlwaysReadCloseOnTouchAttr = false
+    |   mAudioManager = null
+    |   mBackgroundDrawable = null
+    |   mBackgroundFadeDurationMillis = 300
+    |   mBackgroundFallbackResource = 17170670
+    |   mBackgroundResource = 17170670
+    |   mCircularProgressBar = null
+    |   mClipToOutline = true
+    |   mClosingActionMenu = false
+    |   mContentParent = android.widget.FrameLayout@317604864 (0x12ee4400)
+    |   mContentParentExplicitlySet = true
+    |   mContentScene = null
+    |   mContextMenu = null
+    |   mContextMenuCallback = com.android.internal.policy.PhoneWindow$PhoneWindowMenuCallback@314585728 (0x12c03280)
+    |   mContextMenuHelper = null
+    |   mDecor = com.android.internal.policy.DecorView@317606912 (0x12ee4c00)
+    |   mDecorCaptionShade = 0
+    |   mDecorContentParent = null
+    |   mDrawables = null
+    |   mElevation = 0.0
+    |   mEnterTransition = android.transition.Fade@315493248 (0x12ce0b80)
+    |   mExitTransition = null
+    |   mFixedHeightMajor = android.util.TypedValue@316204904 (0x12d8e768)
+    |   mFixedHeightMinor = android.util.TypedValue@316204864 (0x12d8e740)
+    |   mFixedWidthMajor = android.util.TypedValue@316204984 (0x12d8e7b8)
+    |   mFixedWidthMinor = android.util.TypedValue@316204944 (0x12d8e790)
+    |   mForceDecorInstall = false
+    |   mForcedNavigationBarColor = false
+    |   mForcedStatusBarColor = true
+    |   mFrameResource = 0
+    |   mHorizontalProgressBar = null
+    |   mIconRes = 0
+    |   mInvalidatePanelMenuFeatures = 0
+    |   mInvalidatePanelMenuPosted = false
+    |   mInvalidatePanelMenuRunnable = com.android.internal.policy.PhoneWindow$1@319265360 (0x13079a50)
+    |   mIsFloating = false
+    |   mIsStartingWindow = false
+    |   mIsTranslucent = false
+    |   mKeyguardManager = null
+    |   mLayoutInflater = com.android.internal.policy.PhoneLayoutInflater@315389216 (0x12cc7520)
+    |   mLeftIconView = null
+    |   mLoadElevation = true
+    |   mLogoRes = 0
+    |   mMediaController = null
+    |   mMinWidthMajor = android.util.TypedValue@316206784 (0x12d8eec0)
+    |   mMinWidthMinor = android.util.TypedValue@316206744 (0x12d8ee98)
+    |   mNavigationBarColor = -16777216
+    |   mPanelChordingKey = 0
+    |   mPanelMenuPresenterCallback = null
+    |   mPanels = com.android.internal.policy.PhoneWindow$PanelFeatureState[1]@315376128 (0x12cc4200)
+    |   mPreparedPanel = null
+    |   mReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mResourcesSetFlags = 0
+    |   mReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mRightIconView = null
+    |   mSharedElementEnterTransition = android.transition.TransitionSet@315746752 (0x12d1e9c0)
+    |   mSharedElementExitTransition = android.transition.TransitionSet@315747872 (0x12d1ee20)
+    |   mSharedElementReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementsUseOverlay = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mStatusBarColor = 0
+    |   mSupportsPictureInPicture = false
+    |   mTakeInputQueueCallback = null
+    |   mTakeSurfaceCallback = null
+    |   mTextColor = 0
+    |   mTheme = 2131624198
+    |   mTitle = "医护助手"
+    |   mTitleColor = 0
+    |   mTitleView = null
+11-27 11:40:42.968 8093-15409/? D/LeakCanary: |   mTransitionManager = android.transition.TransitionManager@319264976 (0x130798d0)
+    |   mUiOptions = 0
+    |   mUseDecorContext = true
+    |   mVolumeControlStreamType = -2147483648
+    |   mActiveChild = null
+    |   mAppName = "com.qihancloud.zhiyin.deskmedical/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mAppToken = android.os.BinderProxy@315355488 (0x12cbf160)
+    |   mCallback = android.support.v7.app.AppCompatDelegateImplN$AppCompatWindowCallbackN@317222080 (0x12e86cc0)
+    |   mCloseOnSwipeEnabled = false
+    |   mCloseOnTouchOutside = false
+    |   mContainer = null
+    |   mContext = com.qihancloud.zhiyin.ui.activity.MainActivity@316980736 (0x12e4be00)
+    |   mDefaultWindowFormat = -1
+    |   mDestroyed = true
+    |   mFeatures = 8259
+    |   mForcedWindowFlags = -2071920256
+    |   mHardwareAccelerated = true
+    |   mHasChildren = false
+    |   mHasSoftInputMode = true
+    |   mHaveDimAmount = false
+    |   mHaveWindowFormat = false
+    |   mIsActive = true
+    |   mLocalFeatures = 8259
+    |   mOnRestrictedCaptionAreaChangedListener = null
+    |   mOnWindowDismissedCallback = com.qihancloud.zhiyin.ui.activity.MainActivity@316980736 (0x12e4be00)
+    |   mOnWindowSwipeDismissedCallback = null
+    |   mOverlayWithDecorCaptionEnabled = false
+    |   mRestrictedCaptionAreaRect = null
+    |   mSetCloseOnTouchOutside = false
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@314838864 (0x12c40f50)
+    |   mWindowControllerCallback = com.qihancloud.zhiyin.ui.activity.MainActivity@316980736 (0x12e4be00)
+    |   mWindowManager = android.view.WindowManagerImpl@314585824 (0x12c032e0)
+    |   mWindowStyle = android.content.res.TypedArray@315389120 (0x12cc74c0)
+    |   shadow$_klass_ = com.android.internal.policy.PhoneWindow
+    |   shadow$_monitor_ = 0
+    * Instance of com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   static PERMISSION_EXIT_APP = "PERMISSION_EXIT_APP"
+    |   static UI_HIDE_ACTIVATE_VIEW = 202
+    |   static UI_SHOW_ACTIVATE_VIEW = 201
+    |   static PERMISSION_GO_TO_SETTING_ACTIVITY = "PERMISSION_GO_TO_SETTING_ACTIVITY"
+    |   static CHAT_TEXT_INPUT = 101
+    |   static UPDATE_CHAT_DATA = 1
+    |   static TAG = "FRAGMENT"
+    |   static COMMAND_NEXT_ONE = 5
+    |   static COMMAND_PREVIOUS_ONE = 6
+    |   static COMMAND_SET_INIT_POSITION = 13
+    |   static Companion = com.qihancloud.zhiyin.ui.activity.MainActivity$Companion@314728744 (0x12c26128)
+    |   static TAG1 = "MUSIC_SERVICE"
+    |   static CHAT_VOICE_INPUT = 102
+    |   static COMMAND_PLAYER_LIST = 11
+    |   static COMMAND_PLAY_CHANGE_SOME_ONE = 10
+    |   static COMMAND_START_NAVIGATION = 12
+    |   static $classOverhead = byte[2320]@314675201 (0x12c19001)
+    |   static COMMAND_OPEN_CAMERA = 14
+    |   EXIT_HTML_TASK_MILLITIME = 30000
+    |   _$_findViewCache = java.util.HashMap@316702680 (0x12e07fd8)
+    |   animationDisable = null
+    |   currentChatType = 102
+    |   delayExitHtmlTask = com.qihancloud.zhiyin.ui.activity.MainActivity$delayExitHtmlTask$1@319265520 (0x13079af0)
+    |   lastActionTime = 0
+    |   mBidner = com.qihancloud.zhiyin.service.MusicPlayerService$MusicBinder@318521600 (0x12fc4100)
+    |   mCommandQuestion = null
+    |   mConn = null
+    |   mCurrentDealResult = com.qihancloud.zhiyin.bean.DealResult@315870656 (0x12d3cdc0)
+    |   mCurrentfragment = com.qihancloud.zhiyin.ui.fragment.ToUserFragment@318738848 (0x12ff91a0)
+    |   mCustomDialog = null
+    |   mFrameDrawablesListen = java.util.ArrayList@316748536 (0x12e132f8)
+    |   mFrameDrawablesSpeak = java.util.ArrayList@316749736 (0x12e137a8)
+11-27 11:40:42.969 8093-15409/? D/LeakCanary: |   mFrameDrawablesWait = java.util.ArrayList@316750504 (0x12e13aa8)
+    |   mGuideStrTittle = "你好，请问有什么可以帮你?"
+    |   mHTMLLayout = android.widget.FrameLayout@315504640 (0x12ce3800)
+    |   mHandler = com.qihancloud.zhiyin.ui.activity.MainActivity$mHandler$1@317222560 (0x12e86ea0)
+    |   mHtml5WebView = null
+    |   mIsOnPause = true
+    |   mIvCloseActivity = null
+    |   mIvClosePage = android.support.v7.widget.AppCompatImageView@315579392 (0x12cf5c00)
+    |   mIvPlayMusic = android.support.v7.widget.AppCompatImageView@315578368 (0x12cf5800)
+    |   mIvSetMore = android.support.v7.widget.AppCompatImageView@317863936 (0x12f23800)
+    |   mLlHintContainer = android.widget.LinearLayout@317097984 (0x12e68800)
+    |   mMainPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@318112200 (0x12f601c8)
+    |   mManagerPassword = null
+    |   mMusicIntent = null
+    |   mRoundProgressBar = com.qihancloud.zhiyin.ui.widget.RoundProgressBar@314623728 (0x12c0c6f0)
+    |   mTvFromUser = android.support.v7.widget.AppCompatTextView@317600768 (0x12ee3400)
+    |   mUsbDiskReceiver = null
+    |   robot_animation_iv = com.qihancloud.zhiyin.function.frameanimation.FrameAnimationView@315508736 (0x12ce4800)
+    |   _$_findViewCache = null
+    |   handMotionManager = com.sanbot.opensdk.function.unit.HandMotionManager@319264848 (0x13079850)
+    |   isUseSdkVoice = true
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@317438968 (0x12ebbbf8)
+    |   mHdCameraManager = null
+    |   mOnActionManagerListener = null
+    |   mPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@316523680 (0x12ddc4a0)
+    |   mSpeechManager = com.sanbot.opensdk.function.unit.SpeechManager@317436352 (0x12ebb1c0)
+    |   mSystemManager = com.sanbot.opensdk.function.unit.SystemManager@317438872 (0x12ebbb98)
+    |   TAG = "SanbotOpenSdk"
+    |   alarmReceiver = com.sanbot.opensdk.base.BindBaseActivity$alarmReceiver$1@314585440 (0x12c03160)
+    |   clientClass = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   clientName = "com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   clientSocketUtil = null
+    |   currentFunction = "com.qihancloud.zhiyin.deskmedical"
+11-27 11:40:42.973 8093-15409/? D/LeakCanary: |   static ALIGN_BOTTOM = 8
+11-27 11:40:42.974 8093-15409/? D/LeakCanary: |   mLastTouchDownX = 0.0
+    |   mNestedScrollAxes = 0
+    |   mSuppressLayout = false
+11-27 11:40:42.975 8093-15409/? D/LeakCanary: |   mAccessibilityDelegate = null
+    |   mAccessibilityTraversalAfterId = -1
+    |   mAccessibilityTraversalBeforeId = -1
+    |   mBackgroundResource = 0
+    |   mID = -1
+    |   mIgnoreNextUpEvent = false
+11-27 11:40:42.976 8093-15409/? D/LeakCanary: |   mPrivateFlags3 = 19
+    |   mRecreateDisplayList = false
+    |   mRight = 1320
+    |   mRunQueue = android.view.HandlerActionQueue@316315424 (0x12da9720)
+11-27 11:40:42.977 8093-15409/? D/LeakCanary: | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Class:java.lang.ref.PhantomReference (always)
+    | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)
+11-27 11:40:47.960 27457-27497/? D/LeakCanary: Removing 1 heap dumps
+11-27 11:40:48.074 27457-27497/? I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin.deskmedical/f3a190da-b927-47f2-865c-26a36ed27ce9_pending.hprof" starting...
+11-27 11:40:49.835 8093-15524/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:40:49.838 8093-15524/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:40:49.934 27457-27497/? D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:40:50.057 27457-27497/? D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:40:50.991 8093-15524/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:40:55.922 8093-15524/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:40:55.924 8093-15524/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:41:04.709 8093-15524/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:41:05.023 8093-15764/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+11-27 11:41:05.024 8093-15764/? D/LeakCanary: * com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+    * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[0]
+    * ↳ DefaultGuideFragment
+    * Reference Key: 05141f94-17c3-4ff8-9ad8-dff56be1bf7b
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=39533ms, gc=145ms, heap dump=1810ms, analysis=14902ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@316250288 (0x12d998b0)
+    |   static INSTANCE = com.qihancloud.zhiyin.util.LoadingAnimationUtil@314589488 (0x12c04130)
+    |   static $classOverhead = byte[76]@315920177 (0x12d48f31)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314600321 (0x12c06b81)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+    |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+    |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+    |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@316339808 (0x12daf660)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@316340512 (0x12daf920)
+    |   mOnRepeat = android.view.animation.Animation$2@316340496 (0x12daf910)
+    |   mOnStart = android.view.animation.Animation$1@316340480 (0x12daf900)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@316270936 (0x12d9e958)
+    |   mPreviousTransformation = android.view.animation.Transformation@316085888 (0x12d71680)
+    |   mRegion = android.graphics.RectF@316270960 (0x12d9e970)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 3174222
+11-27 11:41:05.025 8093-15764/? D/LeakCanary: |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@316085920 (0x12d716a0)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@315218976 (0x12c9dc20)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314646272 (0x12c11f00)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314594776 (0x12c055d8)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+    |   shadow$_monitor_ = -1902163521
+    * Instance of android.view.ViewRootImpl
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   static USE_MT_RENDERER = true
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static DEBUG_INPUT_RESIZE = false
+    |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static sFirstDrawComplete = true
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_DIE = 3
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static TAG = "ViewRootImpl"
+    |   static LOCAL_LOGV = false
+    |   static MSG_CHECK_FOCUS = 13
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static DEBUG_DIALOG = false
+    |   static DBG = false
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static DEBUG_FPS = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_INVALIDATE_WORLD = 22
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+    |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static DEBUG_IMF = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_RESIZED_REPORT = 5
+    |   static DEBUG_LAYOUT = false
+11-27 11:41:05.025 8093-15764/? D/LeakCanary: |   static DEBUG_ORIENTATION = false
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   mAccessibilityFocusedHost = null
+11-27 11:41:05.026 8093-15764/? D/LeakCanary: |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@318378352 (0x12fa1170)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@315344640 (0x12cbc700)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+    |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@318769664 (0x13000a00)
+    |   mAudioManager = null
+    |   mBasePackageName = "com.qihancloud.zhiyin.deskmedical"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+    |   mChoreographer = android.view.Choreographer@315971896 (0x12d55938)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@318377872 (0x12fa0f90)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@318377856 (0x12fa0f80)
+    |   mContext = com.android.internal.policy.DecorContext@316121248 (0x12d7a0a0)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@318440712 (0x12fb0508)
+    |   mDispatchContentInsets = android.graphics.Rect@318440592 (0x12fb0490)
+    |   mDispatchStableInsets = android.graphics.Rect@318440616 (0x12fb04a8)
+    |   mDisplay = android.view.Display@314660032 (0x12c154c0)
+    |   mDisplayListener = android.view.ViewRootImpl$1@318377824 (0x12fa0f60)
+    |   mDisplayManager = android.hardware.display.DisplayManager@315923808 (0x12d49d60)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@318377792 (0x12fa0f40)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@318428192 (0x12fad420)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@318436904 (0x12faf628)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@318441672 (0x12fb08c8)
+    |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@318378368 (0x12fa1180)
+    |   mInLayout = false
+    |   mInputChannel = null
+    |   mInputEventConsistencyVerifier = null
+11-27 11:41:05.027 8093-15764/? D/LeakCanary: |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@318428000 (0x12fad360)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@318232752 (0x12f7d8b0)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@318440520 (0x12fb0448)
+    |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 9216
+    |   mLastTouchPoint = android.graphics.PointF@318377808 (0x12fa0f50)
+    |   mLastTouchSource = 0
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@318928960 (0x13027840)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@318440640 (0x12fb04c0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@318428032 (0x12fad380)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+    |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@318440496 (0x12fb0430)
+    |   mPendingConfiguration = android.content.res.Configuration@318232856 (0x12f7d918)
+    |   mPendingContentInsets = android.graphics.Rect@318440448 (0x12fb0400)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin.deskmedical/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@318440472 (0x12fb0418)
+    |   mPendingOverscanInsets = android.graphics.Rect@318440376 (0x12fb03b8)
+    |   mPendingStableInsets = android.graphics.Rect@318440424 (0x12fb03e8)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@318440400 (0x12fb03d0)
+    |   mPointerIconType = 1
+    |   mPreviousTransparentRegion = android.graphics.Region@318377904 (0x12fa0fb0)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = null
+    |   mQueuedInputEventPoolSize = 0
+    |   mRemoved = true
+    |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@319043072 (0x13043600)
+    |   mSeq = 0
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@318421640 (0x12faba88)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@318436704 (0x12faf560)
+11-27 11:41:05.028 8093-15764/? D/LeakCanary: |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@318909808 (0x13022d70)
+    |   mTempRect = android.graphics.Rect@318440736 (0x12fb0520)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@318440304 (0x12fb0370)
+    |   mTmpValue = android.util.TypedValue@318435904 (0x12faf240)
+    |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@318377888 (0x12fa0fa0)
+    |   mTraversalBarrier = 1481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@318377840 (0x12fa0f70)
+    |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@315226800 (0x12c9fab0)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+    |   mVisRect = android.graphics.Rect@318440760 (0x12fb0538)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@318440784 (0x12fb0550)
+    |   mWindow = android.view.ViewRootImpl$W@318428064 (0x12fad3a0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@316261984 (0x12d9c660)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@318440280 (0x12fb0358)
+    |   mWindowDrawCountDown = null
+    |   mWindowSession = android.view.IWindowSession$Stub$Proxy@315942976 (0x12d4e840)
+    |   shadow$_klass_ = android.view.ViewRootImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.DecorContext
+    |   static $classOverhead = byte[688]@1884378873 (0x705156f9)
+    |   mActivityResources = android.content.res.Resources@316206864 (0x12d8ef10)
+    |   mPhoneWindow = com.android.internal.policy.PhoneWindow@316771984 (0x12e18e90)
+    |   mWindowManager = null
+    |   mInflater = null
+    |   mOverrideConfiguration = null
+    |   mResources = null
+    |   mTheme = android.content.res.Resources$Theme@319265760 (0x13079be0)
+    |   mThemeResource = 2131624198
+    |   mBase = com.qihancloud.zhiyin.MyApplication@314596576 (0x12c05ce0)
+    |   shadow$_klass_ = com.android.internal.policy.DecorContext
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.PhoneWindow
+    |   static VIEWS_TAG = "android:views"
+    |   static DEFAULT_BACKGROUND_FADE_DURATION_MS = 300
+    |   static USE_DEFAULT_TRANSITION = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   static ACTION_BAR_TAG = "android:ActionBar"
+    |   static TAG = "PhoneWindow"
+    |   static FOCUSED_ID_TAG = "android:focusedViewId"
+    |   static FLAG_RESOURCE_SET_LOGO = 2
+    |   static sRotationWatcher = com.android.internal.policy.PhoneWindow$RotationWatcher@1956828552 (0x74a2d588)
+    |   static PANELS_TAG = "android:Panels"
+    |   static FLAG_RESOURCE_SET_ICON_FALLBACK = 4
+    |   static CUSTOM_TITLE_COMPATIBLE_FEATURES = 13505
+    |   static FLAG_RESOURCE_SET_ICON = 1
+    |   static DEBUG = false
+    |   static $classOverhead = byte[849]@1883356401 (0x7041bcf1)
+    |   mActionMenuPresenterCallback = null
+    |   mAllowEnterTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAllowReturnTransitionOverlap = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mAlwaysReadCloseOnTouchAttr = false
+    |   mAudioManager = null
+    |   mBackgroundDrawable = null
+    |   mBackgroundFadeDurationMillis = 300
+    |   mBackgroundFallbackResource = 17170670
+    |   mBackgroundResource = 17170670
+    |   mCircularProgressBar = null
+    |   mClipToOutline = true
+    |   mClosingActionMenu = false
+    |   mContentParent = android.widget.FrameLayout@317604864 (0x12ee4400)
+11-27 11:41:05.029 8093-15764/? D/LeakCanary: |   mContentParentExplicitlySet = true
+    |   mContentScene = null
+    |   mContextMenu = null
+    |   mContextMenuCallback = com.android.internal.policy.PhoneWindow$PhoneWindowMenuCallback@314585728 (0x12c03280)
+    |   mContextMenuHelper = null
+    |   mDecor = com.android.internal.policy.DecorView@317606912 (0x12ee4c00)
+    |   mDecorCaptionShade = 0
+    |   mDecorContentParent = null
+    |   mDrawables = null
+    |   mElevation = 0.0
+    |   mEnterTransition = android.transition.Fade@315493248 (0x12ce0b80)
+    |   mExitTransition = null
+    |   mFixedHeightMajor = android.util.TypedValue@316204904 (0x12d8e768)
+    |   mFixedHeightMinor = android.util.TypedValue@316204864 (0x12d8e740)
+    |   mFixedWidthMajor = android.util.TypedValue@316204984 (0x12d8e7b8)
+    |   mFixedWidthMinor = android.util.TypedValue@316204944 (0x12d8e790)
+    |   mForceDecorInstall = false
+    |   mForcedNavigationBarColor = false
+    |   mForcedStatusBarColor = true
+    |   mFrameResource = 0
+    |   mHorizontalProgressBar = null
+    |   mIconRes = 0
+    |   mInvalidatePanelMenuFeatures = 0
+    |   mInvalidatePanelMenuPosted = false
+    |   mInvalidatePanelMenuRunnable = com.android.internal.policy.PhoneWindow$1@319265360 (0x13079a50)
+    |   mIsFloating = false
+    |   mIsStartingWindow = false
+    |   mIsTranslucent = false
+    |   mKeyguardManager = null
+    |   mLayoutInflater = com.android.internal.policy.PhoneLayoutInflater@315389216 (0x12cc7520)
+    |   mLeftIconView = null
+    |   mLoadElevation = true
+    |   mLogoRes = 0
+    |   mMediaController = null
+11-27 11:41:05.029 8093-15764/? D/LeakCanary: |   mMinWidthMajor = android.util.TypedValue@316206784 (0x12d8eec0)
+    |   mMinWidthMinor = android.util.TypedValue@316206744 (0x12d8ee98)
+    |   mNavigationBarColor = -16777216
+11-27 11:41:05.029 8093-15764/? D/LeakCanary: |   mPanelChordingKey = 0
+    |   mPanelMenuPresenterCallback = null
+    |   mPanels = com.android.internal.policy.PhoneWindow$PanelFeatureState[1]@315376128 (0x12cc4200)
+    |   mPreparedPanel = null
+    |   mReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mResourcesSetFlags = 0
+    |   mReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mRightIconView = null
+    |   mSharedElementEnterTransition = android.transition.TransitionSet@315746752 (0x12d1e9c0)
+    |   mSharedElementExitTransition = android.transition.TransitionSet@315747872 (0x12d1ee20)
+    |   mSharedElementReenterTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementReturnTransition = android.transition.TransitionSet@1956828400 (0x74a2d4f0)
+    |   mSharedElementsUseOverlay = java.lang.Boolean@1883641264 (0x704615b0)
+    |   mStatusBarColor = 0
+    |   mSupportsPictureInPicture = false
+    |   mTakeInputQueueCallback = null
+    |   mTakeSurfaceCallback = null
+    |   mTextColor = 0
+    |   mTheme = 2131624198
+    |   mTitle = "医护助手"
+    |   mTitleColor = 0
+    |   mTitleView = null
+    |   mTransitionManager = android.transition.TransitionManager@319264976 (0x130798d0)
+    |   mUiOptions = 0
+    |   mUseDecorContext = true
+    |   mVolumeControlStreamType = -2147483648
+    |   mActiveChild = null
+11-27 11:41:30.114 27457-27497/? D/LeakCanary: Removing 1 heap dumps
+11-27 11:41:30.217 27457-27497/? I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin.deskmedical/7bbe58ce-37dd-4c23-b950-72195a15d2c6_pending.hprof" starting...
+11-27 11:41:31.995 8093-16215/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:41:31.998 8093-16215/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:41:32.091 27457-27497/? D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:41:33.079 8093-16215/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:41:37.944 8093-16215/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:41:37.946 8093-16215/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:41:46.909 8093-16215/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:41:47.268 8093-16465/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+    * com.qihancloud.zhiyin.ui.fragment.FromUserFragment has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+    * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[1]
+    * ↳ FromUserFragment
+    * Reference Key: 957909f4-a648-4919-a2b2-b403f45ab376
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=81695ms, gc=132ms, heap dump=1787ms, analysis=14941ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@316250288 (0x12d998b0)
+    |   static INSTANCE = com.qihancloud.zhiyin.util.LoadingAnimationUtil@314589488 (0x12c04130)
+    |   static $classOverhead = byte[76]@315920177 (0x12d48f31)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314600321 (0x12c06b81)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+    |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+    |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+11-27 11:41:47.269 8093-16465/? D/LeakCanary: |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@316339808 (0x12daf660)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@316340512 (0x12daf920)
+    |   mOnRepeat = android.view.animation.Animation$2@316340496 (0x12daf910)
+    |   mOnStart = android.view.animation.Animation$1@316340480 (0x12daf900)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@316270936 (0x12d9e958)
+    |   mPreviousTransformation = android.view.animation.Transformation@316085888 (0x12d71680)
+    |   mRegion = android.graphics.RectF@316270960 (0x12d9e970)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 3174222
+    |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@316085920 (0x12d716a0)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@315218976 (0x12c9dc20)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314646272 (0x12c11f00)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314594776 (0x12c055d8)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+    |   shadow$_monitor_ = -1902163521
+    * Instance of android.view.ViewRootImpl
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   static USE_MT_RENDERER = true
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static DEBUG_INPUT_RESIZE = false
+    |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static sFirstDrawComplete = true
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_DIE = 3
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static TAG = "ViewRootImpl"
+    |   static LOCAL_LOGV = false
+    |   static MSG_CHECK_FOCUS = 13
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static DEBUG_DIALOG = false
+    |   static DBG = false
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static DEBUG_FPS = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_INVALIDATE_WORLD = 22
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+11-27 11:41:47.270 8093-16465/? D/LeakCanary: |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static DEBUG_IMF = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_RESIZED_REPORT = 5
+    |   static DEBUG_LAYOUT = false
+    |   static DEBUG_ORIENTATION = false
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   mAccessibilityFocusedHost = null
+    |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@318378352 (0x12fa1170)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@315344640 (0x12cbc700)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+    |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@318769664 (0x13000a00)
+    |   mAudioManager = null
+    |   mBasePackageName = "com.qihancloud.zhiyin.deskmedical"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+    |   mChoreographer = android.view.Choreographer@315971896 (0x12d55938)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@318377872 (0x12fa0f90)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@318377856 (0x12fa0f80)
+    |   mContext = com.android.internal.policy.DecorContext@316121248 (0x12d7a0a0)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@318440712 (0x12fb0508)
+    |   mDispatchContentInsets = android.graphics.Rect@318440592 (0x12fb0490)
+    |   mDispatchStableInsets = android.graphics.Rect@318440616 (0x12fb04a8)
+    |   mDisplay = android.view.Display@314660032 (0x12c154c0)
+    |   mDisplayListener = android.view.ViewRootImpl$1@318377824 (0x12fa0f60)
+    |   mDisplayManager = android.hardware.display.DisplayManager@315923808 (0x12d49d60)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@318377792 (0x12fa0f40)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@318428192 (0x12fad420)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@318436904 (0x12faf628)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@318441672 (0x12fb08c8)
+    |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@318378368 (0x12fa1180)
+    |   mInLayout = false
+    |   mInputChannel = null
+11-27 11:41:47.271 8093-16465/? D/LeakCanary: |   mInputEventConsistencyVerifier = null
+    |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@318428000 (0x12fad360)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@318232752 (0x12f7d8b0)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@318440520 (0x12fb0448)
+    |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 9216
+    |   mLastTouchPoint = android.graphics.PointF@318377808 (0x12fa0f50)
+    |   mLastTouchSource = 0
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@318928960 (0x13027840)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@318440640 (0x12fb04c0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@318428032 (0x12fad380)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+    |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@318440496 (0x12fb0430)
+    |   mPendingConfiguration = android.content.res.Configuration@318232856 (0x12f7d918)
+    |   mPendingContentInsets = android.graphics.Rect@318440448 (0x12fb0400)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin.deskmedical/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@318440472 (0x12fb0418)
+    |   mPendingOverscanInsets = android.graphics.Rect@318440376 (0x12fb03b8)
+    |   mPendingStableInsets = android.graphics.Rect@318440424 (0x12fb03e8)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@318440400 (0x12fb03d0)
+    |   mPointerIconType = 1
+    |   mPreviousTransparentRegion = android.graphics.Region@318377904 (0x12fa0fb0)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = null
+    |   mQueuedInputEventPoolSize = 0
+    |   mRemoved = true
+    |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@319043072 (0x13043600)
+    |   mSeq = 0
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@318421640 (0x12faba88)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@318436704 (0x12faf560)
+    |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@318909808 (0x13022d70)
+    |   mTempRect = android.graphics.Rect@318440736 (0x12fb0520)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@318440304 (0x12fb0370)
+    |   mTmpValue = android.util.TypedValue@318435904 (0x12faf240)
+11-27 11:41:47.272 8093-16465/? D/LeakCanary: |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@318377888 (0x12fa0fa0)
+    |   mTraversalBarrier = 1481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@318377840 (0x12fa0f70)
+    |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@315226800 (0x12c9fab0)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+    |   mVisRect = android.graphics.Rect@318440760 (0x12fb0538)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@318440784 (0x12fb0550)
+    |   mWindow = android.view.ViewRootImpl$W@318428064 (0x12fad3a0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@316261984 (0x12d9c660)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@318440280 (0x12fb0358)
+11-27 11:42:02.364 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Removing 1 heap dumps
+11-27 11:42:02.497 6933-6957/com.qihancloud.zhiyin I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin/6e29757b-d322-4fec-826f-2a92b440a4d3_pending.hprof" starting...
+11-27 11:42:14.597 27338-16914/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:42:14.603 27338-16914/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:42:14.881 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:15.176 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:15.528 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:15.657 27338-16914/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:42:15.785 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:16.158 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:16.426 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:16.724 6933-6957/com.qihancloud.zhiyin D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:42:20.389 27338-16914/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:42:20.396 27338-16914/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:42:28.654 27338-16914/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:42:28.906 27338-17132/? D/LeakCanary: In com.qihancloud.zhiyin:v2.3.0.8-debug:20191127.
+    * android.widget.RelativeLayout has leaked:
+    * static SanbotActionManagerImpl$SanbotActionManagerHolder.!(mHolder)!
+    * ↳ SanbotActionManagerImpl.!(mHardWareManager)!
+    * ↳ HardWareManager.!(context)!
+    * ↳ MainActivity.mFragments
+    * ↳ FragmentController.mHost
+    * ↳ FragmentActivity$HostCallbacks.mFragmentManager
+    * ↳ FragmentManagerImpl.mAdded
+    * ↳ ArrayList.elementData
+    * ↳ array Object[].[3]
+    * ↳ DefaultGuideFragment.mView
+    * ↳ RelativeLayout
+    * Reference Key: ab0a67f3-b04b-4b37-ae00-fb5a6d0059e2
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=1320928ms, gc=363ms, heap dump=11923ms, analysis=14077ms
+    * Details:
+    * Class com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl$SanbotActionManagerHolder
+    |   static mHolder = com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl@852375608 (0x32ce3838)
+    |   static $classOverhead = byte[56]@852106305 (0x32ca1c41)
+    * Instance of com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl
+    |   static $classOverhead = byte[112]@852028481 (0x32c8ec41)
+    |   static TAG = "ROBOT_ACTION"
+    |   handMotionManager = null
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@852231480 (0x32cc0538)
+    |   mOnActionManagerListener = com.qihancloud.zhiyin.ui.activity.MainPresenter$14@852318608 (0x32cd5990)
+    |   shadow$_klass_ = com.qihancloud.zhiyin.function.action.SanbotActionManagerImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.sanbot.opensdk.function.unit.HardWareManager
+    |   static $classOverhead = byte[168]@851683553 (0x32c3a8e1)
+    |   context = com.qihancloud.zhiyin.ui.activity.MainActivity@851862528 (0x32c66400)
+    |   listener = com.qihancloud.zhiyin.ui.activity.MainActivity@851862528 (0x32c66400)
+    |   listenerMap = android.support.v4.util.ArrayMap@852375584 (0x32ce3820)
+    |   shadow$_klass_ = com.sanbot.opensdk.function.unit.HardWareManager
+    |   shadow$_monitor_ = 0
+    * Instance of com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   static COMMAND_START_NAVIGATION = 12
+    |   static PERMISSION_GO_TO_SETTING_ACTIVITY = "PERMISSION_GO_TO_SETTING_ACTIVITY"
+    |   static COMMAND_NEXT_ONE = 5
+    |   static CHAT_TEXT_INPUT = 101
+    |   static COMMAND_PREVIOUS_ONE = 6
+    |   static COMMAND_PLAYER_LIST = 11
+    |   static UPDATE_CHAT_DATA = 1
+    |   static TAG1 = "MUSIC_SERVICE"
+    |   static COMMAND_OPEN_CAMERA = 14
+    |   static CHAT_VOICE_INPUT = 102
+    |   static TAG = "FRAGMENT"
+11-27 11:42:28.907 27338-17132/? D/LeakCanary: |   static $classOverhead = byte[2192]@852135937 (0x32ca9001)
+    |   static COMMAND_PLAY_CHANGE_SOME_ONE = 10
+    |   static COMMAND_SET_INIT_POSITION = 13
+    |   static PERMISSION_EXIT_APP = "PERMISSION_EXIT_APP"
+    |   EXIT_HTML_TASK_MILLITIME = 30000
+    |   animationDisable = null
+    |   chat_et = android.support.v7.widget.AppCompatEditText@852162560 (0x32caf800)
+    |   chat_input_iv = android.support.v7.widget.AppCompatImageView@852163584 (0x32cafc00)
+    |   currentChatType = 102
+    |   delayExitHtmlTask = com.qihancloud.zhiyin.ui.activity.MainActivity$17@851450272 (0x32c019a0)
+    |   lastActionTime = 0
+    |   mBidner = com.qihancloud.zhiyin.service.MusicPlayerService$MusicBinder@852239104 (0x32cc2300)
+    |   mCommandQuestion = null
+    |   mConn = null
+    |   mCurrentDealResult = com.qihancloud.zhiyin.bean.DealResult@851660008 (0x32c34ce8)
+    |   mCurrentfragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851638560 (0x32c2f920)
+    |   mCustomDialog = null
+    |   mFrameDrawablesListen = java.util.ArrayList@852231384 (0x32cc04d8)
+    |   mFrameDrawablesSpeak = java.util.ArrayList@852231408 (0x32cc04f0)
+    |   mFrameDrawablesWait = java.util.ArrayList@852231432 (0x32cc0508)
+    |   mFrameLayout = android.widget.FrameLayout@852243456 (0x32cc3400)
+    |   mGuideStrTittle = "你好，请问有什么可以帮你?"
+    |   mHTMLLayout = android.widget.FrameLayout@852244480 (0x32cc3800)
+    |   mHandler = com.qihancloud.zhiyin.ui.activity.MainActivity$1@852239136 (0x32cc2320)
+    |   mHtml5WebView = null
+    |   mInput_container = android.widget.RelativeLayout@852245504 (0x32cc3c00)
+    |   mIsOnPause = true
+    |   mIvCloseActivity = null
+    |   mIvClosePage = android.support.v7.widget.AppCompatImageView@852246528 (0x32cc4000)
+    |   mIvPlayMusic = android.support.v7.widget.AppCompatImageView@852247552 (0x32cc4400)
+    |   mIvSetMore = android.support.v7.widget.AppCompatImageView@852248576 (0x32cc4800)
+    |   mLlHintContainer = android.widget.LinearLayout@852249600 (0x32cc4c00)
+    |   mMainPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@851520416 (0x32c12ba0)
+    |   mManagerPassword = null
+    |   mMusicIntent = null
+    |   mRoundProgressBar = com.qihancloud.zhiyin.ui.widget.RoundProgressBar@851822784 (0x32c5c8c0)
+    |   mTvFromUser = android.support.v7.widget.AppCompatTextView@852251648 (0x32cc5400)
+    |   mUsbDiskReceiver = null
+    |   robot_animation_iv = com.qihancloud.zhiyin.function.frameanimation.FrameAnimationView@852252672 (0x32cc5800)
+    |   text_input_ll = android.widget.LinearLayout@852253696 (0x32cc5c00)
+    |   handMotionManager = com.sanbot.opensdk.function.unit.HandMotionManager@852231456 (0x32cc0520)
+    |   isUseSdkVoice = true
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@852231480 (0x32cc0538)
+    |   mHdCameraManager = null
+    |   mOnActionManagerListener = null
+    |   mPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@851520528 (0x32c12c10)
+    |   mSpeechManager = com.sanbot.opensdk.function.unit.SpeechManager@852231504 (0x32cc0550)
+    |   mSystemManager = com.sanbot.opensdk.function.unit.SystemManager@852239168 (0x32cc2340)
+    |   TAG = "SanbotOpenSDK"
+    |   alarmReceiver = com.sanbot.opensdk.base.BindBaseActivity$alarmReceiver$1@852231528 (0x32cc0568)
+    |   clientClass = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   clientName = "com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   clientSocketUtil = com.sanbot.opensdk.utils.socket.ClientSocketUtil@852239200 (0x32cc2360)
+    |   currentFunction = "com.qihancloud.zhiyin"
+    |   executorService = java.util.concurrent.Executors$FinalizableDelegatedExecutorService@851450288 (0x32c019b0)
+    |   hfisonConn = com.sanbot.opensdk.base.BindBaseActivity$hfisonConn$1@851450304 (0x32c019c0)
+    |   iFaceInfoBinder = com.qihancloud.hfisone.IFaceInfoBinder$Stub$Proxy@851450320 (0x32c019d0)
+    |   iFaceInfoNotification = com.sanbot.opensdk.base.BindBaseActivity$iFaceInfoNotification$1@852239232 (0x32cc2380)
+    |   isFaceBind = false
+    |   isMainBind = false
+    |   mainThreadHandler = com.sanbot.opensdk.base.BindBaseActivity$mainThreadHandler$1@852239264 (0x32cc23a0)
+    |   mainserviceVersion = "2.0.0"
+    |   managerMap = java.util.concurrent.ConcurrentHashMap@851674688 (0x32c38640)
+    |   statusMap = java.util.concurrent.ConcurrentHashMap@851674752 (0x32c38680)
+    |   subscriber = com.sanbot.opensdk.base.BindBaseActivity$subscriber$1@851450336 (0x32c019e0)
+    |   weakReference = java.lang.ref.WeakReference@852231552 (0x32cc0580)
+    |   mDelegate = android.support.v7.app.AppCompatDelegateImplN@852259024 (0x32cc70d0)
+    |   mResources = null
+    |   mThemeId = 2131624198
+    |   mCreated = true
+    |   mFragments = android.support.v4.app.FragmentController@851450352 (0x32c019f0)
+11-27 11:42:28.908 27338-17132/? D/LeakCanary: |   mHandler = android.support.v4.app.FragmentActivity$1@852239328 (0x32cc23e0)
+    |   mLoaderManager = null
+    |   mNextCandidateRequestIndex = 0
+    |   mPendingFragmentActivityResults = android.support.v4.util.SparseArrayCompat@852231576 (0x32cc0598)
+    |   mReallyStopped = true
+    |   mRequestedPermissionsFromFragment = false
+    |   mResumed = false
+    |   mRetaining = false
+    |   mStopped = true
+    |   mViewModelStore = null
+    |   mStartedActivityFromFragment = false
+    |   mStartedIntentSenderFromFragment = false
+    |   mExtraDataMap = android.support.v4.util.SimpleArrayMap@852231600 (0x32cc05b0)
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@852239360 (0x32cc2400)
+    |   mActionBar = null
+    |   mActionModeTypeStarting = 0
+    |   mActivityInfo = android.content.pm.ActivityInfo@852259168 (0x32cc7160)
+    |   mActivityTransitionState = android.app.ActivityTransitionState@852206136 (0x32cba238)
+    |   mApplication = com.qihancloud.zhiyin.MyApplication@852192360 (0x32cb6c68)
+    |   mCalled = true
+    |   mChangeCanvasToTranslucent = false
+    |   mChangingConfigurations = false
+    |   mComponent = android.content.ComponentName@851450368 (0x32c01a00)
+    |   mConfigChangeFlags = 0
+    |   mCurrentConfig = android.content.res.Configuration@852218624 (0x32cbd300)
+    |   mDecor = null
+    |   mDefaultKeyMode = 0
+    |   mDefaultKeySsb = null
+    |   mDestroyed = true
+    |   mDoReportFullyDrawn = false
+    |   mEatKeyUpEvent = false
+    |   mEmbeddedID = null
+    |   mEnableDefaultActionBarUp = false
+    |   mEnterTransitionListener = android.app.SharedElementCallback$1@1883688304 (0x7046cd70)
+    |   mExitTransitionListener = android.app.SharedElementCallback$1@1883688304 (0x7046cd70)
+    |   mFinished = true
+    |   mFragments = android.app.FragmentController@851450384 (0x32c01a10)
+    |   mHandler = android.os.Handler@852239392 (0x32cc2420)
+    |   mHasCurrentPermissionsRequest = false
+    |   mIdent = 204962531
+    |   mInstanceTracker = android.os.StrictMode$InstanceTracker@851450400 (0x32c01a20)
+    |   mInstrumentation = android.app.Instrumentation@851660080 (0x32c34d30)
+    |   mIntent = android.content.Intent@852206192 (0x32cba270)
+    |   mLastNonConfigurationInstances = null
+    |   mMainThread = android.app.ActivityThread@851456256 (0x32c03100)
+    |   mManagedCursors = java.util.ArrayList@852231624 (0x32cc05c8)
+    |   mManagedDialogs = null
+    |   mMenuInflater = null
+    |   mParent = null
+    |   mReferrer = null
+    |   mResultCode = 0
+    |   mResultData = null
+    |   mResumed = false
+    |   mSearchEvent = null
+    |   mSearchManager = null
+    |   mStartedActivity = false
+    |   mStopped = true
+    |   mTaskDescription = android.app.ActivityManager$TaskDescription@852239424 (0x32cc2440)
+    |   mTemporaryPause = false
+    |   mTitle = "知音"
+    |   mTitleColor = 0
+    |   mTitleReady = true
+    |   mToken = android.os.BinderProxy@852112192 (0x32ca3340)
+    |   mTranslucentCallback = null
+    |   mUiThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mVisibleBehind = false
+    |   mVisibleFromClient = true
+    |   mVisibleFromServer = true
+    |   mVoiceInteractor = null
+    |   mWindow = com.android.internal.policy.PhoneWindow@851713680 (0x32c41e90)
+    |   mWindowAdded = true
+    |   mWindowManager = android.view.WindowManagerImpl@852196992 (0x32cb7e80)
+11-27 11:42:28.909 27338-17132/? D/LeakCanary: |   mInflater = com.android.internal.policy.PhoneLayoutInflater@851731936 (0x32c465e0)
+    |   mOverrideConfiguration = null
+    |   mResources = android.content.res.Resources@852191560 (0x32cb6948)
+    |   mTheme = android.content.res.Resources$Theme@851449888 (0x32c01820)
+    |   mThemeResource = 2131624198
+    |   mBase = android.app.ContextImpl@851519744 (0x32c12900)
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   shadow$_monitor_ = -1917526172
+    * Instance of android.support.v4.app.FragmentController
+    |   static $classOverhead = byte[212]@851743297 (0x32c49241)
+    |   mHost = android.support.v4.app.FragmentActivity$HostCallbacks@852239648 (0x32cc2520)
+    |   shadow$_klass_ = android.support.v4.app.FragmentController
+    |   shadow$_monitor_ = 0
+    * Instance of android.support.v4.app.FragmentActivity$HostCallbacks
+    |   static $classOverhead = byte[136]@851691393 (0x32c3c781)
+    |   this$0 = com.qihancloud.zhiyin.ui.activity.MainActivity@851862528 (0x32c66400)
+    |   mActivity = com.qihancloud.zhiyin.ui.activity.MainActivity@851862528 (0x32c66400)
+    |   mContext = com.qihancloud.zhiyin.ui.activity.MainActivity@851862528 (0x32c66400)
+    |   mFragmentManager = android.support.v4.app.FragmentManagerImpl@851520976 (0x32c12dd0)
+    |   mHandler = android.support.v4.app.FragmentActivity$1@852239328 (0x32cc23e0)
+    |   mWindowAnimations = 0
+    |   shadow$_klass_ = android.support.v4.app.FragmentActivity$HostCallbacks
+    |   shadow$_monitor_ = 0
+    * Instance of android.support.v4.app.FragmentManagerImpl
+    |   static ANIM_STYLE_OPEN_ENTER = 1
+    |   static ANIM_STYLE_FADE_EXIT = 6
+    |   static DECELERATE_CUBIC = android.view.animation.DecelerateInterpolator@852719616 (0x32d37800)
+    |   static ANIM_STYLE_OPEN_EXIT = 2
+    |   static DEBUG = false
+    |   static DECELERATE_QUINT = android.view.animation.DecelerateInterpolator@852719632 (0x32d37810)
+    |   static sAnimationListenerField = java.lang.reflect.Field@852713344 (0x32d35f80)
+    |   static VIEW_STATE_TAG = "android:view_state"
+    |   static ANIM_STYLE_CLOSE_EXIT = 4
+    |   static ACCELERATE_CUBIC = android.view.animation.AccelerateInterpolator@852740488 (0x32d3c988)
+    |   static ANIM_STYLE_CLOSE_ENTER = 3
+    |   static USER_VISIBLE_HINT_TAG = "android:user_visible_hint"
+    |   static TAG = "FragmentManager"
+    |   static $classOverhead = byte[521]@851606529 (0x32c27c01)
+    |   static TARGET_REQUEST_CODE_STATE_TAG = "android:target_req_state"
+    |   static ANIM_DUR = 220
+    |   static ACCELERATE_QUINT = android.view.animation.AccelerateInterpolator@852740512 (0x32d3c9a0)
+    |   static TARGET_STATE_TAG = "android:target_state"
+    |   static ANIM_STYLE_FADE_ENTER = 5
+    |   mActive = android.util.SparseArray@852231864 (0x32cc06b8)
+    |   mAdded = java.util.ArrayList@852231888 (0x32cc06d0)
+    |   mAvailBackStackIndices = null
+    |   mBackStack = null
+    |   mBackStackChangeListeners = null
+    |   mBackStackIndices = null
+    |   mContainer = null
+    |   mCreatedMenus = null
+    |   mCurState = 0
+    |   mDestroyed = true
+    |   mExecCommit = android.support.v4.app.FragmentManagerImpl$1@851450496 (0x32c01a80)
+    |   mExecutingActions = false
+    |   mHavePendingDeferredStart = false
+    |   mHost = null
+    |   mLifecycleCallbacks = java.util.concurrent.CopyOnWriteArrayList@851450512 (0x32c01a90)
+    |   mNeedMenuInvalidate = false
+    |   mNextFragmentIndex = 7
+    |   mNoTransactionsBecause = null
+    |   mParent = null
+    |   mPendingActions = java.util.ArrayList@852231912 (0x32cc06e8)
+    |   mPostponedTransactions = null
+    |   mPrimaryNav = null
+    |   mSavedNonConfig = null
+    |   mStateArray = null
+    |   mStateBundle = android.os.Bundle@852231936 (0x32cc0700)
+    |   mStateSaved = false
+    |   mStopped = true
+    |   mTmpAddedFragments = java.util.ArrayList@852231960 (0x32cc0718)
+    |   mTmpIsPop = java.util.ArrayList@852231984 (0x32cc0730)
+    |   mTmpRecords = java.util.ArrayList@852232008 (0x32cc0748)
+    |   shadow$_klass_ = android.support.v4.app.FragmentManagerImpl
+    |   shadow$_monitor_ = 0
+11-27 11:42:28.910 27338-17132/? D/LeakCanary: * Instance of java.util.ArrayList
+    |   static serialVersionUID = 8683452581122892189
+    |   static EMPTY_ELEMENTDATA = java.lang.Object[0]@1883552640 (0x7044bb80)
+    |   static DEFAULT_CAPACITY = 10
+    |   static MAX_ARRAY_SIZE = 2147483639
+    |   static $classOverhead = byte[204]@1884207809 (0x704ebac1)
+    |   elementData = java.lang.Object[10]@852206696 (0x32cba468)
+    |   size = 7
+    |   modCount = 7
+    |   shadow$_klass_ = java.util.ArrayList
+    |   shadow$_monitor_ = 0
+    * Array of java.lang.Object[]
+    |   [0] = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851638912 (0x32c2fa80)
+    |   [1] = com.qihancloud.zhiyin.ui.fragment.FromUserFragment@851639088 (0x32c2fb30)
+    |   [2] = com.qihancloud.zhiyin.ui.fragment.BaikeFragment@851639264 (0x32c2fbe0)
+    |   [3] = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851639440 (0x32c2fc90)
+    |   [4] = com.qihancloud.zhiyin.ui.fragment.FromUserFragment@851639616 (0x32c2fd40)
+    |   [5] = com.qihancloud.zhiyin.ui.fragment.ToUserFragment@851508928 (0x32c0fec0)
+    |   [6] = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851638560 (0x32c2f920)
+    |   [7] = null
+    |   [8] = null
+    |   [9] = null
+    * Instance of com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   static $classOverhead = byte[712]@852098049 (0x32c9fc01)
+    |   mAttachDisposable = null
+    |   mDataList = java.util.LinkedList@852233856 (0x32cc0e80)
+    |   mFlGuideContainer = android.widget.LinearLayout@852271104 (0x32cca000)
+    |   mIsAdded = false
+    |   mTvDefaultGuide = android.support.v7.widget.AppCompatTextView@852272128 (0x32cca400)
+    |   mView = android.widget.RelativeLayout@852273152 (0x32cca800)
+    |   mCompositeDisposable = null
+    |   mAdded = false
+    |   mAnimationInfo = android.support.v4.app.Fragment$AnimationInfo@852263408 (0x32cc81f0)
+    |   mArguments = null
+    |   mBackStackNesting = 0
+    |   mCalled = true
+    |   mChildFragmentManager = null
+    |   mChildNonConfig = null
+    |   mContainer = null
+    |   mContainerId = 0
+    |   mDeferStart = false
+    |   mDetached = false
+    |   mFragmentId = 0
+    |   mFragmentManager = null
+    |   mFromLayout = false
+    |   mHasMenu = false
+    |   mHidden = false
+    |   mHiddenChanged = false
+    |   mHost = null
+    |   mInLayout = false
+    |   mIndex = -1
+    |   mInnerView = null
+    |   mIsCreated = false
+    |   mIsNewlyAdded = false
+    |   mLayoutInflater = null
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@852241120 (0x32cc2ae0)
+    |   mLoaderManager = null
+    |   mMenuVisible = true
+    |   mParentFragment = null
+    |   mPerformedCreateView = false
+    |   mPostponedAlpha = 0.0
+    |   mRemoving = false
+    |   mRestored = false
+    |   mRetainInstance = false
+    |   mRetaining = false
+    |   mSavedFragmentState = null
+    |   mSavedUserVisibleHint = null
+    |   mSavedViewState = null
+    |   mState = 0
+    |   mTag = null
+    |   mTarget = null
+    |   mTargetIndex = -1
+    |   mTargetRequestCode = 0
+11-27 11:42:28.911 27338-17132/? D/LeakCanary: |   mUserVisibleHint = true
+    |   mView = null
+    |   mViewModelStore = null
+    |   mWho = null
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   shadow$_monitor_ = 0
+    * Instance of android.widget.RelativeLayout
+    |   static RULES_VERTICAL = int[5]@1883858416 (0x704965f0)
+    |   static ALIGN_BOTTOM = 8
+    |   static START_OF = 16
+    |   static END_OF = 17
+    |   static LEFT_OF = 0
+    |   static ALIGN_PARENT_BOTTOM = 12
+    |   static ALIGN_PARENT_END = 21
+    |   static ALIGN_TOP = 6
+    |   static CENTER_IN_PARENT = 13
+    |   static ALIGN_LEFT = 5
+    |   static CENTER_HORIZONTAL = 14
+    |   static ABOVE = 2
+    |   static ALIGN_END = 19
+    |   static VERB_COUNT = 22
+    |   static CENTER_VERTICAL = 15
+    |   static RULES_HORIZONTAL = int[8]@1883858368 (0x704965c0)
+    |   static VALUE_NOT_SET = -2147483648
+    |   static $classOverhead = byte[3620]@1884602425 (0x7054c039)
+    |   static ALIGN_RIGHT = 7
+    |   static BELOW = 3
+    |   static ALIGN_PARENT_START = 20
+    |   static TRUE = -1
+    |   static ALIGN_PARENT_LEFT = 9
+    |   static RIGHT_OF = 1
+    |   static ALIGN_START = 18
+    |   static DEFAULT_WIDTH = 65536
+    |   static ALIGN_BASELINE = 4
+    |   static ALIGN_PARENT_TOP = 10
+    |   static ALIGN_PARENT_RIGHT = 11
+    |   mAllowBrokenMeasureSpecs = false
+    |   mBaselineView = android.widget.LinearLayout@852271104 (0x32cca000)
+    |   mContentBounds = android.graphics.Rect@852233952 (0x32cc0ee0)
+    |   mDirtyHierarchy = true
+    |   mGraph = android.widget.RelativeLayout$DependencyGraph@852233976 (0x32cc0ef8)
+    |   mGravity = 8388659
+    |   mIgnoreGravity = -1
+    |   mMeasureVerticalWithPaddingMargin = true
+    |   mSelfBounds = android.graphics.Rect@852234000 (0x32cc0f10)
+    |   mSortedHorizontalChildren = android.view.View[2]@852234024 (0x32cc0f28)
+    |   mSortedVerticalChildren = android.view.View[2]@852234048 (0x32cc0f40)
+    |   mTopToBottomLeftToRightSet = null
+    |   mAnimationListener = null
+    |   mCachePaint = null
+    |   mChildCountWithTransientState = 0
+    |   mChildTransformation = null
+    |   mChildren = android.view.View[12]@851675712 (0x32c38a40)
+    |   mChildrenCount = 2
+    |   mChildrenInterestedInDrag = null
+    |   mCurrentDragChild = null
+    |   mCurrentDragStartEvent = null
+    |   mDisappearingChildren = null
+    |   mFirstHoverTarget = null
+    |   mFirstTouchTarget = null
+    |   mFocused = null
+    |   mGroupFlags = 2244691
+    |   mHoveredSelf = false
+    |   mInvalidateRegion = null
+    |   mInvalidationTransformation = null
+    |   mIsInterestedInDrag = false
+    |   mLastTouchDownIndex = -1
+    |   mLastTouchDownTime = 0
+    |   mLastTouchDownX = 0.0
+    |   mLastTouchDownY = 0.0
+    |   mLayoutAnimationController = null
+    |   mLayoutCalledWhileSuppressed = false
+    |   mLayoutMode = -1
+    |   mLayoutTransitionListener = android.view.ViewGroup$2@851451088 (0x32c01cd0)
+    |   mLocalPoint = null
+11-27 11:42:28.912 27338-17132/? D/LeakCanary: |   mNestedScrollAxes = 0
+    |   mOnHierarchyChangeListener = null
+    |   mPersistentDrawingCache = 2
+11-27 11:42:52.327 27457-27497/? D/LeakCanary: Removing 1 heap dumps
+11-27 11:42:52.446 27457-27497/? I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin.deskmedical/26ba87bd-c498-4659-93f2-7ab9ae5f6e9d_pending.hprof" starting...
+11-27 11:42:54.218 8093-17540/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:42:54.222 8093-17540/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:42:55.334 8093-17540/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:43:00.122 8093-17540/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:43:00.125 8093-17540/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:43:07.179 8093-17540/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:43:07.488 8093-17762/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+    * com.qihancloud.zhiyin.ui.fragment.ToUserFragment has leaked:
+    * static LoadingAnimationUtil.!(mRotateAnimation)!
+11-27 11:43:07.489 8093-17762/? D/LeakCanary: * ↳ RotateAnimation.!(mListenerHandler)!
+    * ↳ ViewRootImpl$ViewRootHandler.!(this$0)!
+    * ↳ ViewRootImpl.mContext
+    * ↳ DecorContext.mPhoneWindow
+    * ↳ PhoneWindow.mContext
+    * ↳ MainActivity.mCurrentfragment
+    * ↳ ToUserFragment
+    * Reference Key: 57c35388-ae2c-4280-aab7-e33b69233b8d
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=163890ms, gc=147ms, heap dump=1823ms, analysis=12983ms
+    * Details:
+    * Class com.qihancloud.zhiyin.util.LoadingAnimationUtil
+    |   static mRotateAnimation = android.view.animation.RotateAnimation@316250288 (0x12d998b0)
+    |   static INSTANCE = com.qihancloud.zhiyin.util.LoadingAnimationUtil@314589488 (0x12c04130)
+    |   static $classOverhead = byte[76]@315920177 (0x12d48f31)
+    * Instance of android.view.animation.RotateAnimation
+    |   static $classOverhead = byte[256]@314600321 (0x12c06b81)
+    |   mFromDegrees = 0.0
+    |   mPivotX = 26.5
+    |   mPivotXType = 1
+    |   mPivotXValue = 0.5
+    |   mPivotY = 26.5
+    |   mPivotYType = 1
+    |   mPivotYValue = 0.5
+    |   mToDegrees = 360.0
+    |   guard = dalvik.system.CloseGuard@1884058800 (0x704c74b0)
+    |   mBackgroundColor = 0
+    |   mCycleFlip = false
+    |   mDetachWallpaper = false
+    |   mDuration = 500
+    |   mEnded = true
+    |   mFillAfter = false
+    |   mFillBefore = true
+    |   mFillEnabled = false
+    |   mInitialized = true
+    |   mInterpolator = android.view.animation.LinearInterpolator@316339808 (0x12daf660)
+    |   mListener = null
+    |   mListenerHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mMore = true
+    |   mOnEnd = android.view.animation.Animation$3@316340512 (0x12daf920)
+    |   mOnRepeat = android.view.animation.Animation$2@316340496 (0x12daf910)
+    |   mOnStart = android.view.animation.Animation$1@316340480 (0x12daf900)
+    |   mOneMoreTime = true
+    |   mPreviousRegion = android.graphics.RectF@316270936 (0x12d9e958)
+    |   mPreviousTransformation = android.view.animation.Transformation@316085888 (0x12d71680)
+    |   mRegion = android.graphics.RectF@316270960 (0x12d9e970)
+    |   mRepeatCount = -1
+    |   mRepeatMode = -1
+    |   mRepeated = 0
+    |   mScaleFactor = 1.0
+    |   mStartOffset = 0
+    |   mStartTime = 3174222
+    |   mStarted = true
+    |   mTransformation = android.view.animation.Transformation@316085920 (0x12d716a0)
+    |   mZAdjustment = 0
+    |   shadow$_klass_ = android.view.animation.RotateAnimation
+    |   shadow$_monitor_ = 0
+    * Instance of android.view.ViewRootImpl$ViewRootHandler
+    |   static $classOverhead = byte[184]@1884886897 (0x70591771)
+    |   this$0 = android.view.ViewRootImpl@315218976 (0x12c9dc20)
+    |   mAsynchronous = false
+    |   mCallback = null
+    |   mLooper = android.os.Looper@314646272 (0x12c11f00)
+    |   mMessenger = null
+    |   mQueue = android.os.MessageQueue@314594776 (0x12c055d8)
+    |   shadow$_klass_ = android.view.ViewRootImpl$ViewRootHandler
+11-27 11:43:07.490 8093-17762/? D/LeakCanary: |   shadow$_monitor_ = -1902163521
+    * Instance of android.view.ViewRootImpl
+    |   static DEBUG_TRACKBALL = false
+    |   static MSG_INVALIDATE = 1
+    |   static PROPERTY_PROFILE_RENDERING = "viewroot.profile_rendering"
+    |   static PROPERTY_EMULATOR_WIN_OUTSET_BOTTOM_PX = "ro.emu.win_outset_bottom_px"
+    |   static MSG_UPDATE_POINTER_ICON = 27
+    |   static MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST = 21
+    |   static MSG_DISPATCH_SYSTEM_UI_VISIBILITY = 17
+    |   static USE_MT_RENDERER = true
+    |   static MSG_DISPATCH_GET_NEW_SURFACE = 9
+    |   static DEBUG_INPUT_RESIZE = false
+    |   static DEBUG_KEEP_SCREEN_ON = false
+    |   static MSG_WINDOW_MOVED = 23
+    |   static MSG_REQUEST_KEYBOARD_SHORTCUTS = 26
+    |   static sFirstDrawComplete = true
+    |   static MSG_DISPATCH_WINDOW_SHOWN = 25
+    |   static mResizeInterpolator = android.view.animation.AccelerateDecelerateInterpolator@1883573784 (0x70450e18)
+    |   static MSG_PROCESS_INPUT_EVENTS = 19
+    |   static MSG_DIE = 3
+    |   static MSG_DISPATCH_APP_VISIBILITY = 8
+    |   static TAG = "ViewRootImpl"
+    |   static LOCAL_LOGV = false
+    |   static MSG_CHECK_FOCUS = 13
+    |   static MSG_WINDOW_FOCUS_CHANGED = 6
+    |   static MAX_TRACKBALL_DELAY = 250
+    |   static MSG_CLOSE_SYSTEM_DIALOGS = 14
+    |   static $classOverhead = byte[759]@1884192265 (0x704e7e09)
+    |   static DEBUG_DIALOG = false
+    |   static DBG = false
+    |   static MSG_SYNTHESIZE_INPUT_EVENT = 24
+    |   static sRunQueues = java.lang.ThreadLocal@1883573848 (0x70450e58)
+    |   static MSG_UPDATE_CONFIGURATION = 18
+    |   static MSG_INVALIDATE_RECT = 2
+    |   static DEBUG_FPS = false
+    |   static DEBUG_CONFIGURATION = false
+    |   static DEBUG_DRAW = false
+    |   static MSG_DISPATCH_DRAG_EVENT = 15
+    |   static MSG_INVALIDATE_WORLD = 22
+    |   static MSG_DISPATCH_INPUT_EVENT = 7
+    |   static MSG_DISPATCH_KEY_FROM_IME = 11
+    |   static DEBUG_IMF = false
+    |   static MSG_RESIZED = 4
+    |   static MSG_RESIZED_REPORT = 5
+    |   static DEBUG_LAYOUT = false
+    |   static DEBUG_ORIENTATION = false
+    |   static sConfigCallbacks = java.util.ArrayList@1883573800 (0x70450e28)
+    |   static sFirstDrawHandlers = java.util.ArrayList@1883573824 (0x70450e40)
+    |   static MSG_DISPATCH_DRAG_LOCATION_EVENT = 16
+    |   static DEBUG_INPUT_STAGES = false
+    |   static MAX_QUEUED_INPUT_EVENT_POOL_SIZE = 10
+    |   mAccessibilityFocusedHost = null
+    |   mAccessibilityFocusedVirtualView = null
+    |   mAccessibilityInteractionConnectionManager = android.view.ViewRootImpl$AccessibilityInteractionConnectionManager@318378352 (0x12fa1170)
+    |   mAccessibilityInteractionController = null
+    |   mAccessibilityManager = android.view.accessibility.AccessibilityManager@315344640 (0x12cbc700)
+    |   mActivityRelaunched = false
+    |   mAdded = false
+    |   mAddedTouchMode = true
+    |   mAppVisible = false
+    |   mApplyInsetsRequested = false
+    |   mAttachInfo = android.view.View$AttachInfo@318769664 (0x13000a00)
+    |   mAudioManager = null
+    |   mBasePackageName = "com.qihancloud.zhiyin.deskmedical"
+    |   mCanvasOffsetX = 0
+    |   mCanvasOffsetY = 0
+    |   mCapturingView = null
+11-27 11:43:07.491 8093-17762/? D/LeakCanary: |   mChoreographer = android.view.Choreographer@315971896 (0x12d55938)
+    |   mClientWindowLayoutFlags = -2122251904
+    |   mConsumeBatchedInputImmediatelyRunnable = android.view.ViewRootImpl$ConsumeBatchedInputImmediatelyRunnable@318377872 (0x12fa0f90)
+    |   mConsumeBatchedInputImmediatelyScheduled = false
+    |   mConsumeBatchedInputScheduled = false
+    |   mConsumedBatchedInputRunnable = android.view.ViewRootImpl$ConsumeBatchedInputRunnable@318377856 (0x12fa0f80)
+    |   mContext = com.android.internal.policy.DecorContext@316121248 (0x12d7a0a0)
+    |   mCurScrollY = 0
+    |   mCurrentDragView = null
+    |   mCustomPointerIcon = null
+    |   mDensity = 280
+    |   mDirty = android.graphics.Rect@318440712 (0x12fb0508)
+    |   mDispatchContentInsets = android.graphics.Rect@318440592 (0x12fb0490)
+    |   mDispatchStableInsets = android.graphics.Rect@318440616 (0x12fb04a8)
+    |   mDisplay = android.view.Display@314660032 (0x12c154c0)
+    |   mDisplayListener = android.view.ViewRootImpl$1@318377824 (0x12fa0f60)
+    |   mDisplayManager = android.hardware.display.DisplayManager@315923808 (0x12d49d60)
+    |   mDragDescription = null
+    |   mDragPoint = android.graphics.PointF@318377792 (0x12fa0f40)
+    |   mDragResizing = false
+    |   mDrawingAllowed = false
+    |   mFallbackEventHandler = com.android.internal.policy.PhoneFallbackEventHandler@318428192 (0x12fad420)
+    |   mFirst = false
+    |   mFirstInputStage = android.view.ViewRootImpl$NativePreImeInputStage@318436904 (0x12faf628)
+    |   mFirstPostImeInputStage = android.view.ViewRootImpl$EarlyPostImeInputStage@318441672 (0x12fb08c8)
+    |   mForceDecorViewVisibility = false
+    |   mForceNextWindowRelayout = false
+    |   mFpsNumFrames = 0
+    |   mFpsPrevTime = -1
+    |   mFpsStartTime = -1
+    |   mFullRedrawNeeded = false
+    |   mHadWindowFocus = false
+    |   mHandler = android.view.ViewRootImpl$ViewRootHandler@318427968 (0x12fad340)
+    |   mHandlingLayoutInLayoutRequest = false
+    |   mHardwareXOffset = 0
+    |   mHardwareYOffset = 0
+    |   mHasHadWindowFocus = false
+    |   mHeight = 1200
+    |   mHighContrastTextManager = android.view.ViewRootImpl$HighContrastTextManager@318378368 (0x12fa1180)
+    |   mInLayout = false
+    |   mInputChannel = null
+    |   mInputEventConsistencyVerifier = null
+    |   mInputEventReceiver = null
+    |   mInputQueue = null
+    |   mInputQueueCallback = null
+    |   mInvalidateOnAnimationRunnable = android.view.ViewRootImpl$InvalidateOnAnimationRunnable@318428000 (0x12fad360)
+    |   mInvalidateRootRequested = false
+    |   mIsAmbientMode = false
+    |   mIsAnimating = true
+    |   mIsCreating = false
+    |   mIsDrawing = false
+    |   mIsInTraversal = false
+    |   mLastConfiguration = android.content.res.Configuration@318232752 (0x12f7d8b0)
+    |   mLastGivenInsets = android.view.ViewTreeObserver$InternalInsetsInfo@318440520 (0x12fb0448)
+    |   mLastInCompatMode = false
+    |   mLastOverscanRequested = false
+    |   mLastScrolledFocus = null
+    |   mLastSystemUiVisibility = 9216
+    |   mLastTouchPoint = android.graphics.PointF@318377808 (0x12fa0f50)
+    |   mLastTouchSource = 0
+    |   mLastWasImTarget = true
+    |   mLastWindowInsets = android.view.WindowInsets@318928960 (0x13027840)
+    |   mLayoutRequested = true
+    |   mLayoutRequesters = java.util.ArrayList@318440640 (0x12fb04c0)
+    |   mLocalDragState = null
+    |   mLocation = android.view.WindowLeaked@318428032 (0x12fad380)
+    |   mLostWindowFocus = true
+    |   mNeedsHwRendererSetup = false
+    |   mNewSurfaceNeeded = false
+    |   mNoncompatDensity = 280
+    |   mOrigWindowType = 1
+    |   mPausedForTransition = false
+11-27 11:43:07.492 8093-17762/? D/LeakCanary: |   mPendingAlwaysConsumeNavBar = false
+    |   mPendingBackDropFrame = android.graphics.Rect@318440496 (0x12fb0430)
+    |   mPendingConfiguration = android.content.res.Configuration@318232856 (0x12f7d918)
+    |   mPendingContentInsets = android.graphics.Rect@318440448 (0x12fb0400)
+    |   mPendingInputEventCount = 0
+    |   mPendingInputEventHead = null
+    |   mPendingInputEventQueueLengthCounterName = "aq:pending:com.qihancloud.zhiyin.deskmedical/com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   mPendingInputEventTail = null
+    |   mPendingOutsets = android.graphics.Rect@318440472 (0x12fb0418)
+    |   mPendingOverscanInsets = android.graphics.Rect@318440376 (0x12fb03b8)
+    |   mPendingStableInsets = android.graphics.Rect@318440424 (0x12fb03e8)
+    |   mPendingTransitions = null
+    |   mPendingVisibleInsets = android.graphics.Rect@318440400 (0x12fb03d0)
+    |   mPointerIconType = 1
+    |   mPreviousTransparentRegion = android.graphics.Region@318377904 (0x12fa0fb0)
+    |   mProcessInputEventsScheduled = false
+    |   mProfile = false
+    |   mProfileRendering = false
+    |   mQueuedInputEventPool = null
+    |   mQueuedInputEventPoolSize = 0
+    |   mRemoved = true
+    |   mRenderProfiler = null
+    |   mRenderProfilingEnabled = false
+    |   mReportNextDraw = false
+    |   mResizeMode = 0
+    |   mScrollMayChange = true
+    |   mScrollY = 0
+    |   mScroller = null
+    |   mSendWindowContentChangedAccessibilityEvent = android.view.ViewRootImpl$SendWindowContentChangedAccessibilityEvent@319043072 (0x13043600)
+    |   mSeq = 0
+    |   mSoftInputMode = 274
+    |   mStopped = true
+    |   mSurface = android.view.Surface@318421640 (0x12faba88)
+    |   mSurfaceHolder = null
+    |   mSurfaceHolderCallback = null
+    |   mSyntheticInputStage = android.view.ViewRootImpl$SyntheticInputStage@318436704 (0x12faf560)
+    |   mTag = "ViewRootImpl[MainActivity]"
+    |   mTargetSdkVersion = 27
+    |   mTempHashSet = java.util.HashSet@318909808 (0x13022d70)
+    |   mTempRect = android.graphics.Rect@318440736 (0x12fb0520)
+    |   mThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mTmpLocation = int[2]@318440304 (0x12fb0370)
+    |   mTmpValue = android.util.TypedValue@318435904 (0x12faf240)
+    |   mTranslator = null
+    |   mTransparentRegion = android.graphics.Region@318377888 (0x12fa0fa0)
+    |   mTraversalBarrier = 1481
+    |   mTraversalRunnable = android.view.ViewRootImpl$TraversalRunnable@318377840 (0x12fa0f70)
+    |   mTraversalScheduled = false
+    |   mUnbufferedInputDispatch = false
+    |   mView = null
+    |   mViewConfiguration = android.view.ViewConfiguration@315226800 (0x12c9fab0)
+    |   mViewLayoutDirectionInitial = 2
+    |   mViewVisibility = 8
+    |   mVisRect = android.graphics.Rect@318440760 (0x12fb0538)
+    |   mWidth = 1920
+    |   mWillDrawSoon = false
+    |   mWinFrame = android.graphics.Rect@318440784 (0x12fb0550)
+    |   mWindow = android.view.ViewRootImpl$W@318428064 (0x12fad3a0)
+    |   mWindowAttributes = android.view.WindowManager$LayoutParams@316261984 (0x12d9c660)
+    |   mWindowAttributesChanged = false
+    |   mWindowAttributesChangesFlag = 0
+    |   mWindowCallbacks = java.util.ArrayList@318440280 (0x12fb0358)
+    |   mWindowDrawCountDown = null
+    |   mWindowSession = android.view.IWindowSession$Stub$Proxy@315942976 (0x12d4e840)
+    |   shadow$_klass_ = android.view.ViewRootImpl
+    |   shadow$_monitor_ = 0
+    * Instance of com.android.internal.policy.DecorContext
+11-27 11:43:07.494 8093-17762/? D/LeakCanary: |   mPreparedPanel = null
+    |   mCloseOnSwipeEnabled = false
+    |   mContainer = null
+    |   mOnRestrictedCaptionAreaChangedListener = null
+    |   mOnWindowDismissedCallback = com.qihancloud.zhiyin.ui.activity.MainActivity@316980736 (0x12e4be00)
+    |   mOnWindowSwipeDismissedCallback = null
+11-27 11:43:07.495 8093-17762/? D/LeakCanary: |   mOverlayWithDecorCaptionEnabled = false
+    |   mWindowControllerCallback = com.qihancloud.zhiyin.ui.activity.MainActivity@316980736 (0x12e4be00)
+    |   static UI_HIDE_ACTIVATE_VIEW = 202
+    |   static UI_SHOW_ACTIVATE_VIEW = 201
+    |   static COMMAND_NEXT_ONE = 5
+    |   animationDisable = null
+    |   mIvSetMore = android.support.v7.widget.AppCompatImageView@317863936 (0x12f23800)
+11-27 11:43:07.498 8093-17762/? D/LeakCanary: |   mIsNewlyAdded = false
+    |   mLayoutInflater = null
+    |   mView = null
+    |   mViewModelStore = null
+11-27 11:43:50.881 27457-27497/? D/LeakCanary: Removing 1 heap dumps
+11-27 11:43:51.058 27457-27497/? I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin.deskmedical/94871530-c61b-400d-b579-4426383c9e86_pending.hprof" starting...
+11-27 11:44:00.748 8093-18666/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:44:00.750 8093-18666/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:44:01.168 27457-27497/? D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:44:01.466 27457-27497/? D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:44:01.841 8093-18666/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:44:06.634 8093-18666/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:44:06.637 8093-18666/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:44:09.447 8093-18666/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:44:09.632 8093-18798/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+    * com.qihancloud.zhiyin.ui.activity.MainActivity has leaked:
+    * thread Thread.!(<Java Local>)! (named 'pool-7-thread-1')
+    * ↳ BindBaseActivity$startHeartBeat$task$1.!(this$0)! (anonymous subclass of com.sanbot.opensdk.base.BindBaseActivity$BaseTask)
+    * ↳ MainActivity
+    * Reference Key: bffc0be6-459b-48ea-828e-7837e2dffb30
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=5195ms, gc=324ms, heap dump=9608ms, analysis=8717ms
+    * Details:
+    * Instance of java.lang.Thread
+    |   static NANOS_PER_MILLI = 1000000
+    |   static defaultUncaughtExceptionHandler = com.qihancloud.zhiyin.function.log.CrashUtils@851660512 (0x32c34ee0)
+    |   static threadSeqNumber = 823
+    |   static MIN_PRIORITY = 1
+    |   static SUBCLASS_IMPLEMENTATION_PERMISSION = java.lang.RuntimePermission@1884102800 (0x704d2090)
+    |   static NORM_PRIORITY = 5
+    |   static MAX_PRIORITY = 10
+    |   static EMPTY_STACK_TRACE = java.lang.StackTraceElement[0]@1884102784 (0x704d2080)
+    |   static threadInitNumber = 17
+    |   static $classOverhead = byte[224]@1884105041 (0x704d2951)
+    |   blocker = null
+    |   blockerLock = java.lang.Object@851470656 (0x32c06940)
+    |   contextClassLoader = dalvik.system.PathClassLoader@851712032 (0x32c41820)
+    |   daemon = false
+    |   eetop = 0
+    |   group = java.lang.ThreadGroup@1884102616 (0x704d1fd8)
+    |   inheritableThreadLocals = null
+    |   inheritedAccessControlContext = java.security.AccessControlContext@851470664 (0x32c06948)
+    |   lock = java.lang.Object@851468488 (0x32c060c8)
+    |   name = "pool-7-thread-1"
+    |   nativeParkEventPointer = 0
+    |   nativePeer = 3358489856
+11-27 11:44:09.633 8093-18798/? D/LeakCanary: |   parkBlocker = null
+    |   parkState = 1
+    |   priority = 5
+    |   single_step = false
+    |   stackSize = 0
+    |   started = true
+    |   stillborn = false
+    |   target = java.util.concurrent.ThreadPoolExecutor$Worker@851477312 (0x32c08340)
+    |   threadLocalRandomProbe = 0
+    |   threadLocalRandomSecondarySeed = 0
+    |   threadLocalRandomSeed = 0
+    |   threadLocals = java.lang.ThreadLocal$ThreadLocalMap@853148960 (0x32da0520)
+    |   threadQ = null
+    |   threadStatus = 0
+    |   tid = 789
+    |   uncaughtExceptionHandler = null
+    |   shadow$_klass_ = java.lang.Thread
+    |   shadow$_monitor_ = 0
+    * Instance of com.sanbot.opensdk.base.BindBaseActivity$startHeartBeat$task$1
+    |   static $classOverhead = byte[76]@851485025 (0x32c0a161)
+    |   this$0 = com.qihancloud.zhiyin.ui.activity.MainActivity@852268032 (0x32cc9400)
+    |   isStop = true
+    |   reqId = "1"
+    |   this$0 = com.qihancloud.zhiyin.ui.activity.MainActivity@852268032 (0x32cc9400)
+    |   shadow$_klass_ = com.sanbot.opensdk.base.BindBaseActivity$startHeartBeat$task$1
+    |   shadow$_monitor_ = 0
+    * Instance of com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   static PERMISSION_EXIT_APP = "PERMISSION_EXIT_APP"
+    |   static UI_HIDE_ACTIVATE_VIEW = 202
+    |   static UI_SHOW_ACTIVATE_VIEW = 201
+    |   static PERMISSION_GO_TO_SETTING_ACTIVITY = "PERMISSION_GO_TO_SETTING_ACTIVITY"
+    |   static CHAT_TEXT_INPUT = 101
+    |   static UPDATE_CHAT_DATA = 1
+    |   static TAG = "FRAGMENT"
+    |   static COMMAND_NEXT_ONE = 5
+    |   static COMMAND_PREVIOUS_ONE = 6
+    |   static COMMAND_SET_INIT_POSITION = 13
+    |   static Companion = com.qihancloud.zhiyin.ui.activity.MainActivity$Companion@851469064 (0x32c06308)
+    |   static TAG1 = "MUSIC_SERVICE"
+    |   static CHAT_VOICE_INPUT = 102
+    |   static COMMAND_PLAYER_LIST = 11
+    |   static COMMAND_PLAY_CHANGE_SOME_ONE = 10
+    |   static COMMAND_START_NAVIGATION = 12
+    |   static $classOverhead = byte[2320]@852213761 (0x32cbc001)
+    |   static COMMAND_OPEN_CAMERA = 14
+    |   EXIT_HTML_TASK_MILLITIME = 30000
+    |   _$_findViewCache = java.util.HashMap@852574504 (0x32d14128)
+    |   animationDisable = null
+    |   currentChatType = 102
+    |   delayExitHtmlTask = com.qihancloud.zhiyin.ui.activity.MainActivity$delayExitHtmlTask$1@852542960 (0x32d0c5f0)
+    |   lastActionTime = 0
+    |   mBidner = com.qihancloud.zhiyin.service.MusicPlayerService$MusicBinder@852286016 (0x32ccda40)
+    |   mCommandQuestion = null
+    |   mConn = null
+    |   mCurrentDealResult = com.qihancloud.zhiyin.bean.DealResult@852535616 (0x32d0a940)
+    |   mCurrentfragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851615040 (0x32c29d40)
+    |   mCustomDialog = null
+    |   mFrameDrawablesListen = java.util.ArrayList@852570704 (0x32d13250)
+    |   mFrameDrawablesSpeak = java.util.ArrayList@852570728 (0x32d13268)
+    |   mFrameDrawablesWait = java.util.ArrayList@852570752 (0x32d13280)
+    |   mGuideStrTittle = "你好，请问有什么可以帮你?"
+    |   mHTMLLayout = android.widget.FrameLayout@852508672 (0x32d04000)
+    |   mHandler = com.qihancloud.zhiyin.ui.activity.MainActivity$mHandler$1@852559712 (0x32d10760)
+    |   mHtml5WebView = null
+    |   mIsOnPause = true
+    |   mIvCloseActivity = null
+11-27 11:44:09.634 8093-18798/? D/LeakCanary: |   mIvClosePage = android.support.v7.widget.AppCompatImageView@852509696 (0x32d04400)
+    |   mIvPlayMusic = android.support.v7.widget.AppCompatImageView@852510720 (0x32d04800)
+    |   mIvSetMore = android.support.v7.widget.AppCompatImageView@852511744 (0x32d04c00)
+    |   mLlHintContainer = android.widget.LinearLayout@852583424 (0x32d16400)
+    |   mMainPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@852391488 (0x32ce7640)
+    |   mManagerPassword = null
+    |   mMusicIntent = null
+    |   mRoundProgressBar = com.qihancloud.zhiyin.ui.widget.RoundProgressBar@851864208 (0x32c66a90)
+    |   mTvFromUser = android.support.v7.widget.AppCompatTextView@852584448 (0x32d16800)
+    |   mUsbDiskReceiver = null
+    |   robot_animation_iv = com.qihancloud.zhiyin.function.frameanimation.FrameAnimationView@852585472 (0x32d16c00)
+    |   _$_findViewCache = null
+    |   handMotionManager = com.sanbot.opensdk.function.unit.HandMotionManager@852542976 (0x32d0c600)
+    |   isUseSdkVoice = true
+    |   mHardWareManager = com.sanbot.opensdk.function.unit.HardWareManager@852570776 (0x32d13298)
+    |   mHdCameraManager = null
+    |   mOnActionManagerListener = null
+    |   mPresenter = com.qihancloud.zhiyin.ui.activity.MainPresenter@852391592 (0x32ce76a8)
+    |   mSpeechManager = com.sanbot.opensdk.function.unit.SpeechManager@852570800 (0x32d132b0)
+    |   mSystemManager = com.sanbot.opensdk.function.unit.SystemManager@852570824 (0x32d132c8)
+    |   TAG = "SanbotOpenSdk"
+    |   alarmReceiver = com.sanbot.opensdk.base.BindBaseActivity$alarmReceiver$1@852570848 (0x32d132e0)
+    |   clientClass = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   clientName = "com.qihancloud.zhiyin.ui.activity.MainActivity"
+    |   clientSocketUtil = null
+    |   currentFunction = "com.qihancloud.zhiyin.deskmedical"
+    |   executorService = java.util.concurrent.Executors$FinalizableDelegatedExecutorService@852542992 (0x32d0c610)
+    |   hfisonConn = com.sanbot.opensdk.base.BindBaseActivity$hfisonConn$1@852543008 (0x32d0c620)
+    |   iFaceInfoBinder = null
+    |   iFaceInfoNotification = null
+    |   isFaceBind = false
+    |   isMainBind = false
+    |   mTask = java.util.concurrent.CopyOnWriteArrayList@852543024 (0x32d0c630)
+    |   mainThreadHandler = com.sanbot.opensdk.base.BindBaseActivity$mainThreadHandler$1@852559744 (0x32d10780)
+    |   mainserviceVersion = "2.0.0"
+    |   managerMap = java.util.concurrent.ConcurrentHashMap@852531008 (0x32d09740)
+    |   reqIds = java.util.concurrent.atomic.AtomicInteger@852543040 (0x32d0c640)
+    |   sanbotSDKBatteryReceive = false
+    |   sanbotSDKBatteryValue = 0
+    |   sanbotSDKChargeReceive = false
+    |   sanbotSDKChargeStatus = 0
+    |   statusMap = java.util.concurrent.ConcurrentHashMap@852531072 (0x32d09780)
+    |   subscriber = com.sanbot.opensdk.base.BindBaseActivity$subscriber$1@852543056 (0x32d0c650)
+    |   weakReference = java.lang.ref.WeakReference@852570872 (0x32d132f8)
+    |   mDelegate = android.support.v7.app.AppCompatDelegateImplN@852086496 (0x32c9cee0)
+    |   mResources = null
+    |   mThemeId = 2131624198
+    |   mCreated = true
+    |   mFragments = android.support.v4.app.FragmentController@852543072 (0x32d0c660)
+    |   mHandler = android.support.v4.app.FragmentActivity$1@852559808 (0x32d107c0)
+    |   mLoaderManager = null
+    |   mNextCandidateRequestIndex = 0
+    |   mPendingFragmentActivityResults = android.support.v4.util.SparseArrayCompat@852570896 (0x32d13310)
+    |   mReallyStopped = true
+    |   mRequestedPermissionsFromFragment = false
+    |   mResumed = false
+    |   mRetaining = false
+    |   mStopped = true
+    |   mViewModelStore = null
+    |   mStartedActivityFromFragment = false
+    |   mStartedIntentSenderFromFragment = false
+    |   mExtraDataMap = android.support.v4.util.SimpleArrayMap@852570920 (0x32d13328)
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@852559840 (0x32d107e0)
+    |   mActionBar = null
+    |   mActionModeTypeStarting = 0
+    |   mActivityInfo = android.content.pm.ActivityInfo@852086640 (0x32c9cf70)
+    |   mActivityTransitionState = android.app.ActivityTransitionState@852557544 (0x32d0fee8)
+    |   mApplication = com.qihancloud.zhiyin.MyApplication@852244568 (0x32cc3858)
+    |   mCalled = true
+    |   mChangeCanvasToTranslucent = false
+    |   mChangingConfigurations = false
+    |   mComponent = android.content.ComponentName@852543088 (0x32d0c670)
+    |   mConfigChangeFlags = 0
+11-27 11:44:09.635 8093-18798/? D/LeakCanary: |   mCurrentConfig = android.content.res.Configuration@852391696 (0x32ce7710)
+    |   mDecor = null
+    |   mDefaultKeyMode = 0
+    |   mDefaultKeySsb = null
+    |   mDestroyed = true
+    |   mDoReportFullyDrawn = false
+    |   mEatKeyUpEvent = false
+    |   mEmbeddedID = null
+    |   mEnableDefaultActionBarUp = false
+    |   mEnterTransitionListener = android.app.SharedElementCallback$1@1883688304 (0x7046cd70)
+    |   mExitTransitionListener = android.app.SharedElementCallback$1@1883688304 (0x7046cd70)
+    |   mFinished = true
+    |   mFragments = android.app.FragmentController@852543104 (0x32d0c680)
+    |   mHandler = android.os.Handler@852559872 (0x32d10800)
+    |   mHasCurrentPermissionsRequest = false
+    |   mIdent = 31112822
+    |   mInstanceTracker = android.os.StrictMode$InstanceTracker@852543120 (0x32d0c690)
+    |   mInstrumentation = android.app.Instrumentation@852153896 (0x32cad628)
+    |   mIntent = android.content.Intent@852557600 (0x32d0ff20)
+    |   mLastNonConfigurationInstances = null
+    |   mMainThread = android.app.ActivityThread@851456256 (0x32c03100)
+    |   mManagedCursors = java.util.ArrayList@852570944 (0x32d13340)
+    |   mManagedDialogs = null
+    |   mMenuInflater = null
+    |   mParent = null
+    |   mReferrer = "com.qihancloud.zhiyin.deskmedical"
+    |   mResultCode = 0
+    |   mResultData = null
+    |   mResumed = false
+    |   mSearchEvent = null
+    |   mSearchManager = null
+    |   mStartedActivity = false
+    |   mStopped = true
+    |   mTaskDescription = android.app.ActivityManager$TaskDescription@852559904 (0x32d10820)
+    |   mTemporaryPause = false
+    |   mTitle = "医护助手"
+    |   mTitleColor = 0
+    |   mTitleReady = true
+    |   mToken = android.os.BinderProxy@852559936 (0x32d10840)
+    |   mTranslucentCallback = null
+    |   mUiThread = java.lang.Thread@1956181544 (0x7498f628)
+    |   mVisibleBehind = false
+    |   mVisibleFromClient = true
+    |   mVisibleFromServer = true
+    |   mVoiceInteractor = null
+    |   mWindow = com.android.internal.policy.PhoneWindow@851753904 (0x32c4bbb0)
+    |   mWindowAdded = true
+    |   mWindowManager = android.view.WindowManagerImpl@852570968 (0x32d13358)
+    |   mInflater = com.android.internal.policy.PhoneLayoutInflater@852546320 (0x32d0d310)
+    |   mOverrideConfiguration = null
+    |   mResources = android.content.res.Resources@852574344 (0x32d14088)
+    |   mTheme = android.content.res.Resources$Theme@852543136 (0x32d0c6a0)
+    |   mThemeResource = 2131624198
+    |   mBase = android.app.ContextImpl@852566752 (0x32d122e0)
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.activity.MainActivity
+    |   shadow$_monitor_ = -2011332706
+    * Excluded Refs:
+    | Field: android.os.Message.obj
+    | Field: android.os.Message.next
+    | Field: android.os.Message.target
+    | Field: android.view.inputmethod.InputMethodManager.mNextServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedInputConnection
+    | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Field: android.accounts.AccountManager$AmsTask$Response.this$1
+    | Field: android.os.UserManager.mContext
+    | Field: com.android.internal.policy.BackdropFrameRenderer.mDecorView
+    | Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Thread:main (always)
+    | Thread:LeakCanary-Heap-Dump (always)
+    | Class:java.lang.ref.WeakReference (always)
+    | Class:java.lang.ref.SoftReference (always)
+    | Class:java.lang.ref.PhantomReference (always)
+11-27 11:44:09.636 8093-18798/? D/LeakCanary: | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)
+11-27 11:44:11.500 27457-27497/? D/LeakCanary: Removing 1 heap dumps
+11-27 11:44:11.653 27457-27497/? I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin.deskmedical/b8184007-5f41-4415-a759-23291afc6c42_pending.hprof" starting...
+11-27 11:44:25.485 8093-19026/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:44:25.487 8093-19026/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:44:25.809 27457-27497/? D/LeakCanary: Could not dump heap, previous analysis still is in progress.
+11-27 11:44:26.537 8093-19026/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:44:31.354 8093-19026/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:44:31.357 8093-19026/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:44:34.408 8093-19026/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:44:34.585 8093-19161/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+    * android.widget.RelativeLayout has leaked:
+    * static FragmentFactory.currentFragment
+    * ↳ DefaultGuideFragment.!(mView)!
+    * ↳ RelativeLayout
+    * Reference Key: 7c6f9556-3e19-4d32-97b5-5bc961403bfa
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=25857ms, gc=283ms, heap dump=13625ms, analysis=8931ms
+    * Details:
+    * Class com.qihancloud.zhiyin.ui.fragment.FragmentFactory
+    |   static mCurrentFragmentType = -1
+    |   static currentFragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851615040 (0x32c29d40)
+    |   static INSTANCE = com.qihancloud.zhiyin.ui.fragment.FragmentFactory@851468968 (0x32c062a8)
+    |   static isClearCache = true
+    |   static $classOverhead = byte[109]@852169921 (0x32cb14c1)
+    |   static mCacheFragment = java.util.HashMap@852361136 (0x32cdffb0)
+    * Instance of com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   static $classOverhead = byte[728]@852222977 (0x32cbe401)
+    |   _$_findViewCache = java.util.HashMap@852361176 (0x32cdffd8)
+    |   mAttachDisposable = null
+    |   mDataList = null
+    |   mIsAdded = false
+    |   mView = android.widget.RelativeLayout@852506624 (0x32d03800)
+    |   _$_findViewCache = null
+    |   mCompositeDisposable = null
+    |   mAdded = false
+    |   mAnimationInfo = android.support.v4.app.Fragment$AnimationInfo@852372464 (0x32ce2bf0)
+    |   mArguments = null
+    |   mBackStackNesting = 0
+    |   mCalled = true
+    |   mChildFragmentManager = null
+    |   mChildNonConfig = null
+    |   mContainer = null
+    |   mContainerId = 0
+    |   mDeferStart = false
+    |   mDetached = false
+    |   mFragmentId = 0
+    |   mFragmentManager = null
+    |   mFromLayout = false
+    |   mHasMenu = false
+    |   mHidden = false
+    |   mHiddenChanged = false
+    |   mHost = null
+    |   mInLayout = false
+    |   mIndex = -1
+    |   mInnerView = null
+    |   mIsCreated = false
+    |   mIsNewlyAdded = false
+    |   mLayoutInflater = null
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@852559552 (0x32d106c0)
+    |   mLoaderManager = null
+    |   mMenuVisible = true
+    |   mParentFragment = null
+    |   mPerformedCreateView = false
+    |   mPostponedAlpha = 0.0
+    |   mRemoving = false
+    |   mRestored = false
+    |   mRetainInstance = false
+    |   mRetaining = false
+11-27 11:44:34.586 8093-19161/? D/LeakCanary: |   mSavedFragmentState = null
+    |   mSavedUserVisibleHint = null
+    |   mSavedViewState = null
+    |   mState = 0
+    |   mTag = null
+    |   mTarget = null
+    |   mTargetIndex = -1
+    |   mTargetRequestCode = 0
+    |   mUserVisibleHint = true
+    |   mView = null
+    |   mViewModelStore = null
+    |   mWho = null
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   shadow$_monitor_ = 0
+    * Instance of android.widget.RelativeLayout
+    |   static DEFAULT_WIDTH = 65536
+    |   static ALIGN_PARENT_END = 21
+    |   static ALIGN_LEFT = 5
+    |   static RULES_HORIZONTAL = int[8]@1883858368 (0x704965c0)
+    |   static ALIGN_START = 18
+    |   static ALIGN_TOP = 6
+    |   static ALIGN_PARENT_TOP = 10
+    |   static ALIGN_BASELINE = 4
+    |   static RIGHT_OF = 1
+    |   static START_OF = 16
+    |   static ALIGN_PARENT_RIGHT = 11
+    |   static ALIGN_BOTTOM = 8
+    |   static ALIGN_PARENT_START = 20
+    |   static ALIGN_PARENT_BOTTOM = 12
+    |   static ALIGN_RIGHT = 7
+    |   static LEFT_OF = 0
+    |   static END_OF = 17
+    |   static CENTER_IN_PARENT = 13
+    |   static CENTER_HORIZONTAL = 14
+    |   static TRUE = -1
+    |   static ALIGN_PARENT_LEFT = 9
+    |   static RULES_VERTICAL = int[5]@1883858416 (0x704965f0)
+    |   static BELOW = 3
+    |   static VERB_COUNT = 22
+    |   static VALUE_NOT_SET = -2147483648
+    |   static ABOVE = 2
+    |   static CENTER_VERTICAL = 15
+    |   static $classOverhead = byte[3620]@1884602425 (0x7054c039)
+    |   static ALIGN_END = 19
+    |   mAllowBrokenMeasureSpecs = false
+    |   mBaselineView = android.widget.LinearLayout@852507648 (0x32d03c00)
+    |   mContentBounds = android.graphics.Rect@852570320 (0x32d130d0)
+    |   mDirtyHierarchy = false
+    |   mGraph = android.widget.RelativeLayout$DependencyGraph@852570344 (0x32d130e8)
+    |   mGravity = 8388659
+    |   mIgnoreGravity = -1
+    |   mMeasureVerticalWithPaddingMargin = true
+    |   mSelfBounds = android.graphics.Rect@852570368 (0x32d13100)
+    |   mSortedHorizontalChildren = android.view.View[2]@852570392 (0x32d13118)
+    |   mSortedVerticalChildren = android.view.View[2]@852570416 (0x32d13130)
+    |   mTopToBottomLeftToRightSet = null
+    |   mAnimationListener = null
+    |   mCachePaint = null
+    |   mChildCountWithTransientState = 0
+    |   mChildTransformation = null
+    |   mChildren = android.view.View[12]@852530880 (0x32d096c0)
+    |   mChildrenCount = 2
+    |   mChildrenInterestedInDrag = null
+    |   mCurrentDragChild = null
+    |   mCurrentDragStartEvent = null
+    |   mDisappearingChildren = null
+    |   mFirstHoverTarget = null
+    |   mFirstTouchTarget = null
+    |   mFocused = null
+    |   mGroupFlags = 2244691
+11-27 11:44:34.587 8093-19161/? D/LeakCanary: |   mHoveredSelf = false
+    |   mInvalidateRegion = null
+    |   mInvalidationTransformation = null
+    |   mIsInterestedInDrag = false
+    |   mLastTouchDownIndex = -1
+    |   mLastTouchDownTime = 0
+    |   mLastTouchDownX = 0.0
+    |   mLastTouchDownY = 0.0
+    |   mLayoutAnimationController = null
+    |   mLayoutCalledWhileSuppressed = false
+    |   mLayoutMode = -1
+    |   mLayoutTransitionListener = android.view.ViewGroup$2@852542928 (0x32d0c5d0)
+    |   mLocalPoint = null
+    |   mNestedScrollAxes = 0
+    |   mOnHierarchyChangeListener = null
+    |   mPersistentDrawingCache = 2
+    |   mPreSortedChildren = null
+    |   mSuppressLayout = false
+    |   mTempPoint = null
+    |   mTransientIndices = null
+    |   mTransientViews = null
+    |   mTransition = null
+    |   mTransitioningViews = null
+    |   mVisibilityChangingChildren = null
+    |   mAccessibilityCursorPosition = -1
+    |   mAccessibilityDelegate = null
+    |   mAccessibilityTraversalAfterId = -1
+    |   mAccessibilityTraversalBeforeId = -1
+    |   mAccessibilityViewId = -1
+    |   mAnimator = null
+    |   mAttachInfo = null
+    |   mAttributes = null
+    |   mBackground = android.graphics.drawable.BitmapDrawable@852535472 (0x32d0a8b0)
+    |   mBackgroundRenderNode = android.view.RenderNode@852570440 (0x32d13148)
+    |   mBackgroundResource = 0
+    |   mBackgroundSizeChanged = false
+    |   mBackgroundTint = null
+    |   mBottom = 800
+    |   mCachingFailed = false
+    |   mClipBounds = null
+    |   mContentDescription = null
+    |   mContext = com.qihancloud.zhiyin.ui.activity.MainActivity@852268032 (0x32cc9400)
+    |   mCurrentAnimation = null
+    |   mDrawableState = int[2]@1883759176 (0x7047e248)
+    |   mDrawingCache = null
+    |   mDrawingCacheBackgroundColor = 0
+    |   mFloatingTreeObserver = null
+    |   mForegroundInfo = null
+    |   mFrameMetricsObservers = null
+    |   mGhostView = null
+    |   mHasPerformedLongPress = false
+    |   mID = -1
+    |   mIgnoreNextUpEvent = false
+    |   mInContextButtonPress = false
+    |   mInputEventConsistencyVerifier = null
+    |   mKeyedTags = null
+    |   mLabelForId = -1
+    |   mLastIsOpaque = false
+    |   mLayerPaint = null
+    |   mLayerType = 0
+    |   mLayoutInsets = null
+    |   mLayoutParams = android.widget.FrameLayout$LayoutParams@852557432 (0x32d0fe78)
+    |   mLeft = 0
+    |   mLeftPaddingDefined = false
+    |   mListenerInfo = android.view.View$ListenerInfo@852535544 (0x32d0a8f8)
+    |   mLongClickX = NaN
+    |   mLongClickY = NaN
+    |   mMatchIdPredicate = null
+    |   mMatchLabelForPredicate = null
+    |   mMeasureCache = android.util.LongSparseLongArray@852570464 (0x32d13160)
+    |   mMeasuredHeight = 800
+    |   mMeasuredWidth = 1320
+    |   mMinHeight = 0
+    |   mMinWidth = 0
+    |   mNestedScrollingParent = null
+11-27 11:44:34.588 8093-19161/? D/LeakCanary: |   mNextFocusDownId = -1
+    |   mNextFocusForwardId = -1
+    |   mNextFocusLeftId = -1
+    |   mNextFocusRightId = -1
+    |   mNextFocusUpId = -1
+    |   mOldHeightMeasureSpec = 1073742624
+    |   mOldWidthMeasureSpec = 1073743144
+    |   mOutlineProvider = android.view.ViewOutlineProvider$1@1883834568 (0x704908c8)
+    |   mOverScrollMode = 1
+    |   mOverlay = null
+    |   mPaddingBottom = 0
+    |   mPaddingLeft = 0
+    |   mPaddingRight = 0
+    |   mPaddingTop = 0
+    |   mParent = null
+    |   mPendingCheckForLongPress = null
+    |   mPendingCheckForTap = null
+    |   mPerformClick = null
+    |   mPointerIcon = null
+    |   mPrivateFlags = -2128607184
+    |   mPrivateFlags2 = 1610819112
+    |   mPrivateFlags3 = 0
+    |   mRecreateDisplayList = false
+    |   mRenderNode = android.view.RenderNode@852570488 (0x32d13178)
+    |   mResources = android.content.res.Resources@852574344 (0x32d14088)
+    |   mRight = 1320
+    |   mRightPaddingDefined = false
+    |   mRoundScrollbarRenderer = null
+    |   mRunQueue = null
+    |   mScrollCache = null
+    |   mScrollIndicatorDrawable = null
+    |   mScrollX = 0
+    |   mScrollY = 0
+    |   mSendViewScrolledAccessibilityEvent = null
+    |   mSendViewStateChangedAccessibilityEvent = null
+    |   mSendingHoverAccessibilityEvents = false
+    |   mStartActivityRequestWho = null
+    |   mStateListAnimator = null
+    |   mSystemUiVisibility = 0
+    |   mTag = null
+    |   mTempNestedScrollConsumed = null
+    |   mTop = 0
+    |   mTouchDelegate = null
+    |   mTouchSlop = 11
+    |   mTransformationInfo = android.view.View$TransformationInfo@852570512 (0x32d13190)
+    |   mTransientStateCount = 0
+    |   mTransitionName = null
+    |   mUnscaledDrawingCache = null
+    |   mUnsetPressedState = null
+    |   mUserPaddingBottom = 0
+    |   mUserPaddingEnd = -2147483648
+    |   mUserPaddingLeft = 0
+    |   mUserPaddingLeftInitial = 0
+    |   mUserPaddingRight = 0
+    |   mUserPaddingRightInitial = 0
+    |   mUserPaddingStart = -2147483648
+    |   mVerticalScrollFactor = 0.0
+    |   mVerticalScrollbarPosition = 0
+    |   mViewFlags = 939524224
+    |   mWindowAttachCount = 1
+    |   shadow$_klass_ = android.widget.RelativeLayout
+    |   shadow$_monitor_ = -2083356614
+    * Excluded Refs:
+    | Field: android.os.Message.obj
+    | Field: android.os.Message.next
+    | Field: android.os.Message.target
+    | Field: android.view.inputmethod.InputMethodManager.mNextServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedInputConnection
+    | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Field: android.accounts.AccountManager$AmsTask$Response.this$1
+11-27 11:44:34.589 8093-19161/? D/LeakCanary: | Field: android.os.UserManager.mContext
+    | Field: com.android.internal.policy.BackdropFrameRenderer.mDecorView
+    | Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Thread:main (always)
+    | Thread:LeakCanary-Heap-Dump (always)
+    | Class:java.lang.ref.WeakReference (always)
+    | Class:java.lang.ref.SoftReference (always)
+    | Class:java.lang.ref.PhantomReference (always)
+    | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)
+11-27 11:44:46.223 27457-27497/? D/LeakCanary: Removing 1 heap dumps
+11-27 11:44:46.414 27457-27497/? I/art: hprof: heap dump "/storage/emulated/0/Download/leakcanary-com.qihancloud.zhiyin.deskmedical/40e7a555-0b24-4549-8b8d-4845f6f884e8_pending.hprof" starting...
+11-27 11:44:59.177 8093-19515/? D/LeakCanary: Analysis in progress, working on: READING_HEAP_DUMP_FILE
+11-27 11:44:59.203 8093-19515/? D/LeakCanary: Analysis in progress, working on: PARSING_HEAP_DUMP
+11-27 11:45:00.316 8093-19515/? D/LeakCanary: Analysis in progress, working on: DEDUPLICATING_GC_ROOTS
+11-27 11:45:05.118 8093-19515/? D/LeakCanary: Analysis in progress, working on: FINDING_LEAKING_REF
+11-27 11:45:05.121 8093-19515/? D/LeakCanary: Analysis in progress, working on: FINDING_SHORTEST_PATH
+11-27 11:45:07.657 8093-19515/? D/LeakCanary: Analysis in progress, working on: BUILDING_LEAK_TRACE
+11-27 11:45:07.744 8093-19646/? D/LeakCanary: In com.qihancloud.zhiyin.deskmedical:v2.4.0.1-debug:20191126.
+    * com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment has leaked:
+    * static FragmentFactory.!(currentFragment)!
+    * ↳ DefaultGuideFragment
+    
+    * Reference Key: 877e64fe-1da7-4a60-a6b9-7dd71ddc8cc0
+    * Device: rockchip Android rk3399-all rk3399_all
+    * Android Version: 7.1.2 API: 25 LeakCanary: 1.6.3 31007b4
+    * Durations: watch=60485ms, gc=344ms, heap dump=12777ms, analysis=8487ms
+    
+    * Details:
+    * Class com.qihancloud.zhiyin.ui.fragment.FragmentFactory
+    |   static mCurrentFragmentType = -1
+    |   static currentFragment = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment@851615040 (0x32c29d40)
+    |   static INSTANCE = com.qihancloud.zhiyin.ui.fragment.FragmentFactory@851468968 (0x32c062a8)
+    |   static isClearCache = true
+    |   static $classOverhead = byte[109]@852169921 (0x32cb14c1)
+    |   static mCacheFragment = java.util.HashMap@852361136 (0x32cdffb0)
+    * Instance of com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   static $classOverhead = byte[728]@852222977 (0x32cbe401)
+    |   _$_findViewCache = java.util.HashMap@852361176 (0x32cdffd8)
+    |   mAttachDisposable = null
+    |   mDataList = null
+    |   mIsAdded = false
+    |   mView = android.widget.RelativeLayout@852506624 (0x32d03800)
+    |   _$_findViewCache = null
+    |   mCompositeDisposable = null
+    |   mAdded = false
+    |   mAnimationInfo = android.support.v4.app.Fragment$AnimationInfo@852372464 (0x32ce2bf0)
+    |   mArguments = null
+    |   mBackStackNesting = 0
+    |   mCalled = true
+    |   mChildFragmentManager = null
+    |   mChildNonConfig = null
+    |   mContainer = null
+    |   mContainerId = 0
+    |   mDeferStart = false
+    |   mDetached = false
+    |   mFragmentId = 0
+    |   mFragmentManager = null
+    |   mFromLayout = false
+    |   mHasMenu = false
+    |   mHidden = false
+    |   mHiddenChanged = false
+    |   mHost = null
+    |   mInLayout = false
+    |   mIndex = -1
+    |   mInnerView = null
+    |   mIsCreated = false
+    |   mIsNewlyAdded = false
+    |   mLayoutInflater = null
+    |   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@852559552 (0x32d106c0)
+    |   mLoaderManager = null
+    |   mMenuVisible = true
+    |   mParentFragment = null
+    |   mPerformedCreateView = false
+    |   mPostponedAlpha = 0.0
+    |   mRemoving = false
+    |   mRestored = false
+    |   mRetainInstance = false
+    |   mRetaining = false
+    |   mSavedFragmentState = null
+    |   mSavedUserVisibleHint = null
+    |   mSavedViewState = null
+    |   mState = 0
+    |   mTag = null
+    |   mTarget = null
+    |   mTargetIndex = -1
+    |   mTargetRequestCode = 0
+    |   mUserVisibleHint = true
+    |   mView = null
+    |   mViewModelStore = null
+    |   mWho = null
+    |   shadow$_klass_ = com.qihancloud.zhiyin.ui.fragment.DefaultGuideFragment
+    |   shadow$_monitor_ = 0
+    * Excluded Refs:
+    | Field: android.os.Message.obj
+    | Field: android.os.Message.next
+    | Field: android.os.Message.target
+    | Field: android.view.inputmethod.InputMethodManager.mNextServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedView
+    | Field: android.view.inputmethod.InputMethodManager.mServedInputConnection
+    | Field: android.view.inputmethod.InputMethodManager.mCurRootView
+    | Field: android.accounts.AccountManager$AmsTask$Response.this$1
+    | Field: android.os.UserManager.mContext
+    | Field: com.android.internal.policy.BackdropFrameRenderer.mDecorView
+    | Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+    | Thread:FinalizerWatchdogDaemon (always)
+    | Thread:main (always)
+    | Thread:LeakCanary-Heap-Dump (always)
+    | Class:java.lang.ref.WeakReference (always)
+    | Class:java.lang.ref.SoftReference (always)
+    | Class:java.lang.ref.PhantomReference (always)
+    | Class:java.lang.ref.Finalizer (always)
+    | Class:java.lang.ref.FinalizerReference (always)

@@ -63,7 +63,6 @@ https://www.jianshu.com/p/2d47d1cf5ccf
                     我们MainActivity右键Path to GC Roots(表示从对象到GC roots的路径)找到从对象到GC Roots的路径,在根据exclude all phantom/weak/soft排除虚引用，弱引用，再通过泄露的类的引用关系分析泄露原因
                     复杂的分析我们可以通过和另一个hprof快速对比,compare to another heap dumps,再通过对比不同的引用链进行分析
 
-
                 3.Top Consumers:消耗内存最大的对象
                 4.Duplicate Classes
             default_report...栏
