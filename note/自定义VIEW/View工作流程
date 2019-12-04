@@ -1,3 +1,4 @@
+参考<<Android进阶之光>>
 一、View基础
     1.View坐标系
         View获取自身的宽高
@@ -35,9 +36,11 @@
                     mViews.add(view)
                     mRoots.add(root)
                     mParas.add(wparams)
-                    root.setView(view,wparams,panelParentView)
-                这样,通过root.setView就将DecorView加载到window中了,但是此时界面还不会显示出来,因为还要经过measure、layout、draw方法
+                    root.setView(view,wparams,panelParentView)//这里的view就是DecorView
+                这样,通过root.setView就将DecorView加载到当前Activity对应的window中了,但是此时界面还不会显示出来,因为还要经过measure、layout、draw方法
+                WindowManager管理着所有Activity的DecorView和ViewRootImpl方法
 
     2.ViewRootImpl的PerformTraversals(读音:[trəˈvərs(ə)l])方法执行performMeasure、performLayout、performDraw
 
     3.viewTree开始View的工作流程,根据childWidthMeasureSpec和childHeightMeasureSpec参数执行所有View的measure、layout和draw方法
+
