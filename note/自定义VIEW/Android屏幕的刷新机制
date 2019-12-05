@@ -1,3 +1,131 @@
 VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
 屏幕刷新机制概览   https://blog.csdn.net/feather_wch/article/details/79720907
 屏幕刷新机制流程   https://www.jianshu.com/p/0d00cb85fdf3
+问题点：
+    1.Android每隔16.6ms刷新一次屏幕是什么意思
+    2.如果界面一直保持不变的话,那么还会每隔16.6ms刷新一次屏幕吗
+    3.一个Activity的View树都进行测量、布局、绘制三大步骤后,屏幕会马上刷新吗
+    4.如何理解"避免丢帧的方法之一是保证每次绘制界面的操作要在16ms之内完成"这句话
+    5.主线程耗时操作为什么会导致丢帧
+    6.为什么界面不刷新就接收不到Vsync信号了?为什么绘制视图树计算下一帧画面的工作是在屏幕刷新信号来的时候开始的
+一、基本概念
+    在Android显示系统中,包括CPU、GPU、显示器三大部分,CPU负责计算数据,把计算好的数据交给GPU进行渲染,GPU将渲染好的数据存放到Buffer中,
+    然后显示器每隔16ms从Buffer中读取一帧数据显示到屏幕上(但是CPU/GPU写数据是无规律的)
+
+    简单说就是：屏幕的刷新包括三个步骤:CPU计算屏幕数据、GPU对数据进一步处理和缓存、display将数据从缓存中取出来显示
+    对Android而言,CPU计算屏幕数据就是View树的绘制过程,也就是Activity对应的视图树从根布局DecorView开始层层遍历每个View,分别执行测量、布局、绘制三个操作的过程
+
+    Android中常说的每隔16.6ms刷新一次屏幕是指:
+        底层以固定的频率每隔16.6ms(VSync信号)将buffer中的屏幕数据显示出来
+        VSync信号来显示当前帧的同时,CPU会开始计算下一帧的屏幕数据,CPU、GPU将下一帧数据计算准备完毕后会等下一个屏幕刷新信号来,再交由屏幕显示数据
+        当我们的App界面不需要刷新时,App就接收不到VSync信号,也就不会让CPU执行绘制流程；但是屏幕还是会每隔16.6ms刷新数据,只不过每一帧都是相同的数据
+
+二、Android屏幕刷新机制流程
+        Android设备呈现到界面上大多是情况都是一个Activity,真正承载视图的是一个Window,每个Window都有一个DecorView,
+    我们通过setContentView其实就是将自己的布局通过window添加到DecorView为根布局的ViewGroup中,形成一棵View树
+    而DecorView其实还有一个Parent,就是ViewRootImpl,每个界面上的View的刷新,绘制,点击事件的分发都是先找到ViewRootImpl然后由它发起进行分发处理的
+    如View.invalidate,view.requestLayout,view.requestFocus等操作都会最终找到ViewRootImpl,然后由ViewRootImpl控制这些操作从DecorView开始遍历View树去分发处理
+
+    1.DecorView何时创建的
+        Activity的启动是在ActivityThread里完成的,handleLaunchActivity会依次间隔执行Activity的onCreate,onStart,onResume方法
+        Activity的setContentView会调用getWindow().setContentView(),其中getVindow会返回一个Window的实现类对象PhoneWindow
+        PhoneWindow的setContentView会创建一个DecorView(通过installDecor方法会调用generateDecor方法)，DecorView是PhoneWindow的内部类,继承了FrameLayout
+        而这个DecorView就是Activity的根View,这个DecorView将屏幕划分为两个区域:一个TitleView；一个ContentView
+
+    2.ViewRootImpl与DecorView是何时进行绑定的
+        Activity的启动是在ActivityThread里完成的,handleLaunchActivity会依次间隔执行Activity的onCreate,onStart,onResume方法
+        在handleResumeActivity中会执行windowManager#addView方法
+        ActivityThread的handleResumeActivity方法
+            final void handleResumeActivity(IBinder token...)
+                    ActivityClientRecord r = mActivities.get(token);
+                    r = performResumeActivity(token, clearHide, reason);    //这里会回调我们Activity的onResume方法
+                    if (r.window == null && !a.mFinished && willBeVisible) {
+                        r.window = r.activity.getWindow();
+                        View decor = r.window.getDecorView();
+                        ViewManager wm = a.getWindowManager();
+                        ...
+                        WindowManager.LayoutParams l = r.window.getAttributes();
+                        if (a.mVisibleFromClient) {
+                            if (!a.mWindowAdded) {
+                                a.mWindowAdded = true;
+                                wm.addView(decor, l);                       //这里将decorView和window绑定起来
+                            } else {
+                                a.onWindowAttributesChanged(l);
+                            }
+                        }
+            }
+            而addView最终会调用WindowManagerGlobal的addView方法,会创建一个ViewRootImpl对象,且通过viewRootImpl.setView将DecorView设置给viewRootImpl
+        viewRootImpl.setView中会调用requestLayout和view.assignParent(this)方法,将ViewRootImpl绑定到DecorView中
+            WindowManager管理着所有Activity的DecorView和ViewRootImpl
+
+        1.WindowManagerGlobal的addView方法
+            root = new ViewRootImpl(view.getContext(),display)
+            view.setLayoutParams(wparams)
+            mViews.add(view)
+            mRoots.add(root)
+            mParas.add(wparams)
+            root.setView(view,wparams,panelParentView)//这里的view就是DecorView
+        2.ViewRootImpl的setView方法
+            synchronized(this){
+                if(mView == null){
+                    mView = view;//这个就是DecorView
+                    ...
+                    requestLayout();
+                    mView.assignParent(this);//这里为DecorView分配一个父亲即ViewRootImpl
+                }
+            }
+        3.DecorView的assignParent方法
+            void assignParent(ViewParent parent){
+                if(mParent == null){
+                    mParent = parent;//这里就将ViewRootImpl与DecorView进行绑定了,ViewRootImpl继承自ViewParent接口
+                }
+                ...
+            }
+        所以,ViewRootImpl与DecorView的绑定是这样的
+            1.ActivityThread类的handleResumeActivity方法
+            2.windowmanager类的addView方法-windowManagerGlobal类addView方法中
+                创建ViewRootImpl对象root,并通过root.setView(decorView)
+            3.ViewRootImpl类中setView的方法中的mView.assignParent(this)
+
+    3.ViewRootImpl#scheduleTraversals
+        现在，我们知道了window、DecorView和ViewRootImpl的概念和关系,但是屏幕还不会显示,因为View还没有经过测量、布局、绘制三大流程
+        而View的绘制流程就是从ViewRootImpl对象的scheduleTraversals方法开始的
+            void scheduleTraversals() {
+                if (!mTraversalScheduled) {
+                    mTraversalScheduled = true;
+                    mTraversalBarrier = mHandler.getLooper().getQueue().postSyncBarrier();
+                    mChoreographer.postCallback(
+                            Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null);
+                    if (!mUnbufferedInputDispatch) {
+                        scheduleConsumeBatchedInput();
+                    }
+                    notifyRendererOfFramePending();
+                    pokeDrawLockIfNeeded();
+                }
+            }
+
+            final class TraversalRunnable implements Runnable {
+                @Override
+                public void run() {
+                    doTraversal();
+                }
+            }
+            final TraversalRunnable mTraversalRunnable = new TraversalRunnable();
+
+            void doTraversal() {
+                if (mTraversalScheduled) {
+                    mTraversalScheduled = false;
+                    mHandler.getLooper().getQueue().removeSyncBarrier(mTraversalBarrier);
+
+                    if (mProfile) {
+                        Debug.startMethodTracing("ViewAncestor");
+                    }
+
+                    performTraversals();
+
+                    if (mProfile) {
+                        Debug.stopMethodTracing();
+                        mProfile = false;
+                    }
+                }
+            }
