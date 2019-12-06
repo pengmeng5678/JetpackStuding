@@ -1,0 +1,165 @@
+https://www.jianshu.com/p/1e7e9b576391
+一.基本使用
+  1.依赖
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
+  2.初始化
+    if(BuildConfig.DEBUG){
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return true;
+        }
+        LeakCanary.install(this);
+    }
+  3.核心类
+    LeakCanary:SDK提供类
+    ActivityRefWatcher：Activity引用检测
+    RefWatcher:检测不可达引用
+    DisplayLeakActivity:内存泄漏查看页面
+    HeapDump:堆转储信息类,生成一个文件存储堆转储的相关信息
+    HeapAnalyzerService:内存分析服务,保证App进程不受影响,运行在独立的进程
+
+  4.问题点
+    1.(内存泄漏检测机制)Application初始化后,它是如何检测所有的Activity页面的
+        LeakCanary通过ApplicationContext统一注册的方式来监测所有的Activity的生命周期
+        并在Activity的onDestroy方法中执行RefWatcher的watch方法,该方法的作用就是检测本页面是否存在内存泄漏
+
+    2.(内存泄漏判定机制)内存泄漏的判断条件是什么,检测内存泄漏的机制原理是什么
+        一句话总结内存泄漏的判断条件：
+            KeyedWeakReference与ReferenceQueue联合使用,在弱引用关联的对象被回收后,会将引用添加到ReferenceQueue中,
+            清空后,可以根据是否继续含有该引用来判定是否被回收
+            判定回收,手动触发GC,再次判定回收,双重判断如果都未回收,则判断为泄漏对象
+        检测内存泄漏的机制原理是：
+            1.移除不可达的引用,如果Activity的引用不可达了就返回
+            2.触发一次GC
+            3.再次移除不可达的引用
+            4.如果Activity的引用还是存在,那就认为发生了内存泄漏
+    3.(内存泄漏轨迹生成机制)检测内存泄漏后,它是如何生成泄漏信息的?内存泄漏的输出轨迹是怎么得到的
+
+  5.源码分析流程
+    1.LeakCanary的install方法
+        public final class LeakCanary {
+            @NonNull
+            public static RefWatcher install(@NonNull Application application) {
+                return ((AndroidRefWatcherBuilder)refWatcher(application).listenerServiceClass(DisplayLeakService.class).excludedRefs(AndroidExcludedRefs.createAppDefaults().build())).buildAndInstall();
+            }
+            ...
+        }
+    2.ActivityRefWatcher触发开始检测的位置:onActivityDestroyed
+        public final class ActivityRefWatcher {
+            private final ActivityLifecycleCallbacks lifecycleCallbacks = new ActivityLifecycleCallbacksAdapter() {
+                public void onActivityDestroyed(Activity activity) {
+                    ActivityRefWatcher.this.refWatcher.watch(activity);
+                }
+            };
+            ...
+        }
+    3.RefWatcher类中watch的内存泄漏检测机制
+        public void watch(Object watchedReference, String referenceName) {
+            if (this != DISABLED) {
+                Preconditions.checkNotNull(watchedReference, "watchedReference");
+                Preconditions.checkNotNull(referenceName, "referenceName");
+                long watchStartNanoTime = System.nanoTime();
+                String key = UUID.randomUUID().toString();
+                this.retainedKeys.add(key);
+                KeyedWeakReference reference = new KeyedWeakReference(watchedReference, key, referenceName, this.queue);
+                this.ensureGoneAsync(watchStartNanoTime, reference);
+            }
+        }
+        private void ensureGoneAsync(final long watchStartNanoTime, final KeyedWeakReference reference) {
+            this.watchExecutor.execute(new Retryable() {
+                public Result run() {
+                    return RefWatcher.this.ensureGone(reference, watchStartNanoTime);
+                }
+            });
+        }
+
+        Result ensureGone(KeyedWeakReference reference, long watchStartNanoTime) {
+            long gcStartNanoTime = System.nanoTime();
+            long watchDurationMs = TimeUnit.NANOSECONDS.toMillis(gcStartNanoTime - watchStartNanoTime);
+            //1.第一次移除不可达的引用,如果引用不存在了就直接返回
+            this.removeWeaklyReachableReferences();
+            if (this.debuggerControl.isDebuggerAttached()) {
+                return Result.RETRY;
+            } else if (this.gone(reference)) {
+                return Result.DONE;
+            } else {
+                //2.如果引用还存在就触发一次GC
+                this.gcTrigger.runGc();
+                //3.第二次移除不可达的引用
+                this.removeWeaklyReachableReferences();
+                if (!this.gone(reference)) {
+                //4.如果引用还存在就认为出现了内存泄漏
+                    long startDumpHeap = System.nanoTime();
+                    long gcDurationMs = TimeUnit.NANOSECONDS.toMillis(startDumpHeap - gcStartNanoTime);
+                    //5.获取写入堆内存快照的文件(xxx_pending.hprof),同时弹吐司和发通知通知用户内存泄漏了
+                    File heapDumpFile = this.heapDumper.dumpHeap();
+                    if (heapDumpFile == HeapDumper.RETRY_LATER) {
+                        return Result.RETRY;
+                    }
+
+                    long heapDumpDurationMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startDumpHeap);
+                    HeapDump heapDump = this.heapDumpBuilder.heapDumpFile(heapDumpFile).referenceKey(reference.key).referenceName(reference.name).watchDurationMs(watchDurationMs).gcDurationMs(gcDurationMs).heapDumpDurationMs(heapDumpDurationMs).build();
+                    //6.分析堆内存快照文件
+                    this.heapdumpListener.analyze(heapDump);
+                }
+
+                return Result.DONE;
+            }
+        }
+        //检查Activity的弱引用是否还存在
+        private boolean gone(KeyedWeakReference reference) {
+            return !this.retainedKeys.contains(reference.key);
+        }
+        //移除不可达的引用
+        private void removeWeaklyReachableReferences() {
+            KeyedWeakReference ref;
+            //所有弱引用的对象被回收后都会放到这个queue中,如果弱引用包裹的Activity被回收了,那的retainedKeys中对应的key肯定也会被移除;
+            //反之表示Activity没有被回收，没有放到queue中,且retainedKeys存在Activity对应的key,即gone方法返回false
+            while((ref = (KeyedWeakReference)this.queue.poll()) != null) {
+                this.retainedKeys.remove(ref.key);
+            }
+        }
+    4.内存泄漏文件生成机制
+        该版本采用eclipse.Mat来分析泄漏详细,从GCRoot开始逐步生成引用轨迹
+        ensureGone方法中判定发生内存泄漏后执行heapDumper.dumpHeap方法,获取写入堆内存快照的文件(xxx_pending.hprof),同时弹吐司和发通知通知用户内存泄漏了
+        通过heapdumpListener.analyze(heapDump)方法执行分析并生成内存泄漏文件,其实现类是一个独立进程HeapAnalyzerService
+        HeapAnalyzerService中通过HeapAnalyzer中的checkForLeak方法来进行具体的分析
+
+        public AnalysisResult checkForLeak(@NonNull File heapDumpFile, @NonNull String referenceKey, boolean computeRetainedSize) {
+            long analysisStartNanoTime = System.nanoTime();
+            if (!heapDumpFile.exists()) {
+                Exception exception = new IllegalArgumentException("File does not exist: " + heapDumpFile);
+                return AnalysisResult.failure(exception, this.since(analysisStartNanoTime));
+            } else {
+                try {
+                    this.listener.onProgressUpdate(Step.READING_HEAP_DUMP_FILE);
+                    HprofBuffer buffer = new MemoryMappedFileBuffer(heapDumpFile);
+                    HprofParser parser = new HprofParser(buffer);
+                    this.listener.onProgressUpdate(Step.PARSING_HEAP_DUMP);
+                    Snapshot snapshot = parser.parse();
+                    this.listener.onProgressUpdate(Step.DEDUPLICATING_GC_ROOTS);
+                    this.deduplicateGcRoots(snapshot);
+                    this.listener.onProgressUpdate(Step.FINDING_LEAKING_REF);
+                    Instance leakingRef = this.findLeakingReference(referenceKey, snapshot);
+                    if (leakingRef == null) {
+                        String className = leakingRef.getClassObj().getClassName();
+                        return AnalysisResult.noLeak(className, this.since(analysisStartNanoTime));
+                    } else {
+                        return this.findLeakTrace(analysisStartNanoTime, snapshot, leakingRef, computeRetainedSize);
+                    }
+                } catch (Throwable var11) {
+                    return AnalysisResult.failure(var11, this.since(analysisStartNanoTime));
+                }
+            }
+        }
+    5.Leakcanary的缺点
+        1.由于leakCanary只是在Activity的onDestroy方法中触发检测的,所以默认情况只检测Activity的泄露问题
+        如果需要检测其他对象的泄露，需要使用RefWatcher
+          1.在Application中初始化LeakCanary和RefWatcher
+              if (LeakCanary.isInAnalyzerProcess(this)) {
+                  return RefWatcher.DISABLED;
+              }
+              RefWatcher refWatcher = LeakCanary.install(this);
+          2.在其他对象中通过RefWatcher检测内存泄露,如在Fragment的onDestroy方法中检测
+            MyAppclication.getRefWatcher().watch(this)
