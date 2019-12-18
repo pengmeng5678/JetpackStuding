@@ -121,7 +121,7 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                         Debug.startMethodTracing("ViewAncestor");
                     }
 
-                    performTraversals();
+                    performTraversals();//这个方法很长,会根据条件调用performMessure,performDraw,performLayout
 
                     if (mProfile) {
                         Debug.stopMethodTracing();
@@ -129,3 +129,11 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                     }
                 }
             }
+
+        从这里我们可以看出
+           1.一个View发起刷新操作时,会通过层层通知到ViewRootImpl的scheduleTraversals方法中,
+            然后这个方法会将遍历绘制View树的操作performTraversals方法封装到Runnable中,
+            传给Choreographer[[kɔːriˈɑːɡrəfər],以当前的时间戳放到一个mCallbackQueue中，然后调用了一个native层的方法监听下一个屏幕刷新信号
+
+           2.当下一个屏幕刷新信号来的时候，如果app有监听vSync信号,那底层就会回调app层的onVsync方法来通知,
+           onVsync方法会通过主线程handler去mCallbackQueue里根据时间戳将之前放进去的Runnable取出来,而这些Runnable有一个就是遍历绘制View树的操作performTraversals

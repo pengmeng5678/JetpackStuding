@@ -88,8 +88,8 @@ https://www.cnblogs.com/aspirant/p/8662690.html
             新对象生成，并且在Eden申请空间失败时会触发Scavenge GC
         2.老年代GC,Full GC(Major GC)
             对整个堆进行整理包括Young、Tenured和Perm,所以比Scavenge GC效率慢，可能触发Full GC的条件
-                a.年久代被写满
-                b.持久带被写满
+                a.老年代被写满
+                b.永久带被写满
                 c.System.gc被显示调用
                 d.上一次GC之后Heap的各域分配策略动态变化
 

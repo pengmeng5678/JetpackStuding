@@ -26,7 +26,6 @@
                 }
             }
 
-
 2.Retrofit下载时如何拦截链回调进度
     通过自定义OkHttp拦截器ProgressInterceptor
         1.添加拦截链

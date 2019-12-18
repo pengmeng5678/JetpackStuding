@@ -1,4 +1,5 @@
 http://www.cnblogs.com/aspirant/p/7200523.html
+https://www.cnblogs.com/mybatis/p/9396135.html
 1.什么是类加载器
     负责读取Java字节代码，并转换成java.lang.Class类的一个实例
 2.类加载器与类的"相同"判断
@@ -6,13 +7,14 @@ http://www.cnblogs.com/aspirant/p/7200523.html
     即便是同样的字节码,被不同的类加载器加载之后所得到的类,也是不同的(类的Class对象的equals方法,isAssignableFrom,isInstance,instanceOf方法为false)
     通俗的说,要判断两个类是否相同,前提是这两个类必须被同一个类加载器加载,否则这两个类不相同
 3.类加载器种类
-    启动类加载器，Bootstrap ClassLoader,加载JAVA_HOME\lib,或者被-Xbootclasspath参数限定的类
-    扩展类加载器,Extension ClassLoader,加载\lib\ext,或者被java.ext.dirs系统变量指定的类
-    应用程序类加载器,Application ClassLoader,加载ClassPath的类库
+    启动类加载器，Bootstrap ClassLoader,加载jre\lib中的jar文件,或者被-Xbootclasspath参数限定的类
+    扩展类加载器,Extension ClassLoader,加载jre\lib\ext中的jar文件,或者被java.ext.dirs系统变量指定的类
+    应用程序类加载器,Application ClassLoader,它负责加载系统类路径java -classpath或者-D java.class.path指定路径下的类库，通过ClassLoader.getSystemClassLoader可以获取到类加载器
     自定义类加载器,通过继承ClassLoader实现,一般是加载我们的自定义类
+
 4.双亲委派模型
     类加载器Java类如同其它的java类一样,也是要由类加载器来加载的,除了启动类加载器,每个类都有其父类加载器(父子关系由组合类实现,不是继承关系)
-    所谓双亲委派是指每次收到类加载请求时,先将请求委派给父类加载器完成(所有的加载最终都会委派到Bootstrap Classloader)
+    所谓双亲委派是指每次收到类加载请求时,先将请求委派给父类加载器完成(所有的加载最终都会委派到Bootstrap['bʊt'stræp] Classloader)
     如果父类加载器无法完成这个加载(该加载器的搜索范围中没有找到对应的类),子类尝试自己加载
 5.类加载过程
     类加载过程分为三个步骤：加载、连接、初始化，其中连接分为验证、准备、解析三个步骤
@@ -24,7 +26,7 @@ http://www.cnblogs.com/aspirant/p/7200523.html
         转换为一个与目标类型对应的java.lang.Class对象
     连接
         验证
-            验证阶段主要包括四个校验过程:文件格式验证、元数据验证、字节码验证和符号引用验证
+            验证阶段主要包括四个校验过程:文件格式验证、元数据验证、字节码验证和符号引用验证.保证加载到JVM中的二进制流数据符合JVM要求,不会危害JVM安全
         准备
             为类中所有的静态变量分配内存空间，并为其设置初始值(由于还没有对象,实例变量将不在此操作范围)
         解析
@@ -37,7 +39,7 @@ http://www.cnblogs.com/aspirant/p/7200523.html
             static{
                 value2 = 66;
             }
-        在连接的准备阶段,value1和value2的初始值都未0
+        在连接的准备阶段,value1和value2的初始值都为0
         在初始化阶段,value1为5,value2为66
             1.所有类变量初始化语句和静态代码块都会在编译时被前端编译器放在收集器里头，
                 存放到一个特殊的方法中，这个方法就是<clinit>方法，即类/接口初始化方法，该方法只能在类加载的过程中由JVM调用；
