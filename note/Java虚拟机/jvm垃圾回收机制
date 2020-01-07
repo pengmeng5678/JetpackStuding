@@ -15,6 +15,32 @@ https://www.cnblogs.com/aspirant/p/8662690.html
             2.方法区中类静态属性引用的对象
             3.方法区中常量引用的对象
             4.本地方法栈中JNI引用的对象
+        GCRoots根结点演示
+        public class GCRoots{
+            Object o =new Object(); //o不是GCRoots,方法运行完以后，o可回收。
+            static Object GCRoot1 =new Object(); //GC Roots---方法区中 类静态属性的对象
+            final  static Object GCRoot2 =new Object();//GCRoots---方法区中 常量的对象
+
+            public static void main(String[] args) {
+                //可达
+                Object object1 = GCRoot1; //注意：“ = ” 不是赋值，在对象中是引用，传递的是右边对象的地址
+                Object object2 = object1;
+                Object object3 = object1;
+                Object object4 = object3;
+            }
+            public void method1(){
+                //不可达（方法运行完后可回收）
+                Object object5 = o;//o不是GCRoots
+                Object object6 = object5;
+                Object object7 = object5;
+            }
+            //本地变量表中引用的对象
+            public void stack(){
+                Object ostack =new Object();    //本地变量表的对象
+                Object object9 = ostack;
+                //以上object9 在方法没有(运行完)出栈前都是可达的
+            }
+        }
     3.对象的四种引用状态
         1.强引用
             只要强引用存在,虚拟机永远不会回收被引用的对象
