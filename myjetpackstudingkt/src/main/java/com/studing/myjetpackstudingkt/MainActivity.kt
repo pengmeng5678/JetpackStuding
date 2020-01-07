@@ -43,4 +43,5 @@ class MainActivity : AppCompatActivity() {
     fun goMasterDetailActivity(view: View) {
         goActivity(ItemListActivity::class.java)
     }
+
 }

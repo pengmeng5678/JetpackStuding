@@ -4,8 +4,8 @@ ThreadLocal:https://www.jianshu.com/p/98b68c97df9b
 synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
 线程原理 https://www.jianshu.com/p/31a100fc945d
 并发编码的两大核心：JMM抽象内存模型和happens-before规则。三天性质：原子性、有序性和可见性
-
-1.进程、线程
+死锁：https://blog.csdn.net/hd12370/article/details/82814348
+1.进程、线程、协程
     进程：
         介绍：在现代操作系统中,进程是资源分配的最小单位,而线程是CPU调度的基本单位,一个进程里面最小有一个线程,叫主线程
         特点：每个进程都有自己独立的内存空间、一组资源系统，其内部数据和状态都是完全独立的；但进程消耗的内存大，进程切换的代价高
@@ -13,6 +13,8 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         介绍：线程是进程的一个实体,是CPU调度和分配的基本单位,它是比进程更小的独立运行的基本单位，线程自己基本上不拥有系统资源
         只拥有在运行中不可少的资源(程序计数器、栈),但它可与其他线程共享进程所拥有的全部资源
         特点：在JVM中,本地方法栈、虚拟机栈和程序计数器是线程隔离的，而堆区和方法区是线程共享的
+    协程:
+
     进程线程的区别
         地址空间：线程是进程的一个执行单元；进程至少有一个线程；一个进程内的多线程共享该进程的地址空间；而进程自己有独立的地址空间
         资源有用:进程是资源分配和拥有的单位,同一个进程内的线程共享进程的资源；线程是处理器调度的基本单位,但进程不是
@@ -90,7 +92,10 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         3.等待唤醒机制与synchronized
             所谓等待唤醒机制这里主要指wait、notify、notifyAll方法,使用这三个方法时必须处于synchronized方法或代码块中
         否则就会抛出IllegalMonitorStateException。这是因为调用这几个方法必须拿到当前对象的监视器monitor对象
-
+    4.Volatile和Synchronize区别
+        1.Volatile只修饰一个变量，而Synchronize可以通过锁修饰一个方法或者一个代码块
+        2.Volatile保证可见性和有序性,而Synchronize保证原子性、可见性和有序性
+        3.Volatile不会造成线程的阻塞,而Synchronize可能会造成线程阻塞
 4.Java内存模型和Java内存区域
     具体说明见E:\AndroidProject\Studing\AndroidStudingProject\note\Java虚拟机\Java内存模型
     java内存模型(Java Memory Model,JMM)就是一种符合内存模型规范的,屏蔽了各种硬件和操作系统访问差异,
@@ -159,9 +164,40 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             Handler handler = new Handler(thread.getLooper());
     intentService
         介绍
-            是一个封装了HandlerThread的Service,当队列中的所有任务串行执行完成后，该Service会杀死自己
+            是一个封装了HandlerThread的Service,提交任务后会存放到工作队列中,并回调onHandIntent方法执行任务,当队列中的所有任务串行执行完成后，该Service会杀死自己
+        原理
+            onCreate方法创建HandlerThread和ServiceHandler对象，ServiceHandler中回调onHandIntent方法执行任务
+            public void onCreate() {
+               super.onCreate();
+               HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+               thread.start();
 
-8.volatile
+               mServiceLooper = thread.getLooper();
+               mServiceHandler = new ServiceHandler(mServiceLooper);
+            }
+            public void onStart(Intent intent, int startId) {
+                Message msg = mServiceHandler.obtainMessage();
+                msg.arg1 = startId;
+                msg.obj = intent;
+                mServiceHandler.sendMessage(msg);
+            }
+            private final class ServiceHandler extends Handler {
+                public ServiceHandler(Looper looper) {
+                    super(looper);
+                }
+
+                @Override
+                public void handleMessage(Message msg) {
+                    onHandleIntent((Intent)msg.obj);
+                    stopSelf(msg.arg1);
+                }
+            }
+8.生产者和消费者模型
+    生产者和消费者模型保证的是当缓冲区满了的时候，生产者不再生产数据；当缓冲区空的时候,消费者不再消费数据;
+    实现机制就是：当缓冲区满时,生产者进入等待状态，当缓冲区空时，让消费者进入等待状态；当生产后数据后,唤醒消费者，当消费数据后，唤醒生产者
+    三种实现方式:wait和notify,await和signal(Reentrantlock,Reentrantlock.newCondition),BlockQueue(put,take)
+9.Java线程死锁
+10.volatile
     一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。程序运行中的数据都存放在主存中，这样会有一个问题，由于 CPU 的执行速度是要远高于主存的读写速度，所以直接从主存中读写数据会降低 CPU 的效率。为了解决这个问题，就有了高速缓存的概念，在每个 CPU 中都有高速缓存，它会事先从主存中读取数据，在 CPU 运算之后在合适的时候刷新到主存中。
     这样的运行模式在单线程中是没有任何问题的，但在多线程中，会导致缓存一致性的问题。举个简单的例子：i=i+1 ,在两个线程中执行这句代码，假设i的初始值为0。我们期望两个线程运行后得到2，那么有这样的一种情况，两个线程都从主存中读取i到各自的高速缓存中，这时候两个线程中的i都为0。在线程1执行完毕得到i=1，将之刷新到主存后，线程2开始执行，由于线程2中的i是高速缓存中的0，所以在执行完线程2之后刷新到主存的i仍旧是1。
     所以这就导致了对共享变量的缓存一致性的问题，那么为了解决这个问题，提出了缓存一致性协议：当 CPU 在写数据时，如果发现操作的是共享变量，它会通知其他 CPU 将它们内部的这个共享变量置为无效状态，当其他 CPU 读取缓存中的共享变量时，发现这个变量是无效的，它会从新从主存中读取最新的值。

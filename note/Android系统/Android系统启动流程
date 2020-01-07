@@ -1,0 +1,29 @@
+一.init进程启动流程
+    init进程启动前需要经历以下步骤
+        1.启动电源以及系统启动
+        2.引导程序BootLoader
+        3.Linux内核启动
+        4.init进程启动
+    init进程启动做了哪些事
+        1.创建和挂载启动所需要的文件目录
+        2.初始化和启动属性服务
+        3.解析init.rc文件并启动Zygote进程
+
+二.Zygote进程启动流程
+    Zygote的main方法做了如下事情
+        1.创建一个Service端的Socket
+        2.预加载类和资源
+        3.启动SystemServer进程
+        4.等待AMS请求创建新的应用程序进程
+    Zygote启动做了如下事情
+        1.创建AndroidRuntime并调用start方法，启动Zygote进程
+        2.创建Java虚拟机并为Java虚拟机注册JNI方法
+        3.通过JNI调用ZygoteInit的main函数进入Zygote的java框架层
+        4.通过registerZygoteSocket方法创建服务器端Socket，并通过runSelectLoop方法等待AMS的请求来创建新的应用程序进程
+        5.启动SystemServer进程
+三.SystemServer处理过程
+    1.启动Binder线程池,这样就可以与其它进程进行通信
+    2.创建SystemServiceManager，其用于对系统的服务进行创建，启动和生命周期管理
+    3.启动各种系统服务(AMS,PMS,MMS等)
+四.Launcher启动过程
+    1.Launcher启动后会把已安装应用程序的图标显示到桌面上

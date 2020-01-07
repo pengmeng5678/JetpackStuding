@@ -1,0 +1,47 @@
+
+1.Activity启动流程
+    1.根Activity启动涉及的类
+        1.ActivityThread:Activity最终启动的入口
+        2.ApplicationThread：ActivityThread的内部类,继承Binder，可以跨进程通信，他是AMS所在进程(SystemServer进程)和应用程序进程通信的桥梁
+        3.ApplicationThreadProxy:ApplicationThread的一个本地代理,其他的client端通过这个对象调用server端ApplicationThread中的方法
+        4.instrumentation:(监控应用程序和系统的交互)负责发起Activity的启动、并负责Activity的创建以及Activity生命周期的回调。一个应用进程只会有一个Instumentation对象,App内所有的Activity都持有该对象的引用
+        5.ActivityManagerService:简称AMS,是service端对象，负责管理系统中所有的Activity
+        6.ActivityMangerProxy：是AMS的本地代理
+        7.ActivityStack：Activity在AMS的栈管理,用来记录已经启动的Activity的先后关系，状态信息等。通过ActivityStack决定是否需要启动新的进程
+        8.ActivityRecord：ActivityStack的管理对象,每个Activity在AMS对应一个ActivityRecord,来记录Activity的状态以及其他的管理信息。其实就是服务端Activity的映射
+        9.TaskRecord：AMS抽象出来的一个“任务”的概念，是记录ActivityRecord的栈，一个“Task”包含若干个ActivityRecord。AMS用TaskRecord确保Activity启动和退出的顺序
+        10.ActivityStarter(7.0+)加载Activity的控制类,会收集所有逻辑来决定如何将Intent和Flags转换为Activity,并将Activity和Task及Stack相关联
+    2.根Activity启动涉及的进程
+        1.Launcher进程
+        2.SystemServer进程(AMS属于SystemServer进程)
+        3.Zygote进程
+        4.应用程序进程(ActivityThread属于应用程序进程,ApplicationThread属于ActivityThread的内部类)
+        流程如下
+            1.Launcher点击应用程序图标,Launcher向AMS请求创建根Activity(Binder通信)
+            2.AMS如果判断该应用程序进程不存在，就向Zygote进程请求创建该应用程序进程(socket通信)
+            3.Zygote进程创建应用程序进程，应用程序进程准备就绪
+            4.AMS向ApplicationThread发请求，启动根Activity(Binder通信)
+    3.根Activity的启动流程，MainActivity
+        1.根Activity启动流程概览
+            1.Launcher请求AMS过程
+                Launcher-Activity-Instrumentation-IActivityManager-AMS
+            2.AMS到ApplicationThread的调用过程
+                AMS-ActivityStarter-ActivityStackSupervisor-ActivityStack-ApplicationThread
+            3.ActivityThread启动Activity过程
+                ApplicationThread-ActivityThrad-H-Instrumentation-Activity
+        2.根Activity启动描述
+            手动点击launcher桌面的app涉及到app,launcher,ActivityManagerService三个进程,这三个进程是通过Binder进程通信实现的,具体步骤如下
+            1.launcher组件向ActivityManagerService发送一个启动MainActivity的进程间通信请求
+            2.AMS首先将要启动的MainActivity组件的信息保存起来,然后再向launcher发送一个进入中止(pause)状态的进程间请求
+            3.launcher组件进入到中止(pause)状态后,向AMS发送一个已进入到中止(pause)状态的进程间通信请求,AMS继续执行启动MainActivity组件的操作
+            4.AMS发现用来运行MainActivity组件的应用程序进程不存在,因此先启动一个新的应用程序进程
+            5.新的应用程序进程启动完成之后,就会向AMS发送一个启动完成的进程间通信,AMS继续执行MainAcitivity的操作
+            6.AMS将第2步保存的MainAcitivity组件信息发送给第4步创建的应用程序进程,以便它可以将MainActivity组件启动起来
+            7.ActivityThread中创建应用程序的Application,contextImpl,回调Activity生命周期等
+    4.子Activity的在当前进程的启动流程,从MainActivity启动同进程中的SubActivity
+        1.MainActivity组件向ActivityManagerService发送一个启动SubActivity的进程间通信请求
+        2.AMS首先将要启动的SubActivity组件的信息保存起来,然后再向MainActivity发送一个进入中止状态的进程间请求
+        3.MainActivity组件进入到中止状态后,向AMS发送一个已进入到中止状态的进程间通信请求,AMS继续执行启动SubActivity组件的操作
+        4.AMS发现用来运行SubActivity的应用进程已经存在,因此将第2步中保存的SubActivity信息发送给应用进程,以便它可以将SubActivity启动起来
+
+    4.子Activity在新进程的启动流程
