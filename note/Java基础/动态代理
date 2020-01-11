@@ -1,0 +1,14 @@
+https://mp.weixin.qq.com/s/18kwZsmdaE5m6CveSGQQlA
+    ILawyer xiaoming = new XiaoMing();
+    DynamicProxy dynamicProxy = new DynamicProxy(xiaoming);
+
+    ClassLoader classLoader = xiaoming.getClass().getClassLoader();
+    ILawyer lawyer = (ILawyer)Proxy.newProxyInstance(classLoader, new Class[]{ILawyer.class}, dynamicProxy);
+    //律师提交诉讼申请
+    lawyer.submit();
+    //律师进行举证
+    lawyer.burden();
+    //律师代替小明进行辩护
+    lawyer.defend();
+    //诉讼完成
+    lawyer.finish();
