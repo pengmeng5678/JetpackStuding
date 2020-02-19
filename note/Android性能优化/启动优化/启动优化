@@ -1,4 +1,6 @@
 https://github.com/JsonChao/Awesome-Android-Interview
+https://blog.csdn.net/qian520ao/article/details/81908505
+https://www.jianshu.com/p/a5353748159f
 1.认识App启动加速
     冷启动:指App进程被杀死后,再启动App就叫冷启动
     热启动:指App进程按Home键后在后台运行,再启动App就叫热启动
@@ -24,7 +26,38 @@ https://github.com/JsonChao/Awesome-Android-Interview
     2.优化手段
         1.利用主题曲防止出现白屏,给启动页设置一个Theme属性,在windowBackground标签下设置默认图片替代白屏
         2.减少Application、Activity中做的事,不重要的SDK懒加载、异步加载。能异步执行的全部异步执行
-        3.5.0以下的系统multidex预加载优化。5.0以后
+        3.5.0以下的系统multidex预加载优化。https://www.jianshu.com/p/e164ee033928  https://www.jianshu.com/p/2891599511ff
 
+            MultiDex第一次加载出现ANR的原因是因为提取Dex以及DexOpt这两个过程都是耗时的操作，而且他们还都发生在主进程
+            5.0以下的系统冷启动时MultiDex工作流程如下
+                APP启动->一系列校验初始化->提取Dex->强行提取或修改过->重新提取Dex->原始Apk解压得到Dex，写成Zip文件->动态装载得到Zip文件-运行
+                                                ->强行提取或修改过->提取缓存Dex-------------------------------->动态装载得到Zip文件-运行
+            5.0以下系统优化过程如下
+                optimizing['ɑptə,maɪz]
+                首先MyApplication不再继承MultiDexApplication
+                App启动->是否执行过Dex优化->有就执行主线程的MultiDex.install->执行
+                                        ->没有就单开进程等待->子线程中执行优化操作->主进程MultiDex.install->执行
+            5.0以上的系统默认使用ART虚拟机,与Dalvik的区别在于安装时已经将全部的Class.dex转换为了oat文件，优化过程在安装时已经完成,因此无需执行
 
+        4.简单理解multidex加载过程
+            1.安装完app点击桌面图标时，系统发现没有这个进程,于是从该apk抽取classes.dex(主dex)加载,触发一次dexopt
+            2.App的launchActivity准备启动,触发Application启动，Application的onAttach方法调用,这个时候MultiDex.install调用,class2.dex被调用,再次触发dexopt
+            3.然后Application onCreate执行,然后launcher Activity真的起来了
 
+        5.multidex冷启动优化方案
+            1.冷启动时,Application不再继承MultiDexApplication,重写onAttachBaseContext方法
+            2.在onAttachBaseContext方法中启动Splash界面,开始轮询dexOpt工作是否完成，在Splash界面加载Dex(子dex,通过MultiDex.install加载)
+            3.
+4.相关命令
+    获取所有应用的堆栈信息 adb shell dumpsys activity
+    获取自己应用的堆栈信息 adb shell dumpsys | grep packageName
+    adb启动一个Activity   adb shell am start packageName/.MainActivity(如adb shell am start com.sanbot.www.childteach/.MainActivity)
+    adb统计启动时间       adb shell am start -W packageName/Activity的全路径名(如packagename.MainActivity)
+        Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.qihancloud.zhiyin/.ui.activity.MainActivity }
+        Status: ok
+        Activity: com.qihancloud.zhiyin/.ui.activity.MainActivity
+        ThisTime: 5173      最后一个Activity启动耗时
+        TotalTime: 5173     启动一连串Activity总耗时(有几个就统计几个)
+        WaitTime: 5211      应用进程的创建时间+TotalTime
+        Complete
+    获取在As中过滤Displayed字段也可看到整个应用的启动时间

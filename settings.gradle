@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-include ':NavigationBasicSample', ':BasicRoomSample', ':NavigationAdvance', ':myjetpackstudingkt'
+include ':NavigationBasicSample', ':BasicRoomSample', ':NavigationAdvance', ':myjetpackstudingkt', ':kotlindemo'
 //include ':workManagerSample',':workManagerLib'
 include ':sunflower'
 include':MyJetpackstuding'
