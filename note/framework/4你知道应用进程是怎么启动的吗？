@@ -1,0 +1,28 @@
+1.了解Linux进程启动的方式
+    进程启动都是通过fork函数启动的，fork函数返回0时表示是子进程返回的
+    有两种启动方式，区别就是execve函数,execve(path,argv,env)
+        不带execve函数，子进程继承父进程的资源
+        带execve函数，子进程不继承父进程的资源,子进程的二进制程序资源通过path参数获取
+2.熟悉应用进程启动的基本流程
+    1.什么时候触发的进程启动，谁发起的
+        启动组件时如果发现组件所在的进程不存在就会启动该进程
+        ProcessRecord app = getProcessRecordLocked()
+        if(app!=null && app.thread != null){
+            //进程已经启动了，这里可以启动组件了
+            return;
+        }
+        startProcessLocked(r.processName)
+    2.进程是谁启动的，怎么启动
+        1.点击launcher桌面图标，launcher向AMS发起请求启动应用程序(binder)
+        2.AMS如果发现该组件所在进程不存在就向zygote进程请求创建该应用程序进程(socket)
+        3.zygote进程创建应用程序进程
+        4.应用程序进程启动(ActivityThread的Main方法执行)并告诉AMS
+            public static void main(String[] args){
+                Looper.prepareMainLooper()
+                ActivityThread thread = new ActivityThread()
+                thread.attach(false);//这里执行了IActivityManager.attachApplication(mAppThread)，相当于告诉AMS并将ApplicationThread与之连接
+                Looper.loop()
+            }
+        5.AMS通过ApplicationThread启动应用程序进程
+
+3.深入理解应用进程启动的原理

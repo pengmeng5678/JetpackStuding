@@ -1,0 +1,17 @@
+
+1.Android有哪些主要的系统进程,这些进程的作用
+    看系统启动配置文件init.rc,包括
+        zygote,servicemanager,surfaceflinger,media...
+
+2.这些系统进程是如何启动的
+    zygote进程启动流程
+        init进程fork出zygote进程
+        启动Android虚拟机,注册Jni函数
+        预加载系统资源
+        zygote启动SystemServer进程
+        进入SocketLoop
+    SystemServer进程启动流程
+        1.启动Binder线程池,这样就可以与其它进程进行通信
+        2.创建SystemServiceManager，其用于对系统的服务进行创建，启动和生命周期管理
+        3.启动各种系统服务(AMS,PMS,MMS等)
+3.进程启动之后主要做了什么事

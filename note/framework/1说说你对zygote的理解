@@ -1,0 +1,46 @@
+谈理解可分为三个部分，what,how,why，即是什么，如何工作,实现原理
+1.zygote的作用
+   1.启动SystemServer
+   2.孵化应用进程
+2.zygote的启动流程
+    系统独立进程启动三段式：进程启动、准备工作、Loop
+    1.zygote进程如何启动
+        通过init进程启动的,fork+execve,init.rc文件中配置参数
+        启动进程的两种方式
+            1.fork+handle
+                pid_t pid = fork();
+                if(pid == 0){
+                    //child process
+                }else{
+                    //parent process
+                }
+            2.fork+execve
+                pid_t pid = fork();//fork进程是单线程，创建进程完成后再启动其他线程
+                if(pid == 0){
+                    //child process
+                    execve(path,argv,env);//执行二进制的可执行程序，继承的父进程的资源会被清掉
+                }else{
+                    //parent process
+                }
+        信号处理 SIGCHILD，如子进程(zygote进程)挂了，父进程(init进程)会收到信号(重启zygote进程)
+    2.zygote启动之后做了什么事
+        1.Zygote的Native世界
+            启动Android虚拟机；注册Android的JNI函数；进入Java世界
+        2.Zygote的java世界
+            预加载；启动SystemServer;进入Loop循环(通过socket通信)
+            Loop循环每接收到一个socket消息就执行一次runOnce函数
+                boolean runOnce(){
+                    String[] args = readArgmentList()
+                    int pid = Zygote.forkAndSpecialize()
+                    if(pid == 0){
+                        handleChildProc(parseArgs,...)
+                        return true;
+                    }else{
+                        return handleParentProc(pid,...)
+                    }
+                }
+3.zygote的工作原理
+
+4.问题点
+    1.孵化应用进程这个事为什么不交给SystemServer来做，而是设计一个Zogote
+    2.Zygote的IPC通信机制为什么不采用binder，如果采用Binder会有什么问题

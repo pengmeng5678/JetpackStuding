@@ -1,4 +1,6 @@
 https://www.jianshu.com/p/f5e103674953
+https://blog.csdn.net/carson_ho/article/details/73560642
+https://mubu.com/doc/uRmziI6te0
 <<Android系统源码情景分析>>
 1.背景介绍
     Android应用程序四大组件运行在一个进程中,而如ActivityManagerService运行在系统进程中

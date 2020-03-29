@@ -1,0 +1,7 @@
+1.了解Application的作用
+    1.保存应用进程内的全局变量
+    2.初始化操作
+    3.提供应用上下文context
+2.熟悉Application的类继承关系和生命周期
+    Application继承ContextWrapper，ContextWrapper继承Context
+3.深入理解Application的初始化原理

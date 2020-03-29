@@ -1,0 +1,39 @@
+1.应用层如何使用系统服务
+    getSystemService(String name)
+    service为空就createService
+        public PowerManager createService(ContextImpl ctx){
+            IBinder b = ServiceManager.getService(Context.POWER_SERVICE)
+            PowerManager service = IPowerManager.Stub.asInterface(b)
+            return new PowerManager(ctx.getOuterContext(),service,ctx.mMainThread.getHandler())
+        }
+    所有创建过的系统服务的IBinder接口对象都会存放到一个hashMap缓存里
+2.系统服务调用的基本原理
+
+3.服务的注册原理
+    方便、开放、IPC
+    1.怎么注册
+        public static void addService(String name,IBinder service){
+            //getIServiceManager即ServiceManagerNative.asInterface(BinderInternal.getContextObject())
+            getIServiceManager().addService(name,service,false)
+        }
+    2.什么时候注册
+        回忆SystemServer启动步骤：启用Binder机制，启动各类系统服务(AMS,PMS,MMS)，进入Loop循环
+        所以启动系统服务后，便会将系统服务注册到ServiceManager中，无论这个服务是不是单独的进程
+4.那具体如何添加一个系统服务
+    1.添加系统服务的时机
+        如何是该服务是跑在一个单独进程，那要将服务添加到init.rc文件，同时跑在一个main函数
+    2.服务端要做哪些事
+        启动Binder机制，管理Binder通信
+5.系统服务和Binder应用服务有什么区别
+                        系统服务                                     应用服务
+    启动方式区别     在SystemServer中启动                             strtService/bindService
+                    private void run(){                             private void handleCreateService(){
+                        startBootstrapService()                       Service service = (Service)cl.loadClass(data.info.name).newInstance()
+                        startCoreService()                            ComtextImpl context = ComtextImpl.createApplication(..)
+                        startOtherService()                           Application app = packageInfo.makeAppAplication(...)
+                    }                                                 service.attach(context,this,...)
+                                                                      service.onCreate()
+                                                                    }
+    注册方式区别
+                    addService()                                       应用端bindService-AMS请求binder--服务端发布binder通过AMS返回给客户端
+    使用方式区别      context.getSystemService(Context.POWER_SERVICE)  bindService后接口回调返回一个IBinder代理接口
