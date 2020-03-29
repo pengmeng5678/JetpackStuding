@@ -140,7 +140,7 @@ https://blog.csdn.net/u013064109/article/details/78786646
 			fun printSum(a:Int,b:Int):Unit{	//此处的:Unit可以省略
 				println("sum of $a and $b is ${a+b}")
 			}
-		默认参数 fun sum(a:Int,b:Int = 3):Int
+		默认参数 fun sum(a:Int,b:Int = 3):Int ,如果只传一个参数a,那么b的默认值就是3
 
         高阶函数与lambda表达式
             高阶函数：是将函数作为参数或返回值的函数
@@ -530,8 +530,11 @@ https://blog.csdn.net/u013064109/article/details/78786646
         it指代对象,与let唯一区别就是返回函数自身
 
 第七章 协程
+    https://www.kotlincn.net/docs/reference/coroutines/coroutine-context-and-dispatchers.html
+    https://blog.csdn.net/c10WTiybQ1Ye3/article/details/94415256
     1.基础介绍
         本质上，协程是轻量级的线程。它们在某些CoroutineScope上下文中与lauch协程构建器一起启动
+        作用:协程可以通过替代回调(callback)来简化代码
         示例1
             fun main() {
                 GlobalScope.launch { // 在后台启动一个新的协程并继续
@@ -552,11 +555,14 @@ https://blog.csdn.net/u013064109/article/details/78786646
            println("Hello,")
            job.join() // 等待直到子协程执行结束
 
-        当我们使用GlobalScope.launche时，我们会创建一个顶层协程,它运行会消耗一些内存资源。
+        当我们使用GlobalScope.launch时，我们会创建一个顶层协程,它运行会消耗一些内存资源。
         我们可以使用结构化并发来优化它，即在执行操作所在的指定作用域内启动协程
         示例三：作用域构建器
             //这里我们使用runBlocking将main函数转换为协程,包括runBlocking在内的每个协程构建器都将CoroutineScope的实例添加到其代码块所在作用域中
             在这个作用域中启动协程无需显式join,因为外部协程(示例中的runBlocking)直到在其作用域启动的所有协程都执行完毕后才会结束
+            简单说就是，结构性并发:协程A中启动了协程B，那么协程B必须在协程A之前执行完毕，否则就不属于结构性并发，且容易发生内存泄漏，而CoroutineScope就是用于避免内存泄漏的
+
+            结构性并发可以保证，当一个作用域被取消，作用域里面的所有协程都会被取消
             fun main() = runBlocking { // this: CoroutineScope
                 launch {
                     delay(200L)
@@ -593,6 +599,10 @@ https://blog.csdn.net/u013064109/article/details/78786646
                 delay(1000L)
                 println("World!")
             }
+            被suspend修饰的函数比普通函数多两个操作(suspend和resume)
+                suspend：暂停当前协程的执行，保存所有的局部变量
+                resume:从协程暂停的地方继续执行协程
+
     2.协程的取消
         val job = launch {
             try{
@@ -649,7 +659,7 @@ https://blog.csdn.net/u013064109/article/details/78786646
                return 29
            }
         使用async并发
-            async类似于lanch，它启动了一个单独的协程,它与其他协程一起并发工作
+            async类似于lanch，它启动了一个单独的协程,它与其他协程一起并发工作(案例中doSomethingUsefulOne和doSomethingUsefulTwo是并发执行的)
             不同之处在于launch返回一个job并不附带任何结果值，而async返回一个Deferred(一个轻量级的非阻塞future)
             可以使用.await在一个延期的值上得到它的结果
                 val time = measureTimeMillis {
@@ -665,6 +675,35 @@ https://blog.csdn.net/u013064109/article/details/78786646
                     val two = async { doSomethingUsefulTwo() }
                     one.await() + two.await()
                 }
+    4.协程上下文与调度器
+        协程上下文包含一个协程调度器CoroutineDispatcher,它确定哪些线程与线程相对应的协程执行,协程调度器可以将协程限制在一个特定的线程执行
+        所有协程构建起如launch和asyc接收一个可选的CoroutineContext参数,它可以显示的为一个新协程或者其他上下文元素指定一个调度器
+
+        当调用launch{...}时不传参数,它从启动了它的CoroutineScope中承袭了上下文,如从main线程中的runBlocking主协程承袭了上下文
+        下面演示一段代码演示线程和协程切换，其中use是kotlin标准库中的use函数,用于释放该线程
+            import kotlinx.coroutines.*
+            fun log(msg: String) = println("[${Thread.currentThread().name}] $msg")
+            fun main() {
+                newSingleThreadContext("Ctx1").use { ctx1 ->
+                    newSingleThreadContext("Ctx2").use { ctx2 ->
+                        runBlocking(ctx1) {
+                            log("Started in ctx1")
+                            withContext(ctx2) {
+                                log("Working in ctx2")
+                            }
+                            log("Back to ctx1")
+                        }
+                    }
+                }
+            }
+        以上代码打印结果如下
+            [Ctx1 @coroutine#1] Started in ctx1
+            [Ctx2 @coroutine#1] Working in ctx2
+            [Ctx1 @coroutine#1] Back to ctx1
+
+        当一个协程被其他协程在CoroutingScope中启动的时候,它将通过CoroutineScope.coroutineCoxtext来承袭上下文
+        并且这个新协程的Job将会成为父协程的子作业,当一个父协程被取消的时候，它的所有子协程也会被递归的取消
+        然而，当使用GlobalScope来启动一个协程时,则新协程的作业没有父作业，因此他与这个启动的作用域无关，是独立运行的
 
 
 

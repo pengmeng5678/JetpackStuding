@@ -1,0 +1,18 @@
+https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&mid=2665517792&idx=1&sn=2983fd5f81694996d28c63aba1dd3b5a&chksm=80d66aa3b7a1e3b50d052b6094c0c28212687a2d5a661679f4a1f867c461e1553bca7c377122&scene=21#wechat_redirect
+1.解释执行
+    执行流程：源码-Parser-抽象语法树-解释执行
+    代表语言：JS,PHP,Ryby,Perl
+    特点:写完马上就可以执行，修改方便，效率低执行速度慢
+2.编译执行
+    源码-编译&执行-机器指令-在硬件上执行
+    代表语言：C,C++,GO,Rust,Ada
+    特点:执行速度快
+3.字节码执行
+
+    特点：编译+解释：字节码结合了编译和解释的优点，且支持跨平台，只需要对应的平台有个虚拟机就可以执行
+    执行流程:先将Java源码编译成自定义的字节码,然后解释执行,在执行过程中用JIT方式，把热点代码编译成机器指令,直接执行
+    代表语言:java,随后Clojure,Scala,Jython,JRyby,Groovy,Kotlin都拥抱了Java字节码(自己编译成了Java字节码)
+            Ruby,PHP,Perl,Python,Lua则创建了自己的字节码
+
+
+

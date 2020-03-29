@@ -41,3 +41,25 @@
 		
 	9.Fragment中直接通过布局id引用报空指针
         在onCreateView方法未执行完成就直接引用布局id就会报这种错误
+
+2.Kotlin常见问答
+    1.Kotlin相对于Java有哪些优缺点
+    https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650829355&idx=1&sn=3a7087d2cfa9087107aad8d8b369ce0d&chksm=80b7a6b5b7c02fa3b0025fb600644456f267e619b7b15d5814ff93eead4f0fdf2811e0b39a05&mpshare=1&scene=1&srcid=0219hCjNYsx4XRMrgksz8Gds&sharer_sharetime=1582097543018&sharer_shareid=b91a3062fa43e169a7da0f016e38637e&exportkey=AcWCcmIxsakJOY3Hyqk15Mw%3D&pass_ticket=MBdOe6nebVJnejquEfwTIDeyuvFoOZsO57r8C65JtPzhIwyEmp7fsoBgRZ3uK5Su#rd
+        字符模板，
+        空安全，
+        延迟加载，
+        when表达式，
+        默认参数，
+        方便易读的循环,
+        强大的迭代器，
+        Datacalss
+        标准函数库：let,with,run,apply,also
+
+    2.Kotlin实现空安全的原理是什么
+        AndroidStudio-Tool-kotlin-Show Kotlin Bytecode,通过这个工具可以显示kotlin编译后的字节码，通过左上角的Decompile可以反编译字节码查看java代码形式
+        通过查看代码，kotlin实现空安全原理如下
+            1.非空类型的属性编译器编译时会添加@NotNull注解,可空类型添加@Nullable注解
+            2、非空类型直接对参数进行判空，如果为空直接抛出异常；
+            3、可空类型，如果是?.判空，不空才执行后续代码，否则返回null；如果是!!，空的话直接抛出NPE异常。
+            4、as操作符会判空，空的话直接抛出异常，不为空才执行后续操作，没做类型判断！运行时可能会报错！
+            5、as?则是新建一个变量，参数赋值给它，然后判断是否为特定类型，赋值为null，接着把这个变量的值赋值给另一个新的变量，这里有一点注意：as?处理后的参数可能为空！！！所以调用as?转换后的对象还需要添加安全调用操作符(?.)

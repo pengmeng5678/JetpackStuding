@@ -46,7 +46,6 @@ class PlantDetailFragment : Fragment() {
                         Snackbar.make(root,"Add plant to garden",Snackbar.LENGTH_LONG).show()
                     }
                 }
-
             }
             var isToolbarShown = false
             plantDetailScrollview.setOnScrollChangeListener(
