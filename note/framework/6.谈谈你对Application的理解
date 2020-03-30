@@ -4,4 +4,7 @@
     3.提供应用上下文context
 2.熟悉Application的类继承关系和生命周期
     Application继承ContextWrapper，ContextWrapper继承Context
+    调用顺序
+        Application构造函数->attachBaseContext->onCreate
+        ContextWrapper中包含一个Context,调用都委托给它了
 3.深入理解Application的初始化原理

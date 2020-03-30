@@ -1,0 +1,20 @@
+1.应用中有多少个context,他们之间的区别
+    个数：Application+Activity个数+Service个数
+    区别：
+        Application和Service是继承自ContextWrapper
+        而Activity是继承自ContextThemeWrapper
+2.Activity里的this,和getBaseContext的区别
+    Activity里的this返回自己
+    getBaseContext返回ContextWrapper里的mBaseContext
+3.getApplication和getApplicationContext的区别
+    两者都返回Application对象
+    但是getApplication是Activity和Service特有的，在broadcastReceiver中是不能调用getApplication的，只能调用getApplicationContext
+4.应用组件的构造，onCreate,attachBaseContext的调用顺序
+    先调用组件的构造函数，再调用attachBaseContext赋予上下文，最后调用onCreate
+5.谈谈你对Context的理解
+    1.说清楚Context的作用
+        Context是一个上下文，有了它，各个组件就可以方便的访问系统资源，调用各类系统服务
+    2.说出应用中有几种Context,各自的继承关系
+        Application和Service继承自ContextWrapper
+        Activity继承自ContextThemeWrapper
+        ContextThemeWrapper继承ContextWrapper，ContextWrapper和ContextImpl继承自Context,同时ContextWrapper是ContextImpl的包装类
