@@ -41,10 +41,17 @@
         }
      5.Handler初始化好之后，就发送handler消息执行启动Activity,并回调Activity的各个生命周期方法
         private Activity performLaunchActivity(ActivityClientRecord r,...){
+            //1.创建Activity对象
             Activity activity = mInstrumentation.newActivity()
+
+            //2.准备Application和创建Context
             Application app = r.packafaInfo.makeApplication(false,mInstrumentation)
             Context appContext = createBaseContextForActivity(r,activity)
+
+            //3.执行Activity的attach操作,这里创建了PhoneWindow并初始化
             activity.attach(appContext,...)
+
+            //4.回调Activity的onCreate方法
             mInstrumentation.callActivityOnCreate(activity,r.state)
             activity.performStart()
             return activity;

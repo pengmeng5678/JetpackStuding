@@ -4,7 +4,7 @@ https://blog.csdn.net/freekiteyu/article/details/79408969
         Window是Android中窗口的宏观定义，主要是管理View的创建，以及与ViewRootImpl的交互，
         将Activity与View解耦，在performLaunchActivity中的attach函数中创建的，activity.attach(appContext,...)
     2.setContentView原理,DecorView是什么
-        setContentView会加载DecorView
+        setContentView会调用PhoneWindow的setContentView,在PhoneWindow中会创建DecorView,DecorView是PhoneWindow的内部类,他是Activity的根View
     3.ViewRoot是什么,有什么作用
         ViewRoot对应于ViewRootImpl,它是WindowManager和DecorView的纽带,所有view的刷新都会层层找到ViewRootImpl,然后由它执行performTraversal执行测量、绘制、布局工作
     4.View的显示原理是什么?WMS发挥了什么作用

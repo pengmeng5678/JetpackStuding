@@ -1,0 +1,26 @@
+1.说说UI线程是什么
+    刷新UI所在的线程称为UI线程,UI是单线程刷新的，主线程和子线程都可以刷新UI(子线程刷新UI时要求主动对handler做prepare操作和loop操作才能使用)
+    1.对于Activity来说,UI线程就是主线程
+        activity.runOnUiThread()
+    2.对于View来说,它的UI线程就是ViewRootImpl创建时所在的线程
+        view.post(Runnable)
+        只有创建DecorView对应的ViewRootImpl所在的线程才能刷新这个UI,Activity的DecorView对应的ViewRootImpl是在主线程handleResumeActivity方法中创建的
+        在其他线程刷新UI会报错"only the original thread that create a view hierarchy..."
+
+
+    如果我们在子线程模拟handleResumeActivity中创建ViewRootImpl操作,然后点击view发现是可以刷新UI的
+        new Thread(){
+            public void run(){
+                Looper.prepare()
+                getWindowManager().addView(view,paras)
+                Looper.loop()
+            }
+        }.start()
+
+2.UI线程的消息循环是怎么创建的
+    在ActivityThread的main方法中
+    Looper.prepareMainLooper()
+    Looper.loop()
+3.UI线程和UI体系之间的关系
+    ViewRootImpl在主线程的performResumeActivity函数创建
+    ViewRootImpl刷新UI时会检测发起刷新UI的线程，和创建ViewRootImpl的线程是不是同一个线程,如果不是就会抛异常
