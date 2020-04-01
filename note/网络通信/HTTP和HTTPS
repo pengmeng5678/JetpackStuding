@@ -1,5 +1,7 @@
 https://www.jianshu.com/p/a6d086a3997d
 https://www.jianshu.com/p/116ebf3034d9
+Http协议介绍
+    http://liuwangshu.cn/application/network/1-http.html
 以下是对Https的介绍
 https://www.jianshu.com/p/ca7df01a9041
 网络请求全流程
@@ -25,11 +27,43 @@ https://zhuanlan.zhihu.com/p/43789231
             请求头  声明客户端、服务器/报文的部分信息                 请求方法:定义 对请求对象的操作，GET,POST
             请求体  存放需发送给服务器的数据信息                      请求路径：URL中请求地址部分
                                                                    协议版本：HTTP/1.0、HTTP2.0
+        请求报文示例 如下
+            POST http://patientapi.shoujikanbing.com/api/common/getVersion HTTP/1.1       //请求行
+            Content-Length: 226                                                          //请求报头
+            Content-Type: application/x-www-form-urlencoded
+            Host: patientapi.shoujikanbing.com
+            Connection: Keep-Alive
+            User-Agent: Mozilla/5.0 (Linux; U; Android 4.4.4; zh-cn; MI NOTE LTE Build/KTU84P) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+            Accept-Encoding: gzip
+                                                                         //不能省略的空格，下面是请求数据
+            clientversion=2_2.0.0&time=1459069342&appId=android&channel=hjwang&sessionId=0d1cee1f31926ffa8894c64804efa855101d56eb21caf5db5dcb9a4955b7fbc9&token=b191944d680145b5ed97f2f4ccf03058&deviceId=869436020220717&type=2&version=2.0.0
+
+
        响应报文
            类型          作用                                          具体介绍
            状态行  声明协议版本版本、状态码、状态码描述              组成=协议版本+状态码+状态信息
            响应头  声明客户端、服务器/报文的部分信息                 采用“header”(字段名):value(值)
            响应体  存放需发送给服务器的数据信息                      数据使用方式有3种，数据交换、键值对、分部分
+
+       响应报文示例 如下
+           HTTP/1.1 200 OK                                                              //状态行
+           Server: nginx                                                               //响应报头
+           Date: Sun, 27 Mar 2016 09:02:20 GMT
+           Content-Type: text/html;charset=utf-8
+           Transfer-Encoding: chunked
+           Connection: keep-alive
+           Vary: Accept-Encoding
+           Set-Cookie: sessionId=0d1cee1f31926ffa8894c64804efa855101d56eb21caf5db5dcb9a4955b7fbc9; expires=Mon, 28-Mar-2016 09:02:20 GMT; Max-Age=86400; path=/; domain=.shoujikanbing.com
+           Set-Cookie: PHPSESSID=0d1cee1f31926ffa8894c64804efa855101d56eb21caf5db5dcb9a4955b7fbc9; path=/; domain=.shoujikanbing.com
+           Expires: Thu, 19 Nov 1981 08:52:00 GMT
+           Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+           Pragma: no-cache
+           Content-Encoding: gzip
+                                                              //不能省略的空格
+           17f                                                //实体报文编码格式为gzip所以显示在这里的响应数据是乱码
+                  mP N @     "E ?    n m   1
+           w ( HL (1^ P nK  E ѷ93'3gNLH  7P  $c \  T 4a6   L:+ 1dY%$g   h H   +
+           ...
 
         2.GET和POST方法对比
          使用方式             使用参数的长度限制                       传递参数的数据类型   安全性         应用场景

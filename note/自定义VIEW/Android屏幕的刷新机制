@@ -3,7 +3,9 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
 屏幕刷新机制流程   https://www.jianshu.com/p/0d00cb85fdf3
 问题点：
     1.Android每隔16.6ms刷新一次屏幕是什么意思
+        屏幕刷新频率是60HZ时,显示器会每隔16.6ms从缓冲区取一帧画面进行显示
     2.如果界面一直保持不变的话,那么还会每隔16.6ms刷新一次屏幕吗
+
     3.一个Activity的View树都进行测量、布局、绘制三大步骤后,屏幕会马上刷新吗
     4.如何理解"避免丢帧的方法之一是保证每次绘制界面的操作要在16ms之内完成"这句话
     5.主线程耗时操作为什么会导致丢帧
@@ -72,6 +74,8 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                     ...
                     requestLayout();
                     mView.assignParent(this);//这里为DecorView分配一个父亲即ViewRootImpl
+                    ...
+                    mWindowSession.addToDisplay(mWindow,...)
                 }
             }
         3.DecorView的assignParent方法
@@ -121,13 +125,23 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                         Debug.startMethodTracing("ViewAncestor");
                     }
 
-                    performTraversals();//这个方法很长,会根据条件调用performMessure,performDraw,performLayout
+                    //这个方法很长,会根据条件调用performMessure,performDraw,performLayout
+                    performTraversals();
 
                     if (mProfile) {
                         Debug.stopMethodTracing();
                         mProfile = false;
                     }
                 }
+            }
+            private void performTraversals(){
+
+                //relayoutWindow就调用了mWindowSession.relayout(...,mSurface),(跨进程Binder调用)relayout返回之后,mSurface就可用了
+                //这个mSurface绘制完成后就会提交给surfaceFlinger存放到屏幕显示缓存区等待vsync信号来取
+                relayoutWindow()
+                performMessure()
+                performDraw()
+                performLayout()
             }
 
         从这里我们可以看出
@@ -137,3 +151,9 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
 
            2.当下一个屏幕刷新信号来的时候，如果app有监听vSync信号,那底层就会回调app层的onVsync方法来通知,
            onVsync方法会通过主线程handler去mCallbackQueue里根据时间戳将之前放进去的Runnable取出来,而这些Runnable有一个就是遍历绘制View树的操作performTraversals
+
+
+          3.要理解的一点是，我们写的代码，只是控制让 CPU 在接收到屏幕刷新信号的时候开始去计算下一帧的画面工作。
+          而底层在每一次屏幕刷新信号来的时候都会去切换这一帧的画面，这点我们是控制不了的，是底层的工作机制。
+          之所以要讲这点，是因为，当我们的 app 界面没有必要再刷新时（比如用户不操作了，当前界面也没动画），这个时候，我们 app 是接收不到屏幕刷新信号的，
+          所以也就不会让 CPU 去计算下一帧画面数据，但是底层仍然会以固定的频率来切换每一帧的画面，只是它后面切换的每一帧画面都一样，所以给我们的感觉就是屏幕没刷新

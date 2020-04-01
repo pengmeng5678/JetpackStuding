@@ -1,0 +1,28 @@
+https://blog.csdn.net/freekiteyu/article/details/79408969
+1.Activity的显示原理(Window/DecorView/ViewRootImpl)
+    1.PhoneWindow是什么,怎么创建的
+        Window是Android中窗口的宏观定义，主要是管理View的创建，以及与ViewRootImpl的交互，
+        将Activity与View解耦，在performLaunchActivity中的attach函数中创建的，activity.attach(appContext,...)
+    2.setContentView原理,DecorView是什么
+        setContentView会加载DecorView
+    3.ViewRoot是什么,有什么作用
+        ViewRoot对应于ViewRootImpl,它是WindowManager和DecorView的纽带,所有view的刷新都会层层找到ViewRootImpl,然后由它执行performTraversal执行测量、绘制、布局工作
+    4.View的显示原理是什么?WMS发挥了什么作用
+        1.View的显示原理
+            屏幕显示的Activity,其实真正承载的是一个PhoneWindow,每个PhoneWindow都有一个DecorView,
+            我们的setContentView就是将自定义布局添加到DecorView为根布局的ViewGroup中，DecorView会对应一个ViewRootImpl对象
+            作为DecorView和WMS的纽带，ViewRootImpl可以和WMS双向通信(Binder)，并全权负责View的绘制流程
+            ViewRootImpl会在WMS中注册一个窗口(WMS管理所有窗口的显示和尺寸),
+            并在第一次绘制时申请一个surface,surfaceFinger会按照WMS提供的层级,尺寸等信息会将绘制好的surface合成存放到屏幕缓冲区中等待Vsync信号取出图像进行显示
+        2.WMS主要作用
+            1.分配surface
+            2.掌管surface显示顺序及位置尺寸等
+            3.控制窗口动画
+            4.输入事件分发
+
+    5.Activity与PhoneWindow与DecorView之间什么关系？
+        一个 Activity 对应一个 Window 也就是 PhoneWindow，一个 PhoneWindow 持有一个 DecorView 的实例，DecorView 本身是一个 FrameLayout。
+2.Activity的UI刷新机制(Vsync/Choreographer)
+
+3.UI的绘制原理(Measure/Layout/Draw)
+4.Surface原理(Suface/SurfaceFlinger)

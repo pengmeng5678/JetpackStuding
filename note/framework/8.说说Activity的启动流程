@@ -1,0 +1,54 @@
+1.启动Activity会经历哪些生命周期回调
+2.冷启动大致流程，涉及哪些组件，通信过程是怎么样的
+    1.Launcher给AMS发请求启动应用组件startActivity(Binder通信)
+        ActivityManagerNative.getDefault().startActivity
+        //transact就是把所有的请求参数封装成parcel写到Binder驱动，Binder驱动再给转发到AMS
+        mRemote.transact(START_ACTIVITY_TRANSACTION,data,reply,0)
+        //AMS收到消息后开始启动Activity
+        void startSpecificActivityLocked(ActivityRecord r,..){
+            ProcessRecord app = mService.getProcessRecordLocked(r.processName,..)
+            if(app != null && app.thread != null){
+                realStartActivityLocked(r,app,...)
+                return;
+            }
+            mService.startProcessLocked(r.processName,...)
+        }
+     2.如果启动组件时发现组件所在进程不存在AMS就要请求zygote先启动应用程序进程(socket通信)
+        mServices.startProcessLocked(r.processName)
+        startViaZygote(processClass)
+
+     3.Zygote进程收到请求后，就开始启动应用程序进程
+        boolean runOnce(){
+            String[] args = readArgumentList();
+            int pid = Zygote.forkAndSpecialize()
+            if(pid == 0){
+                handleChildProc(parsedArgs)
+                return true;
+            }else{
+                return handleParentProc(pid,...)
+            }
+        }
+     4.应用进程启动后执行ActivityThread的Main函数,并通过attach函数通知AMS
+        public static void main(String[] args){
+            Looper.prepareMainLooper()
+            ActivityThread thread = new ActivityThread()
+            thread.attach(false)
+            Looper.loop()
+        }
+        private void attach(boolean system){
+            IActivityManager mgr = ActivityManagerNative.getDefault()
+            mgr.attachApplication(mAppThread)//
+        }
+     5.Handler初始化好之后，就发送handler消息执行启动Activity,并回调Activity的各个生命周期方法
+        private Activity performLaunchActivity(ActivityClientRecord r,...){
+            Activity activity = mInstrumentation.newActivity()
+            Application app = r.packafaInfo.makeApplication(false,mInstrumentation)
+            Context appContext = createBaseContextForActivity(r,activity)
+            activity.attach(appContext,...)
+            mInstrumentation.callActivityOnCreate(activity,r.state)
+            activity.performStart()
+            return activity;
+        }
+
+
+3.Activity启动过程中，生命周期回调的原理

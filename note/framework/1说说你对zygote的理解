@@ -44,3 +44,4 @@
 4.问题点
     1.孵化应用进程这个事为什么不交给SystemServer来做，而是设计一个Zogote
     2.Zygote的IPC通信机制为什么不采用binder，如果采用Binder会有什么问题
+        孵化应用进程要求使用单线程，而Binder是多线程的
