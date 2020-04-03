@@ -6,7 +6,7 @@ https://blog.csdn.net/freekiteyu/article/details/79408969
     2.setContentView原理,DecorView是什么
         setContentView会调用PhoneWindow的setContentView,在PhoneWindow中会创建DecorView,DecorView是PhoneWindow的内部类,他是Activity的根View
     3.ViewRoot是什么,有什么作用
-        ViewRoot对应于ViewRootImpl,它是WindowManager和DecorView的纽带,所有view的刷新都会层层找到ViewRootImpl,然后由它执行performTraversal执行测量、绘制、布局工作
+        ViewRoot对应于ViewRootImpl,它可以和WindowManager进行双向通信,所有view的刷新都会层层找到ViewRootImpl,然后由它执行performTraversal执行测量、绘制、布局工作
     4.View的显示原理是什么?WMS发挥了什么作用
         1.View的显示原理
             屏幕显示的Activity,其实真正承载的是一个PhoneWindow,每个PhoneWindow都有一个DecorView,
@@ -22,7 +22,42 @@ https://blog.csdn.net/freekiteyu/article/details/79408969
 
     5.Activity与PhoneWindow与DecorView之间什么关系？
         一个 Activity 对应一个 Window 也就是 PhoneWindow，一个 PhoneWindow 持有一个 DecorView 的实例，DecorView 本身是一个 FrameLayout。
+
+        PhoneWindow对象的创建
+            ActivityThread的performLaunchActivity中的attach方法中会创建PhoneWindow对象
+        DecorView对象的创建
+            Activity的setContentView方法会调用PhoneWindow的setContentView方法，并创建DecorView实例
 2.Activity的UI刷新机制(Vsync/Choreographer)
 
 3.UI的绘制原理(Measure/Layout/Draw)
+
+    private void draw(boolean fullRedrawNeeded) {
+        Surface surface = mSurface;//mSurface 是 ViewRoot 的成员变量
+        ......
+        Canvascanvas;
+
+        try {
+           int left = dirty.left;
+           int top = dirty.top;
+           int right = dirty.right;
+           int bottom = dirty.bottom;
+
+           //从 mSurface 中 lock 一块 Canvas
+           canvas = surface.lockCanvas(dirty);
+           ......
+           mView.draw(canvas);//调用 DecorView 的 draw 函数，canvas 就是画布
+           ......
+           //unlock 画布，屏幕上马上就能看到 View 的样子了
+           surface.unlockCanvasAndPost(canvas);
+        }
+        ......
+    }
 4.Surface原理(Suface/SurfaceFlinger)
+        在 App 进程中创建 PhoneWindow 后会创建 ViewRoot。ViewRoot 的创建会创建一个 Surface，这个 Surface 其实是空的，
+    通过与 WindowManagerService 通信 copyFrom() 一个 NativeSurface。在与 SurfaceFlinger 通信时，会创建 SharedClient 一段共享内存，
+    里面存放的是 SharedBufferStack 对应 SurfaceFlinger 中的 SurfaceLayer 每个 Layer 其实是一个 FrameBuffer，
+    每个 FrameBuffer 中有两个 GraphicBuffer 记作 FrontBuffer 和 BackBuffer。
+
+        在 SurfaceFlinger 中 SharedBufferServer 来管理 FrameBuffer。同时在 App 端 copyFrom() 出来 NativeSurface 时会创建一个 SharedBufferClient 与 SharedClient 这块共享内存关联。
+    当客户端 addView() 或者需要更新 View 时，会通过 SharedBufferClient 写入数据到 ShareClient 中，SurfaceFlinger 中的 SharedBufferServer 接收到通知会将 FrameBuffer 中的数据传输到屏幕上。
+    HWComposer 是基于硬件来产生 VSync 信号的，来通知 SurfaceFlinger 重绘控制显示的帧率。

@@ -1,0 +1,4 @@
+1.怎么理解surface,它是一块buffer吗
+2.如果是,surface跨进程传递怎么带上这个buffer
+3.如果不是,surface和buffer是什么关系
+4.surface到底是如何跨进程传递的?

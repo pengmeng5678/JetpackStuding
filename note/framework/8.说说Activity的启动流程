@@ -1,5 +1,5 @@
 1.启动Activity会经历哪些生命周期回调
-2.冷启动大致流程，涉及哪些组件，通信过程是怎么样的
+2.点击Launcher图标从启动到显示大致流程，涉及哪些组件，通信过程是怎么样的
     1.Launcher给AMS发请求启动应用组件startActivity(Binder通信)
         ActivityManagerNative.getDefault().startActivity
         //transact就是把所有的请求参数封装成parcel写到Binder驱动，Binder驱动再给转发到AMS
@@ -37,9 +37,10 @@
         }
         private void attach(boolean system){
             IActivityManager mgr = ActivityManagerNative.getDefault()
-            mgr.attachApplication(mAppThread)//
+            mgr.attachApplication(mAppThread)//通知AMS,并通过ApplicationThread这个Binder对象通信
         }
-     5.Handler初始化好之后，就发送handler消息执行启动Activity,并回调Activity的各个生命周期方法
+     5.AMS收到应用进程启动完成的消息,就通过ApplicationThread给应用进程发消息启动Activity组件,
+       Handler初始化好之后，就发送handler消息执行启动Activity,并回调Activity的各个生命周期方法
         private Activity performLaunchActivity(ActivityClientRecord r,...){
             //1.创建Activity对象
             Activity activity = mInstrumentation.newActivity()
@@ -51,11 +52,91 @@
             //3.执行Activity的attach操作,这里创建了PhoneWindow并初始化
             activity.attach(appContext,...)
 
-            //4.回调Activity的onCreate方法
+            //4.回调Activity的onCreate方法,onCreate方法的setContentView其实就是调用了PhoneWindow的setContentView并创建了DecorView
             mInstrumentation.callActivityOnCreate(activity,r.state)
             activity.performStart()
             return activity;
         }
+    6.执行Activity的onResume操作,使window和Activity的decorView建立连接,同时创建了ViewRootImpl管理View树的绘制流程
+        final void handleResumeActivity(IBinder token...){
+            ActivityClientRecord r = mActivities.get(token);
+            r = performResumeActivity(token, clearHide, reason);//这里会回调我们Activity的onResume方法
+            if (r.window == null && !a.mFinished && willBeVisible) {
+                r.window = r.activity.getWindow();
+                View decor = r.window.getDecorView();
+                ViewManager wm = a.getWindowManager();
+                ...
+                WindowManager.LayoutParams l = r.window.getAttributes();
+                if (a.mVisibleFromClient) {
+                    if (!a.mWindowAdded) {
+                        a.mWindowAdded = true;
+                        wm.addView(decor, l); //这里将decorView和window绑定起来,同时创建了ViewRootImpl
+                    } else {
+                        a.onWindowAttributesChanged(l);
+                    }
+                }
+            }
+            if (r.activity.mVisibleFromClient) {
+                r.activity.makeVisible();
+            }
+        }
+        其中wm.addView(decor,l)最终是调用了WindowManagerGlobal的addView函数
+            void addView(...){
+                //ViewRootImpl构造的时候会创建一个空的surface
+                root = new ViewRootImpl(view.getContext(),display)
+                view.setLayoutParams(wparams)
+                mViews.add(view)
+                mRoots.add(root)
+                mParas.add(wparams)
+                root.setView(view,wparams,panelParentView)//这里的view就是DecorView
+            }
+            //ViewRootImpl的setView方法
+            void setView(View view,...){
+                synchronized(this){
+                    if(mView == null){
+                        mView = view;//这个就是DecorView
+                        ...
+                        //触发第一次绘制,scheduleTraversals->等待Vsync信号来后执行doTraversal()
+                        requestLayout();
+                        mView.assignParent(this);//这里为DecorView分配一个父亲即ViewRootImpl
+                        ...
+                        mWindowSession.addToDisplay(mWindow,...)
+                    }
+                }
+            }
+            void scheduleTraversals() {
+                if (!mTraversalScheduled) {
+                    //核心方法,该Callback会在下一次Vsync信号来的时候调用,执行mTraversalRunnable触发View树的绘制流程PerformMessure,performDraw,performLayout
+                    mChoreographer.postCallback(
+                            Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null);
+                }
+            }
 
 
 3.Activity启动过程中，生命周期回调的原理
+
+4.常见问题
+        1.ActivityThread 是什么，它是一个线程吗，如何被启动的？
+            它不是一个线程，它是运行在 App 进程中的主线程中的一个方法中。当 App 进程创建时会执行 ActivityThread.main()，ActivityThread.main() 首先会创建 Looper 执行 Looper.prepareMainLooper()；然后创建 ActivityThread 并调用 ActivityThread.attach() 方法告诉 ActivityManagerService 我们创建了一个应用 并将 ApplicationThread 传给 ActivityManagerService；最后调用 Looper.loop()。
+
+        2. ActivityClientRecord 与 ActivityRecord 是什么？
+            记录 Activity 相关信息，比如：Window，configuration，ActivityInfo 等。
+            ActivityClientRecord 是客户端的，ActivityRecord 是 ActivityManagerService 服务端的。
+
+        3.Context 是什么，ContextImpl，ContextWapper 是什么？
+            Context 定义了 App 进程的相关环境，Context 是一个接口，ContextImpl 是子类，ContextWapper 是具体实现。
+            应用资源是在 Application 初始化的时候，也就是创建 Application，ContextImpl 的时候，ContextImpl 就包含这个路径，主要就是对就是 ResourcesManager 这个单例的引用。
+            可以看出每次创建 Application 和 Acitvity 以及 Service 时就会有一个 ContextImpl 实例，ContentProvider 和B roadcastReceiver 的 Context 是其他地方传入的。
+            所以 Context 数量 = Application 数量 + Activity 数量 + Service 数量，单进程情况下 Application 数量就是 1。
+
+        4.Instrumentation 是什么？
+            管理着组件Application,Activity，Service等的创建，生命周期调用。
+
+        5.Application 是什么，什么时候创建的，每个应用程序有几个 Application？
+            Application 是在 ActivityThread.handleBindApplication() 中创建的，一个进程只会创建一个 Application，但是一个应用如果有多个进程就会创建多个 Application 对象。
+            点击 Launcher 启动 Activity 和应用内部启动 Activity 的区别？
+            点击 Launcher 时会创建一个新进程来开启 Activity，而应用内打开 Activity，如果 Activity 不指定新进程，将在原来进程打开，是否开启新进程实在 ActivityManagerService 进行控制的，上面分析得到，每次开启新进程时会保存进程信息，默认为 应用包名 + 应用UID，打开 Activity 时会检查请求方的信息来判断是否需要新开进程。Launcher 打开 Activity 默认 ACTIVITY_NEW_TASK，新开一个 Activity 栈来保存 Activity 的信息。
+
+        6.Activity 启动过程，onCreate()，onResume() 回调时机及具体作用？
+            Activity.onCreate() 完成了 App 进程，Application，Activity 的创建，调用 setContentView() 给 Activity 设置了 layout 布局。
+            Activity.onResume() 完成了 Activity 中 Window 与 WindowManager 的关联，并对所有子 View 进行渲染并显示。

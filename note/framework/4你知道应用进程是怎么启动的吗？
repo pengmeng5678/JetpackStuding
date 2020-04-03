@@ -23,6 +23,6 @@
                 thread.attach(false);//这里执行了IActivityManager.attachApplication(mAppThread)，相当于告诉AMS并将ApplicationThread与之连接
                 Looper.loop()
             }
-        5.AMS通过ApplicationThread启动应用程序进程
+        5.AMS通过ApplicationThread启动应用程序组件
 
 3.深入理解应用进程启动的原理

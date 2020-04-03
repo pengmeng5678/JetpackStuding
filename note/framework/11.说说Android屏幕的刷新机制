@@ -9,6 +9,7 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
     3.一个Activity的View树都进行测量、布局、绘制三大步骤后,屏幕会马上刷新吗
         不会,屏幕的刷新是等待Vsync信号到来时,从缓存区取上一帧绘制好的图像进行显示,同时执行界面发起的新的刷新请求(测量,绘制,布局)
     4.如何理解"避免丢帧的方法之一是保证每次绘制界面的操作要在16ms之内完成"这句话
+        丢帧的原因是主线程有太多的耗时操作，耽误了View的绘制
         因为Vsync信号是每隔16.6ms触发一次，如果我们在16ms内绘制界面操作没有完成,就会导致下次Vsync信号来的时候,缓冲区里没有绘制好的画面，即少了一帧
 
         由于我们可以随时调用requestLayout等函数触发绘制请求,为了保证Vsync信号和绘制过程保持同步(避免Vsync信号即将来的时候执行了绘制,导致),我们使用了Choreographer来规避
@@ -108,9 +109,11 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                     //往主线程的消息队列中发送一个同步屏障,拦截这个时刻之后所有的同步消息的执行,但不会拦截异步消息,
                     //以此来尽可能的保证当接收到屏幕刷新信号时可以尽可能第一时间处理遍历View树的工作
                     mTraversalBarrier = mHandler.getLooper().getQueue().postSyncBarrier();
+
                     //往Choreographer存放绘制的任务,等待下一个Vsync信号来的时候,这个任务就会被执行
                     mChoreographer.postCallback(
                             Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null);
+
                     if (!mUnbufferedInputDispatch) {
                         scheduleConsumeBatchedInput();
                     }
@@ -147,7 +150,6 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                 }
             }
             private void performTraversals(){
-
                 //relayoutWindow就调用了mWindowSession.relayout(...,mSurface),(跨进程Binder调用)relayout返回之后,mSurface就可用了
                 //这个mSurface绘制完成后就会提交给surfaceFlinger存放到屏幕显示缓存区等待vsync信号来取
                 relayoutWindow()
@@ -155,16 +157,57 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                 performDraw()
                 performLayout()
             }
+    4.scheduleTraversals中如何等待下一次Vysnc信号后执行doTraversal任务的原理
+            1.异步消息如何存放到Choreographer
+                mChoreographer.postCallback(
+                        Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, null);}
+
+                private void postCallbackDelayedInternal(){
+                    //根据消息的类型和时间,存放到单链表mCallbackQueues中
+                    mCallbackQueues[callbackType].addCallbackLocked(time,...)
+                    scheduleFrameLocked(now)
+                }
+                private void scheduleFrameLocked(long now){
+                        //告诉SurfaceFlinger,到下一次Vsync信号来的时候要通知我们
+                        //mDisplayEventReceiver.scheduleVsync()
+                        scheduleVsyncLocked()
+                    }else{
+                        //发送异步消息到队列的头部,不受同步屏障的影响，告诉SurfaceFlinger下一次Vsync消息来得时候要第一时间通知我们刷新UI
+                        Message msg = mHandler.obtainMessage(MSG_DO_SCHEDULE_VSYNC)
+                        msg.setAsynchronous(true)
+                        mHandler.senMessageAtFrontOfQueue(msg)
+                    }
+                }
+            2.如何接收到Vsync信号
+                class FrameDisplayEventReceiver extends DisplayEventReceiver{
+                    public void onVsync(){
+                        ...
+                        //vsync信号来就发送消息回调给mChoreographer
+                        Message msg = Message.obtain(mHandler,this)
+                        mHandler.sendMessageAtTime(msg,...);
+                    }
+                    public void run(){
+                        //doFrame主要做两件事
+                        //    1.
+                        //        如果指定时间都没有发出去消息,即出现了丢帧,如果丢帧的次数大于SKIPPED_FRAME_WARNING_LIMIT这个数的话，就会打印以下内容
+                        //        //The application may be doing too much work on its main thread
+                        //    2.根据消息类型处理callback
+                        //       doCallbacks(Choreographer.CALLBACK_TRAVERSAL,frameTimeNanos)
+                        //       doCallbacks(Choreographer.CALLBACK_INPUT,frameTimeNanos)
+                                    ...
+                        doFrame()
+                    }
+                }
+                最终有一个doCallbacks调用后会执行TraversalRunnable中的performTraversals执行绘制流程
 
 三、说说Android的屏幕刷新机制
-    1.UI刷新的大致流程,应用和surfaceFlingeer的通信过程
+    1.UI刷新的大致流程,应用和surfaceFlinger的通信过程
            1.一个View发起刷新操作时,会通过层层通知到ViewRootImpl的scheduleTraversals方法中,
             然后这个方法会将遍历绘制View树的操作performTraversals方法封装到Runnable中,
-            传给Choreographer[[kɔːriˈɑːɡrəfər],以当前的时间戳放到一个mCallbackQueue中，然后调用了一个native层的方法监听下一个屏幕刷新信号
+            传给Choreographer[[kɔːriˈɑːɡrəfər],以当前的时间戳放到一个mCallbackQueue中，然后调用了一个native层的方法监听SinfaceFlinger的下一个屏幕刷新信号Vsync
 
            2.当下一个屏幕刷新信号来的时候，如果app有监听vSync信号,那底层就会回调app层的onVsync方法来通知,
            onVsync方法会通过主线程handler去mCallbackQueue里根据时间戳将之前放进去的Runnable取出来,而这些Runnable有一个就是遍历绘制View树的操作performTraversals
-
 
            3.要理解的一点是，我们写的代码，只是控制让 CPU 在接收到屏幕刷新信号的时候开始去计算下一帧的画面工作。
            而底层在每一次屏幕刷新信号来的时候都会去切换这一帧的画面，这点我们是控制不了的，是底层的工作机制。

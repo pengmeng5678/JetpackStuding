@@ -56,3 +56,5 @@ https://mubu.com/doc/uRmziI6te0
     4.代理接口将Parcel发送给内核的Binder Driver
     5.Server端会读取Binder Driver中请求的数据,如果是发送给自己的,解包Parcel对象,处理并将结果返回
     6.整个调用过程是一个同步过程,在server处理的时候,client会Block
+
+    从一个进程传递到另一个进程，然后把它映射到进程的内存空间
