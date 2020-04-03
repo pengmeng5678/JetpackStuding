@@ -1,4 +1,62 @@
 1.怎么理解surface,它是一块buffer吗
-2.如果是,surface跨进程传递怎么带上这个buffer
-3.如果不是,surface和buffer是什么关系
-4.surface到底是如何跨进程传递的?
+    Activity有一个DecorView需要绘制,而绘制就需要有surface,surface是需要向系统申请的
+    surface继承自Parcelable,它不是buffer,它里面包含了一个能生产buffer的IGraphicBufferProducer(一个Binder对象)
+    关注writeToParcel和readFromParcel函数的实现
+    java层的surface主要关注在Native层的surface的实现,而Native新创建了一个surface，主要通过IBinder实现
+    static jlong nativeReadFromParcel(JNIEnv* env,jclass clazz,...){
+        Parcel* parcel = parcelForJavaObject(env,parcelObj)
+        ...
+        sp<IBinder> binder(parcel->readStrongBinder)
+        sp<IGraphicBufferProducer> gbp(interface_cast<IGraphicBufferProducer>(binder))
+        sp<Surface> sur = new Surface(gbp,true)
+        return jlong(sur.get())
+    }
+3.surface到底是如何跨进程传递的?
+    surface里面包含了一个能生产buffer的IGraphicBufferProducer(一个Binder对象),跨进程传递的不是surface，而是传递的IGraphicBufferProducer这个binder对象
+    private void performTraversals(){
+        if(mFirst){
+            relayoutResult = relayoutWindow(params)
+        }
+    }
+    int relayoutWindow(WindowManager.LayoutParams params){
+        return mWindowSession.relayout(mWindow,...,mSurface)//这里传了一个空的surface到WMS
+    }
+    public int relayoutWindow(Session session,...,Surface outSurface){
+        SurfaceControl surfaceControl = winAnimatior.createSurfaceLocked()
+        outSurface.copyFrom(surfaceControl)
+    }
+    public void copyFrom(SurfaceControl other){
+        long surfaceControlPtr = other.mNativeObject;
+        long newNativeObject = nativeCreateFromSurfaceControl(surfaceControlPtr)
+        //将Native和java层的surface对象绑定起来,把Native层的surface对象
+        setNativeObjectLocked(newNativeObject)
+    }
+    jlong nativeCreateFromSurfaceControl(...){
+        sp<SurfaceControl> ctrl(reinterpret_cast<SurfaceControl*>(SurfaceControlNativeObj))
+        sp<Surface> surface(ctrl->getSurface())
+        return reinterpret_cast<jlong>(surface.get())
+    }
+    sp<Surface> SurfaceControl::getSurface()const{
+        if(mSurfaceData == 0){
+            //SurfaceControl有个GraphicBufferProducer，
+            //根据GraphicBufferProducer创建了Surface,将这个Surface对象和Java中的Surface对象绑定到一起(将Native层Surface对象的指针存放到Java层的Surface对象中)
+            mSurfaceData = new Surface(mGraphicBufferProducer,false)
+        }
+        return mSurfaceData
+    }
+3.Activity的surface在系统中创建后，是怎么跨进程传回应用的
+    系统中创建的是SurfaceControl对象,SurfaceControl中有GraphicBufferProducer,GraphicBufferProducer可以生产surface
+
+4.Surface绘制的原理
+    private boolen drawSoftware(){
+        canvas = mSurface.lockCanvas(dirty)//调用mLoackObject = nativeLockCanvas(mNativeObject,mCanvas,inOutDirty)
+        mView.draw(canvas)
+        surface.unlockCanvasAndPost(canvas)
+    }
+    1.surface绘制的buffer是怎么来的
+        通过GraphicBufferProducer向SurfaceFlinger中的bufferQueue申请
+    2.buffer绘制完了怎么提交的
+        buffer绘制完成后通过GraphicBufferProducer提交到sufaceFlinger进行合成显示
+5.结论
+    1.surface本质是GraphicBufferProducer，而不是buffer
+    2.surface跨进程传递,本地就是GraphicBufferProducer传递
