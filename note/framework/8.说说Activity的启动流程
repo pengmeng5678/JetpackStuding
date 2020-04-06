@@ -37,10 +37,25 @@
         }
         private void attach(boolean system){
             IActivityManager mgr = ActivityManagerNative.getDefault()
-            mgr.attachApplication(mAppThread)//通知AMS,并通过ApplicationThread这个Binder对象通信
+            mgr.attachApplication(mAppThread)//将ApplicationThread这个Binder对象传递给AMS，即调用AMS的attachApplicationLocked函数
         }
-     5.AMS收到应用进程启动完成的消息,就通过ApplicationThread给应用进程发消息启动Activity组件,
+     5.AMS收到应用进程启动完成的消息,就通过ApplicationThread代理对象给应用发Binder消息启动Activity组件,
        Handler初始化好之后，就发送handler消息执行启动Activity,并回调Activity的各个生命周期方法
+
+        ActivityManagerService.java
+            private final boolean attachApplicationLocked(IApplicationThread thread,
+                       int pid, int callingUid, long startSeq) {
+                       ...
+                thread.bindApplication(processName, appInfo, providers,...)
+            }
+
+        ActivityThread.java
+        public final void bindApplication(String processName, ApplicationInfo appInfo,...){
+            ...
+            sendMessage(H.BIND_APPLICATION, data);
+            ...
+        }
+        某个时刻接受一个LAUNCHE_ACTIVITY的handler消息启动Activity
         private Activity performLaunchActivity(ActivityClientRecord r,...){
             //1.创建Activity对象
             Activity activity = mInstrumentation.newActivity()

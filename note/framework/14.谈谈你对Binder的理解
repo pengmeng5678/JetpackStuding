@@ -1,0 +1,97 @@
+1.Linx常见的跨进程通信方式，Framework中常见的有以下四种
+    1.管道
+        特点:
+            半双工,单向传输,我们可以使用pipe(fds)生成一对描述符,一个用来写，一个用来读
+            一般在父子进程之间使用
+                int main(void){
+                    int n,fd[2];//fd[0]用来读,fd[1]用来写
+                    char buf[SIZE];
+                    pipe(fd);
+                    pid_t pid = fork();
+                    if(pid==0){//子进程返回了,我们在子进程关闭写通道
+                        close(fd[1]);
+                        read(fd[0],buf,SIZE);
+                    }else if(pid > 0){
+                        close(fd[0]);//在父进程关闭读通道
+                        write(fd[1],"hello world",5)
+                    }
+                }
+            4.4版本中Framework层中native的looper用到了管道
+
+    2.socket
+        特点:
+            全双工,即可读又可写,在Framework中AMS和zygote就是用socket通信的
+             public static void main(String[] argv[]){
+                ...
+                registerZygonteSocket(socketName)
+                ...
+                runSelectLoop(abiList)
+             }
+             void runSelectLoop(){
+                while(true){
+                    Os.poll(pollFds,-1)
+                    for(int i = pollFds.length-1;i>=0;--i){
+                        if(i == 0){
+                            //处理新过来的请求
+                        }else{
+                            //处理发过来的数据
+                            peers.get(i).runOnce()
+                        }
+                    }
+                }
+             }
+    3.共享内存
+        特点；
+            速度快,不需要多次拷贝
+            进程之间无需存在亲缘关系
+         //Android的匿名共享内存
+         public MemoryFile(String name,int length){
+            mFD = native_open(name,length)
+            mAddress = native_mmap(mFD,length,PROT_READ|PROT_WRITE)
+         }
+    4.信号
+        特点
+            单向的，发出去之后怎么处理是本人的事
+            只能带个信号,不能带参数
+            知道进程pid就能发信号了，也可以一次给一群进程发信号
+        //Android中的信号,uid相同才能给其他进程发信号
+        public class Process{
+            public static final void killProcess(int pid){
+                sendSignal(pid,SIGNAL_KILL)
+            }
+            static void SetSigChildHandler(){
+                struct sigaction sa;
+                memset(&sa,0,sizeof(sa))
+                sa.sa_handler = SigChildHandler
+                sigaction(SIGCHILD,&sa,NULL)
+            }
+        }
+
+2.谈谈你对Binder的理解
+    1.binder是干嘛的
+        Binder是Android系统特有的一种进程通信方式
+    2.binder存在的意义是什么
+        Android没有采用Linux中传统的进程通信方式，主要是因为Android平台进程需要频繁的通信,所以对性能、安全及速度等要求比较高
+
+        性能好:
+            一次拷贝,速度快,节省内存空间,其他进程(如管道,socket)拷贝需要借助内核进行中转,一次从应用层拷贝到内核，还有一次从内核拷贝到应用层
+            而binder是用一块物理内存同时映射到内核和目标进程的用户空间
+        方便:
+            逻辑简单
+        安全:
+            身份标志只能由IPC机制本身在内核中添加
+    3.binder实现原理
+        Bindder实现原理主要由四个端实现：Client端、Service端、serviceManager、Binder驱动
+        进程启动binder机制主要由三步：打开Binder驱动；内存映射，分配缓冲区；启用binder线程
+3.一次完整的IPC通信流程
+    1.了解binder的整体通信架构,U型传递数据，同步传递
+        client端             Server端
+            proxy              Stub         应用层
+            binderProxy        Binder       JAVA层
+            BpBinder           BBinder       Native层
+      (transact函数写parcel)  (onTransact)
+                 Binder驱动(dev/binder)
+
+    2.了解应用和binder驱动的交互方式
+
+    3.了解IPC过程中的通信协议

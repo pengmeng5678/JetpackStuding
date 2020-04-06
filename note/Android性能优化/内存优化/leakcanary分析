@@ -27,10 +27,22 @@ https://www.jianshu.com/p/1e7e9b576391
     2.(内存泄漏判定机制)内存泄漏的判断条件是什么,检测内存泄漏的机制原理是什么
         一句话总结内存泄漏的判断条件：
             KeyedWeakReference与ReferenceQueue联合使用,在弱引用关联的对象被回收后,会将引用添加到ReferenceQueue中,
-            清空后,可以根据是否继续含有该引用来判定是否被回收
+            将ReferenceQueue清空后,可以根据是否继续含有该引用来判定是否被回收
             判定回收,手动触发GC,再次判定回收,双重判断如果都未回收,则判断为泄漏对象
         检测内存泄漏的机制原理是：
-            1.移除不可达的引用,如果Activity的引用不可达了就返回
+            如果一个对象只被一个弱引用所关联，那么在gc的时候一定会被回收,被回收后就会存放到这个ReferenceQueue，
+            反过来说，如果一个对象不仅被弱引用引用，还被强引用引用，那么gc肯定是无效的
+
+            activity的onDestroy方法中调用watch方法,将activity的弱引用存放到KeyedWeakReference中
+            当Activity被回收后,应该被回收的activity的弱引用会被存放到ReferenceQueue中
+                WeakReference有四个状态：
+                    Active:一般来说，内存一开始被分配的状态都是 Active，
+                    Pending: 大概是指快要被放进队列的对象，也就是马上要回收的对象，
+                    Enqueued: 就是对象的内存已经被回收了，把这个对象放入到一个队列中，方便以后我们查询某个对象是否被回收，
+                    Inactive: 就是最终的状态，不能再变为其它状态
+                    注意第三个状态Enqueued，当这个弱引用被回收后，gc会把这个弱引用所指向的对象加入到引用队列中，也就是前面的ReferenceQueue，
+
+            1.移除不可达(已经回收了的activity)的引用(从KeyedWeakReference中移除ReferenceQueue中包含的activity弱引用),如果Activity的引用不可达了就返回
             2.触发一次GC
             3.再次移除不可达的引用
             4.如果Activity的引用还是存在,那就认为发生了内存泄漏
@@ -120,6 +132,7 @@ https://www.jianshu.com/p/1e7e9b576391
                 this.retainedKeys.remove(ref.key);
             }
         }
+
     4.内存泄漏文件生成机制
         该版本采用eclipse.Mat来分析泄漏详细,从GCRoot开始逐步生成引用轨迹
         ensureGone方法中判定发生内存泄漏后执行heapDumper.dumpHeap方法,获取写入堆内存快照的文件(xxx_pending.hprof),同时弹吐司和发通知通知用户内存泄漏了

@@ -1,0 +1,139 @@
+1.Service启动方式
+    1.startService
+    2.bindService,带上BIND_AUTO_CREATE参数
+2.Service启动流程
+    1.应用组件(如Activity)向AMS发起请求启动Service,如果service启动成功就回调onStartCommand方法
+    2.如果service所在的进程不存在，AMS就发socket消息给Zygote进程启动service所在的进程
+    3.service所在的进程启动成功后,就会执行ActivityThread的main函数并通过attach方法告诉AMS(将ApplicationThread传给AMS),
+    AMS发来handler消息(通过ApplicationThread这个Binder对象调用ActivityThread的bindApplication方法)并执行handleCreateService
+        private void handleCreateService(CreateServiceData data) {
+            LoadedApk packageInfo = getPackageInfoNoCheck(
+                    data.info.applicationInfo, data.compatInfo);
+                java.lang.ClassLoader cl = packageInfo.getClassLoader();
+                //1.创建Service对象
+                Service service = packageInfo.getAppFactory()
+                        .instantiateService(cl, data.info.name, data.intent);
+                //2.创建Context对象
+                ContextImpl context = ContextImpl.createAppContext(this, packageInfo);
+                context.setOuterContext(service);
+                //3.准备Application
+                Application app = packageInfo.makeApplication(false, mInstrumentation);
+                //4.为Service赋予上下文,主要是调用Service中的attachBaseContext
+                service.attach(context, this, data.info.name, data.token, app,
+                        ActivityManager.getService());
+                //5.回调Service的onCreate方法
+                service.onCreate();
+                mServices.put(data.token, service);
+         }
+    4.Service启动完成后就执行Service的onStartCommand方法
+3.Service启动的主要参与者
+    应用组件，AMS，Zygote等等
+4.bindSercie的用法
+    IRemoteCaller mCaller
+    ServiceConnection mServiceConnection = new ServiceConnection(){
+        public void onServiceConnection(ComponentName name,IBinder service){
+            mCaller = IRemoteCaller.Stub.asInterface(service)
+            mCaller.call()
+        }
+    };
+    Intent service = new Intent(this,MyService.class)
+    bindService(service,mServiceConnection,BIND_AUTO_CREATE)
+5.bindService的大致流程
+    1.应用组件向AMS请求bindService,如果Service的binder句柄(IServiceConnection)存在,AMS就回调binder句柄给应用
+    2.如果AMS发现不存在binder句柄,就会去服务端请求binder句柄
+    3.服务端发布binder句柄给AMS
+    4.AMS回调binder句柄给应用(InnerConnection的onConnect函数被回调后,应用层的onServiceConnected被回调)
+    5.应用通过binder句柄向服务端发起binder调用
+
+    具体流程代码如下
+        1.comtextImpl.java文件调用bindServiceCommon
+            private boolean bindServiceCommon(Intent service, ServiceConnection conn, int flags, Handler
+                        handler, UserHandle user) {
+                  //从缓存中查询是否有Binder句柄IServiceConnection
+                IServiceConnection sd = mPackageInfo.getServiceDispatcher(conn, getOuterContext(), handler, flags);
+
+                  //从向服务端请求binder句柄,即调用ActiveServices的bindServiceLocked方法
+                int res = ActivityManager.getService().bindService(
+                    mMainThread.getApplicationThread(), getActivityToken(), service,...),);
+                return res != 0;
+            }
+
+            //通过ServiceConnection获取一个IServiceConnection(binder对象)
+              IServiceConnection持有ServiceConnection的引用(Map保存方式,key是context),所以当AMS通过Binder回调IServiceConnection的onConnect函数时,
+              IServiceConnection可以通过ServiceConnection回调给应用层的onServiceConnection函数
+
+                IServiceConnection getServiceDispatcher(ServiceConnection c,..){
+                    ServiceDispatcher sd = null;
+                    ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher> map = mServices.get(context);
+                    if(map != null){
+                        sd = map.get(c)
+                    }
+                    if(sd == null){
+                        sd = new ServiceDispatcher(c,context,handler,flags)
+                        if(map == null){
+                            map = new ArrayMap<ServiceConnection,ServiceDispatcher>()
+                            mServices.put(context,map)
+                        }
+                        map.pu(c,sd)
+                    }
+                    return sd.getIServiceConnection()
+                }
+
+           //ServiceDispatcher构造函数中创建了一个InnerConnection
+                static class InnerConnection extends IServiceConnection.Stub{
+                    final WeakReference<ServiceDispacher> mDispatcher
+                    public void connection(ComponentName name,IBinder service){
+                        //bindService绑定成功后,AMS会回调这个函数
+                        LoadedApk.ServiceDispather sd = mDispather.get();
+                        if(sd != null){
+                            sd.connected(name,service)
+                        }
+                    }
+                }
+
+          //sd.connect(name,service)就是执行绑定逻辑
+            public void doConnected(ComponentName name, IBinder service, boolean dead) {
+                ServiceDispatcher.ConnectionInfo old;
+                ServiceDispatcher.ConnectionInfo info;
+                synchronized (this) {
+                    old = mActiveConnections.get(name);
+                    if (old != null && old.binder == service) {
+                        // Huh, already have this one.  Oh well!
+                        return;
+                    }
+                     if (service != null) {
+                        // A new service is being connected... set it all up.
+                        info = new ConnectionInfo();
+                        info.binder = service;
+                        info.deathMonitor = new DeathMonitor(name, service);
+                        try {
+                            service.linkToDeath(info.deathMonitor, 0);
+                            mActiveConnections.put(name, info);
+                        } catch (RemoteException e) {
+                            // This service was dead before we got it...  just
+                            // don't do anything with it.
+                            mActiveConnections.remove(name);
+                            return;
+                        }
+                    } else {
+                        // The named service is being disconnected... clean up.
+                        mActiveConnections.remove(name);
+                    }
+                    if (old != null) {
+                        old.binder.unlinkToDeath(old.deathMonitor, 0);
+                    }
+                }
+                // If there was an old service, it is now disconnected.
+                if (old != null) {
+                    mConnection.onServiceDisconnected(name);
+                }
+                if (dead) {
+                    mConnection.onBindingDied(name);
+                }
+                // If there is a new viable service, it is now connected.
+                if (service != null) {
+                    mConnection.onServiceConnected(name, service);
+                }
+            }
+
+6.bindService涉及的参与者

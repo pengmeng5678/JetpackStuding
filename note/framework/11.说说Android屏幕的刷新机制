@@ -202,6 +202,7 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
 
 三、说说Android的屏幕刷新机制
     1.UI刷新的大致流程,应用和surfaceFlinger的通信过程
+
            1.一个View发起刷新操作时,会通过层层通知到ViewRootImpl的scheduleTraversals方法中,
             然后这个方法会将遍历绘制View树的操作performTraversals方法封装到Runnable中,
             传给Choreographer[[kɔːriˈɑːɡrəfər],以当前的时间戳放到一个mCallbackQueue中，然后调用了一个native层的方法监听SinfaceFlinger的下一个屏幕刷新信号Vsync
@@ -214,5 +215,10 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
            之所以要讲这点，是因为，当我们的 app 界面没有必要再刷新时（比如用户不操作了，当前界面也没动画），这个时候，我们 app 是接收不到屏幕刷新信号的，
            所以也就不会让 CPU 去计算下一帧画面数据，但是底层仍然会以固定的频率来切换每一帧的画面，只是它后面切换的每一帧画面都一样，所以给我们的感觉就是屏幕没刷新
     2.Vsync的原理
+        1.VSync信号的生成机制
+            硬件或者软件都可以生成Vsync信号,生成后给DispSyncThread，
+            DispSyncThread一分为二(减少CPU压力),一分给app-EventThread,再给App；一分给sf-EventThread，再给SurfaceFlinger
 
+        2.VSync在SurfaceFlinger的分发流程
+        3.VSync信号的分发原理
     3.Choreogrepher原理

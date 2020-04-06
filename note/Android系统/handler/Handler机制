@@ -57,7 +57,7 @@ https://blog.csdn.net/qian520ao/article/details/78262289
                 }
             }
             作用：为当前工作线程创建一个Looper,同时也生成了1个消息队列对象。
-            需要程序员在线程中主动调用Looper.prepare和Looper.loop启动消息循环
+            子线程中创建handler的前提是需要程序员在线程中主动调用Looper.prepare,和Looper.loop启动消息循环
 
         2.Looper.prepareMainLooper
           public static void prepareMainLooper() {
@@ -96,6 +96,7 @@ https://blog.csdn.net/qian520ao/article/details/78262289
                 this(null,false)
             }
             public Handler(Callback callback,boolea async){
+                //如果在子线程直接创建handler就会抛异常,所以应该创建前调用Looper.prepare,然后主动调用Looper.prepare操作
                 mLooper = Looper.myLooper()
                 mQueue = mLooper.mQueue;
             }
