@@ -95,3 +95,13 @@
     2.了解应用和binder驱动的交互方式
 
     3.了解IPC过程中的通信协议
+
+4.binder对象跨进程实现原理
+    1.binder传递有哪些方式
+    2.binder在传递过程中是怎么存储的
+    3.binder对象序列化和反序列化的过程
+    4.binder对象传递过程中驱动层做了什么
+5.binder的oneway机制
+    1.binder的oneway是什么意思
+    2.oneway有哪些特性
+    3.它的实现原理是怎么样的
