@@ -1,0 +1,58 @@
+1.如何跨进程传递大图片
+    1.将图片保存到本地,传递路径到另一个进程
+    2.intent传图,但是容易抛异常,原因是什么
+            Bundle b = new Bundle()
+            b.putParcelable("bitmap",mBitmap)
+            intent.putExtras(b)
+        Bitmap实现了parcelable,可以跨进程传递,但是底层规定,writeParcel数据大小不能超过1M,不然会抛出TranceActionTooLarge,因为通过intent传图是将parcel数据直接拷贝到缓冲区了
+
+    3.通过binder调用传图,底层ashmem机制
+            Bundle b = new Bundle()
+            b.putBinder("binder",new IRemoteCaller.Stub(){
+                public Bitmap getBitmap(){
+                    return mBitmap
+                }
+            })
+            intent.putExtras(b)
+
+            底层ashmem机制：当图片过大时(大于16K),数据不会存放到Parcel了,而是会创建一块匿名共享内存(会返回fd),再把返回的fd映射到进程的内存空间,再把fd写到parcel
+            int startActivity(...){
+                Parcel data = Parcel.obtain()
+     //调用out.writeBundle(mExtras)-->bundle.writeToParcel-->...nativeWriteToParcel-->writeBlob
+                intent.writeToParcel(data,0)
+                mRemote.transact(START_ACTIVITY_TRANSACTION,data,reply,0)
+            }
+
+2.说说TreadLocal的原理
+    1.适用于什么场景
+        适用于保存当前线程的局部变量(局部变量只在线程的生命周期内有效),在本地线程内随时随地可取,隔离其他线程。
+        Looper的prepare函数,就将Looper对象存放到了当前线程的ThreadLocal中了
+        Choreographer的getInstance函数,也是从ThreadLocal中返回的当前线程的ChoreOgrapher
+
+    2.使用方式是怎么样的
+        threadLocal.set(value)
+        threadLocal.get()
+    3.实现原理是怎么样的
+        public void set(T value) {//设置当前线程的线程局部变量
+            Thread t = Thread.currentThread();
+            ThreadLocalMap map = getMap(t);//获取当前线程的ThreaLocalMap对象
+            if (map != null)
+                map.set(this, value);
+            else
+                createMap(t, value);
+        }
+        public T get() {//返回当前线程所对应的线程局部变量
+            Thread t = Thread.currentThread();
+            ThreadLocalMap map = getMap(t);
+            if (map != null) {
+                ThreadLocalMap.Entry e = map.getEntry(this);
+                if (e != null)
+                    return (T)e.value;
+            }
+            return setInitialValue();
+        }
+        每个ThreadLocal类里面都有个静态内部类ThreadLocalMap
+        我们往ThreadLocal里面set数据时,其实是将数据保存到了当前线程的ThreadLocalMap对象中,而map的key就是ThreadLocal的弱引用
+        我们往ThreadLocal.get数据时,也是先获取当前线程的ThreadLocalMap,再根据treadLocal的弱引用为key取数据
+
+        ThreadLocalMap发生hash冲突时,就依次判断表的下一个节点是不是空的,如果是空的就存放

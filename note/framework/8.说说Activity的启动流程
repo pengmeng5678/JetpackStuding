@@ -29,6 +29,7 @@
             }
         }
      4.应用进程启动后执行ActivityThread的Main函数,并通过attach函数通知AMS
+        final ApplicationThread mAppThread = new ApplicationThread();
         public static void main(String[] args){
             Looper.prepareMainLooper()
             ActivityThread thread = new ActivityThread()

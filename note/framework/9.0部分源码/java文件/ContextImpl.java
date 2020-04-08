@@ -1559,7 +1559,7 @@ class ContextImpl extends Context {
         try {
             validateServiceIntent(service);
             service.prepareToLeaveProcess(this);
-            ComponentName cn = ActivityManager.getService().startService(
+            ComponentName cn = ActivityManager.getService().start Service(
                 mMainThread.getApplicationThread(), service, service.resolveTypeIfNeeded(
                             getContentResolver()), requireForeground,
                             getOpPackageName(), user.getIdentifier());
