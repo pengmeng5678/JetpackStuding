@@ -56,3 +56,62 @@
         我们往ThreadLocal.get数据时,也是先获取当前线程的ThreadLocalMap,再根据treadLocal的弱引用为key取数据
 
         ThreadLocalMap发生hash冲突时,就依次判断表的下一个节点是不是空的,如果是空的就存放
+3.怎么检查线程有耗时任务
+    1.WatchDog
+        1.主要作用
+            1.检查是否发生了死锁
+            2.检查线程是否被任务bolcked
+        2.实现原理
+            1.初始化
+                WatchDog继承自Thread,HandlerChecker实现自Runnable,在SystemServer进程启动时会启动看门狗
+                在WatchDog的构造方法中,我们添加了很多线程任务(HandlerChecker)到一个列表中
+
+                 final ArrayList<HandlerChecker> mHandlerCheckers = new ArrayList<>();
+                 mMonitorChecker = new HandlerChecker(FgThread.getHandler(),"foreground thread", DEFAULT_TIMEOUT);
+                 mHandlerCheckers.add(mMonitorChecker);
+                 mHandlerCheckers.add(new HandlerChecker(new Handler(Looper.getMainLooper()),"main thread", DEFAULT_TIMEOUT));
+                 mHandlerCheckers.add(new HandlerChecker(UiThread.getHandler(),"ui thread", DEFAULT_TIMEOUT));
+                 mHandlerCheckers.add(new HandlerChecker(IoThread.getHandler(),"i/o thread", DEFAULT_TIMEOUT));
+                 mHandlerCheckers.add(new HandlerChecker(DisplayThread.getHandler(),"display thread", DEFAULT_TIMEOUT));
+                 addMonitor(new BinderThreadMonitor());
+            2.如何检测线程耗时
+                在watchDog的run方法中就不断检测列表中的是否有线程被阻塞了
+                @Override
+                public void run() {
+                    while(true){
+                        for(int i = 0;i<mHandlerCheckers.size;i++){
+                           mHandlerCheckers.get(i).scheduleCheckLocked();
+                        }
+                    }
+                    while (timeout > 0) {
+                        wait(timeout);
+                        timeout = CHECK_INTERVAL - (SystemClock.uptimeMillis() - start);
+                    }
+                    final int waitState = evaluateCheckerCompletionLocked()//检查所有HandlerCheker的完成情况,如果某个线程阻塞了30S以上,便会作出相应处理
+                }
+                public void scheduleCheckLocked() {
+                    if (mMonitors.size() == 0 && mHandler.getLooper().getQueue().isPolling()) {
+                        mCompleted = true;
+                        return;
+                    }
+                    if (!mCompleted) {
+                        return;
+                    }
+                    mCompleted = false;
+                    mCurrentMonitor = null;
+                    mStartTime = SystemClock.uptimeMillis();
+                    //记录当前线程时间,往当前线程队列头部发一个消息进行耗时检测,CHECK_INTERVAL为30S
+                    mHandler.postAtFrontOfQueue(this);
+                }
+    2.BlockCanary
+        BlockCanary实现原理是在Looper的looper方法中分发消息前后打印两次时间戳,如果两次时间超过一定阈值便认为发生了阻塞
+
+4.怎么同步处理消息
+    发一个消息到另外一个线程处理,我们需要等待这个消息结果返回
+    Java层实现同步处理消息
+        如Handler中的runWithScissors方法,可以通过wait/notify实现
+
+    Binder调用同步处理消息
+        可以通过动态代理切换工作线程
+        //TODO
+

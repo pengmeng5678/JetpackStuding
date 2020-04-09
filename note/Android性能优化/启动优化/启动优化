@@ -47,7 +47,7 @@ https://www.jianshu.com/p/a5353748159f
         5.multidex冷启动优化方案
             1.冷启动时,Application不再继承MultiDexApplication,重写onAttachBaseContext方法
             2.在onAttachBaseContext方法中启动Splash界面,开始轮询dexOpt工作是否完成，在Splash界面加载Dex(子dex,通过MultiDex.install加载)
-            3.
+
 4.相关命令
     获取所有应用的堆栈信息 adb shell dumpsys activity
     获取自己应用的堆栈信息 adb shell dumpsys | grep packageName

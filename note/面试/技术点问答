@@ -8,3 +8,6 @@ https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650827338&idx=1&sn=39a2e2
 7.JNI/NDK实现
 8.音视频采集、编解码、播放
 9.语音唤醒、识别、合成、语义理解(如何调度科大讯飞、百度、知音)
+10.RxJava实现原理
+11.Kotlin相关
+

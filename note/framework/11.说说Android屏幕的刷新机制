@@ -188,8 +188,7 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
                     }
                     public void run(){
                         //doFrame主要做两件事
-                        //    1.
-                        //        如果指定时间都没有发出去消息,即出现了丢帧,如果丢帧的次数大于SKIPPED_FRAME_WARNING_LIMIT这个数的话，就会打印以下内容
+                        //    1.如果指定时间都没有发出去消息,即出现了丢帧,如果丢帧的次数大于SKIPPED_FRAME_WARNING_LIMIT这个数的话，就会打印以下内容
                         //        //The application may be doing too much work on its main thread
                         //    2.根据消息类型处理callback
                         //       doCallbacks(Choreographer.CALLBACK_TRAVERSAL,frameTimeNanos)
@@ -222,3 +221,4 @@ VSync信号介绍:    https://blog.csdn.net/litefish/article/details/53939882
         2.VSync在SurfaceFlinger的分发流程
         3.VSync信号的分发原理
     3.Choreogrepher原理
+        用于控制UI的绘制节奏,保证只有当vsync信号来的时候才开始绘制下一帧画面
