@@ -176,6 +176,12 @@ MessageQueue.cpp
         比如延迟初始化,检测到当handler空闲的时候再给某些模块初始化
     3.idleHandler的实现原理
         messageQueue的next方法中会判断当前队列是否空闲了,如果是就会回调queueIdle
+    4.dleHandler的基本使用
+        private MessageQueue.IdleHandler mIdleHandler = new MessageQueue.IdleHandler(){
+            public boolean queueIdel(){
+                return true
+            }
+        }
 5.主线程进入了loop循环了为什么没有ANR
     1.了解ANR触发的原理
         在AMS中的子线程中弹出了一个dialog提示用户,应用无响应

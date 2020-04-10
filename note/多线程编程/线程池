@@ -84,3 +84,16 @@ https://www.jianshu.com/p/87bff5cc8d8c
         LinkedBlockDeque,一个由链表结构组成的双向阻塞队列
 
     3.阻塞队列实现原理
+
+6.CountDownLatch介绍
+    https://www.jianshu.com/p/31a100fc945d
+    1.相关API
+      public void await() throws InterruptedException { };   //调用await()方法的线程，如果count>0会被挂起，它会等待直到count值为0才继续执行
+      public boolean await(long timeout, TimeUnit unit) throws InterruptedException { };  //和await()类似，只不过等待一定的时间后count值还没变为0的话就会继续执行
+      public void countDown() { };  //将count值减1
+
+    2.结论
+        CountDownLatch是当前线程等待其他一组线程任务完成之后在继续往下执行；
+        CountDownLatch并不是用来保护共享资源同步访问的，而是用来控制并发线程等待的；
+        CountDownLatch只允许使用一次，一旦内部计数器等于0，再调用这个方法将不起作用，如果还有第二次并发等待，你还得创建一个新的CountDownLatch。
+        有一个任务A，它要等待其他4个任务执行完毕之后才能执行，此时就可以利用CountDownLatch来实现这种功能了

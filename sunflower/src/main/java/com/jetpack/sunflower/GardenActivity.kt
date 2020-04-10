@@ -14,8 +14,11 @@ class GardenActivity : AppCompatActivity(),HomeViewPagerFragment.OnFragmentInter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        Debug.startMethodTracing("GardenActivityOnCreate")
+
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val binding = setContentView<ActivityGardenBinding>(this, R.layout.activity_garden)
+//        Debug.stopMethodTracing()
     }
 
     override fun onFragmentInteraction(uri: Uri) {

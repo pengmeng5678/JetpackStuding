@@ -2,8 +2,9 @@ https://github.com/JsonChao/Awesome-Android-Interview
 https://blog.csdn.net/qian520ao/article/details/81908505
 https://www.jianshu.com/p/a5353748159f
 1.认识App启动加速
-    冷启动:指App进程被杀死后,再启动App就叫冷启动
-    热启动:指App进程按Home键后在后台运行,再启动App就叫热启动
+    冷启动:较慢,指App进程被杀死后,再启动App就叫冷启动()
+    热启动:很快,指App进程按Home键后在后台运行,再启动App到前台运行就叫热启动
+    温启动:较快,温启动会执行一次Activity的生命周期
     启动过程
         冷启动前:
             加载启动App
@@ -15,18 +16,85 @@ https://www.jianshu.com/p/a5353748159f
             创建启动的Activity对象
             加载View布局
             布置屏幕
-            第一次绘制
-2.优化工具TraceView
-    作用:主要做热点分析，得到两种数据:1.单此执行最耗时的方法；2.执行次数最多的方法
-    使用:
-        1.方法中添加Debug.startMethodTracing,Debug.stopMethodTracing()
-        2.Android5.0及以上设备，AndroidProfiler中动态查看CPU,start Record,stop Record,点TopDown,ButtonUp看哪些方法耗时
+            首帧绘制
+    优化方向:Application和Activity生命周期
+    启动时间测量方式
+        1.adb命令(线下)
+            adb shell am start -W packageName/pakageName.MainActivity
+                thisTime：最后一个Activity启动时间
+                totaltime:启动一连串Activity的时间
+                waitime:创建进程的时间+totaltime
+        2.手动打点(线上)
+             开始时间:attachBaseContext
+             结束时间:onWindowFocusChanged(Activity首帧时间),
+                     或者监听ListView第一条显示时的时间更准确,如onBindViewHolder中调用
+                        holder.linearLayout.getViewTreeObserver().addOnPreDrawListener
+2.启动时间检测工具
+        wall time指代码执行时间，耗时较长
+        CPU time(Thread time)指CPU执行时间,耗时较短(以锁冲突分析)，我们应该优化这个指标
+    1.TraceView
+        作用:主要做热点分析，可以以图形形式展示函数执行时间、调用栈等
+        使用:
+            1.方法的开头和结尾分别添加Debug.startMethodTracing("App"),Debug.stopMethodTracing(),生成文件存放于sd卡,Android/data/packageName/files/App.traces
+            2.点击这个文件,AS底部会显示四个栏目
+                *Call Chat:以图表形式展示函数调用链
+                    橙色表示系统API,绿色表示应用自身函数,蓝色表示第三方库的Api
+                Flame Chat:
+                    火焰图主要展示被多次频繁调用的函数链
+                *Top Down:以文字形式展示函数调用链
+                    点击Top Down中的一个方法,查看右边的数据,Total表示该方法执行总耗时,self表示这个方法自身耗时,children表示这个方法调用其他函数的耗时
+                Bottom up:
+
+    2.systrace
+        作用:结合Android内核的数据,生成Html报告;API18以上使用,推荐TraceCompat
+        使用:
+            执行脚本:python systrace.py -t 10 [other-options][categories]
+            使用文档:https:developer.android.com/studio/command-lin/systrace#command_options
+
+            1.在方法的开头和结尾分别调用:TraceCompat.beginSection(),TraceCompat.endSection()
+            2.运行App,执行python脚本,点击App就可以看到命令行中显示报告生成结果,performance.html
+        特点:
+            轻量级,开销小
+            直观反映CPU利用率
+    3.AOP(Aspect Oriented Programming,面向切片编程)函数埋点
+        作用：
+            传统函数打点侵入性强,代码量大，不够优雅,我们可以采用AOP的方式进行埋点,它可以针对同一类问题进行统一处理,无侵入添加代码
+        使用:
+            使用aspectjx框架,详情见AOP思想.txt
+
 3.怎么优化
     1.优化区域：Application、Activity创建
     2.优化手段
         1.利用主题曲防止出现白屏,给启动页设置一个Theme属性,在windowBackground标签下设置默认图片替代白屏
+            1.在清单文件中的Activity设置这个Theme属性设置Activity默认显示图
+            2.在Activity的super.onCreate之前切换成自己真正的Theme,setTheme(R.style.xxx)
+
         2.减少Application、Activity中做的事,不重要的SDK懒加载、异步加载。能异步执行的全部异步执行
-        3.5.0以下的系统multidex预加载优化。https://www.jianshu.com/p/e164ee033928  https://www.jianshu.com/p/2891599511ff
+            1.常规优化方式
+                1.在Application中根据CPU核心数创建一个线程池,将耗时任务放到子线程执行
+                    CPU_COUNT = Runtime.getRuntime().availableProcessors()
+                    int CORE_POOL_SIZE = Math.max(2,Math.min(CPU_COUNT -1,4))
+                    ThreadPoolService service = Excutors.newFixThreadPool(CORE_POOL_SIZE,xxx)
+                    将所有初始化任务分别使用service.submit处理
+
+                2.如果异步任务之间有依赖关系,那么可以使用CountDownLatch进行异步等待
+                    调用CountDownLatch.await()方法的线程，如果count>0会被挂起，它会等待直到count值为0才继续执行
+                    调用CountDownLatch.countDown() { };  //将count值减1
+
+            2.异步优化的最优解:启动器
+                常规异步缺点：代码不优雅、异步依赖关系不太好控制
+
+                代码Task化,启动逻辑抽象成Task
+                根据所有任务依赖关系排序生成一个有向无环图
+                多线程按照排序后的优先级一次执行
+
+        3.延迟初始化、懒加载
+             常规延迟初始化:Handler.postDelay()
+             更优延迟初始化:启动器中可以使用IdleHandler处理执行时机不严格的任务,避免页面卡顿,提高用户体验
+        4.SharedPreferences优化
+            getSharedPreferences会加载文件中的xml文件,此时如果调用get/put操作会阻塞,我们可以在Multidex之前加载,利用此阶段CPU
+
+        5.5.0以下的系统multidex预加载优化。https://www.jianshu.com/p/e164ee033928  https://www.jianshu.com/p/2891599511ff
 
             MultiDex第一次加载出现ANR的原因是因为提取Dex以及DexOpt这两个过程都是耗时的操作，而且他们还都发生在主进程
             5.0以下的系统冷启动时MultiDex工作流程如下
@@ -56,8 +124,24 @@ https://www.jianshu.com/p/a5353748159f
         Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.qihancloud.zhiyin/.ui.activity.MainActivity }
         Status: ok
         Activity: com.qihancloud.zhiyin/.ui.activity.MainActivity
-        ThisTime: 5173      最后一个Activity启动耗时
-        TotalTime: 5173     启动一连串Activity总耗时(有几个就统计几个)
-        WaitTime: 5211      应用进程的创建时间+TotalTime
+        ThisTime: 2173      最后一个Activity启动耗时
+        TotalTime: 2173     启动一连串Activity总耗时(有几个就统计几个)
+        WaitTime: 2211      应用进程的创建时间+TotalTime
         Complete
     获取在As中过滤Displayed字段也可看到整个应用的启动时间
+
+5.启动优化模拟面试
+    1.你做启动优化是怎么做的
+        分析现状、确认问题
+        针对性优化
+        长期保持优化效果
+    2.是怎么异步的，异步遇到问题没有
+        体现演进过程
+        介绍启动器
+    3.你做了启动优化,你觉得有哪些容易忽略的注意点
+        1.cpu time与wall time区别
+        2.注意延迟初始化的优化
+    4.版本迭代导致的启动变慢有好的解决办法吗
+        1.启动器
+        2.结合CI
+        3.监控完善

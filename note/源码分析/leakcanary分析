@@ -28,7 +28,7 @@ https://www.jianshu.com/p/1e7e9b576391
     2.(内存泄漏判定机制)内存泄漏的判断条件是什么,检测内存泄漏的机制原理是什么
         一句话总结内存泄漏的判断条件：
             KeyedWeakReference与ReferenceQueue联合使用,在弱引用关联的对象被回收后,会将引用添加到ReferenceQueue中,
-            清空后,可以根据是否继续含有该引用来判定是否被回收
+            清空KeyedWeakReference中ReferenceQueue包含的所有弱引用后,可以根据KeyedWeakReference是否继续含有该引用来判定是否被回收
             判定回收,手动触发GC,再次判定回收,双重判断如果都未回收,则判断为泄漏对象
         检测内存泄漏的机制原理是：
             1.移除不可达的引用,如果Activity的引用不可达了就返回
