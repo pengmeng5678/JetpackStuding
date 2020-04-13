@@ -5,17 +5,31 @@ https://www.jianshu.com/p/18f16aba79dd
 
 2.原因
     1.主线程做耗时操作
-        1.输入事件(按键或者触摸)5秒内无响应
-        2.广播接收者,前台10S内(后台60S)内未处理完
-        3.Service前台20s,后台200秒未完成启动
+        1.KeyDispatchTimeout,输入事件(按键或者触摸)5秒内无响应
+        2.BroadcastTimeout,广播接收者,前台10S内(后台60S)内未处理完
+        3.ServiceTimeout,Service前台20s,后台200秒未完成启动
         4.ContentProvider的publish在10S内没进行完
     2.主线程被其他线程锁
         如surfaceView获取锁后,绘制图形时被销毁了，导致无法释放锁,而此时主线程更新surfaceView可见或不可见时,会出现surfaceView无法获取锁而阻塞,导致ANR
+        new Thread(){
+            public void run(){
+                synchronized(MainActivity.this){
+                    Thread.sleep(20000)
+                }
+            }
+        }
+        synchronizee(MainActivity.this){
+            Log.d("...")
+        }
     3.CPU被其他进程占用,导致自己的进程无法分配到足够的CPU资源
         ANR后查看日志中的CPU Usage,查看其他应用的CPU使用率是否超过80%以上
+
 3.分析
-    1.查看traces.txt文件
+    1.现象
+        AMS中会弹出一个Dialog提示用户,是在子线程中弹出来的(Rom不同表现可能不一样)
+    2.查看traces.txt文件
         adb pull /data/anr/traces.txt
+        详细分析：CPU、IO、锁
 
 4.帧动画如何使用SurfaceView播放
 5.设置SurfaceView显示和隐藏为何ANR

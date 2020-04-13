@@ -14,7 +14,7 @@ https://www.jianshu.com/p/4f44a178c547
         GPU过度绘制5中的区域颜色：蓝色1次，绿色2次，粉色3次，红色4次。标准是蓝色及以下，过度绘制通过以下方式解决
             1.处理有图片背景的的区域在代码里有选择的取出背景
             2.有选择性的移除窗口背景,getWindow().setBackgroundDrawable(null)
-            3.自定义View中使用Cavas.clipRect
+            3.自定义View中使用Cavas.clipRect只绘制显示出来的View
     2.减少嵌套层次和控件个数
         布局加载原理：LayoutInflater通过Pull解析方式解析各个XML文件中的节点,再将各个节点通过反射创建出View的对象实例
         可按照以下顺序进行优化

@@ -1,6 +1,7 @@
 https://github.com/JsonChao/Awesome-Android-Interview
 https://blog.csdn.net/qian520ao/article/details/81908505
 https://www.jianshu.com/p/a5353748159f
+https://github.com/NoEndToLF/AppStartFaster.git
 1.认识App启动加速
     冷启动:较慢,指App进程被杀死后,再启动App就叫冷启动()
     热启动:很快,指App进程按Home键后在后台运行,再启动App到前台运行就叫热启动
@@ -32,7 +33,7 @@ https://www.jianshu.com/p/a5353748159f
 2.启动时间检测工具
         wall time指代码执行时间，耗时较长
         CPU time(Thread time)指CPU执行时间,耗时较短(以锁冲突分析)，我们应该优化这个指标
-    1.TraceView
+    1.TraceView(CPU Profiler)
         作用:主要做热点分析，可以以图形形式展示函数执行时间、调用栈等
         使用:
             1.方法的开头和结尾分别添加Debug.startMethodTracing("App"),Debug.stopMethodTracing(),生成文件存放于sd卡,Android/data/packageName/files/App.traces
@@ -46,6 +47,7 @@ https://www.jianshu.com/p/a5353748159f
                 Bottom up:
 
     2.systrace
+        通过AndroidSdk/tools/monitor.bat打开Monitor工具
         作用:结合Android内核的数据,生成Html报告;API18以上使用,推荐TraceCompat
         使用:
             执行脚本:python systrace.py -t 10 [other-options][categories]
@@ -137,7 +139,7 @@ https://www.jianshu.com/p/a5353748159f
         长期保持优化效果
     2.是怎么异步的，异步遇到问题没有
         体现演进过程
-        介绍启动器
+        介绍启动器 https://github.com/NoEndToLF/AppStartFaster.git
     3.你做了启动优化,你觉得有哪些容易忽略的注意点
         1.cpu time与wall time区别
         2.注意延迟初始化的优化

@@ -1,0 +1,80 @@
+https://www.jianshu.com/p/4f44a178c547
+1.绘制原理
+    CPU负责计算显示内容
+    GPU负责栅格化(UI元素绘制到屏幕缓冲区)
+    显示器负责每隔16ms发出Vsync信号从屏幕缓冲区中取一帧数据
+2.检测工具
+    1.Systrace(通过AndroidSdk/tools/monitor.bat打开Monitor工具,通过生成的html文件进行分析)
+        作用：线下操作关注是否丢帧
+        关注Frames
+        正常:绿色原点;丢帧:黄色或红色
+        Alerts栏
+    2.LayoutInspect
+       作用:线下查看界面的层次结构是否复杂和重叠
+       AndroidStudio/Tools/LayoutInspector/
+    3.Choreographer
+        作用：线上获取帧率FPS,API16以上可以使用
+        Choreographer.getInstance().postFrameCallback(new Choreographer.FrameListener(){
+            public void doFrame(long frameTimeNanos){
+                //每秒钟打印一次帧数,不足一秒时帧数自增加1
+            }
+        })
+
+3.理解绘制耗时原理
+    Android布局加载原理
+        LayoutInflater通过Pull解析方式解析各个XML文件中的节点,再将各个节点通过反射创建出View的对象实例
+        加载流程：setContentView-LayoutInflator-inflate-getLayout-createViewFromTag-Factory-createView-反射
+        性能瓶颈：
+            布局文件解析：IO过程
+            创建View对象: 反射(比new对象慢三倍)
+    Android绘制原理
+        每一帧图像的绘制都会遍历View树的测量、布局、绘制三大步骤，所有View层级越深,绘制就越耗时
+
+    如何优雅获取界面布局耗时时间呢
+        1.使用AOP
+        2.使用ARTHook
+        3.在super.onCreate之前通过LayoutInflatorCompat.setFactory2获取onCreat方法的耗时，(当某个类有compat后缀可能就是个高版本对低版本的兼容类)
+
+4.针对绘制耗时原理给出优化方案
+    加载布局优化方案
+        1.异步加载布局AsyncInflater(缓解性能问题)
+            1.侧面缓解加载卡顿问题,即子线程解析布局文件
+            2.不能设置LayoutInflator.Factory(final类需要自定义解决兼容问题)
+            3.注意View中不能有依赖主线程的操作
+        2.使用java代码动态创建布局，避免IO和反射过程(根本解决问题)
+            1.X2C框架介绍
+                保留XML优点,解决其性能问题
+                开发人员写XML,加载Java代码
+                原理:APT编译器翻译XML为Java代码动态创建布局
+                缺点:失去了系统的兼容(xxxCompact)
+    绘制优化实战
+        1.降低布局层级及复杂度
+            不嵌套使用RelativeLaout
+            不再嵌套LinearLayout中使用weight
+            merge标签:减少一个层级,只能用于根View
+        2.避免过度绘制
+            去掉多余背景，减少复杂shape使用
+            避免层级叠加
+            自定义View使用clipRect屏蔽被遮盖View绘制
+        3.其他技巧
+            Viewstub:高效占位符、延迟初始化
+            onDraw中避免创建大对象、耗时操作
+            TextView优化
+
+5.模拟面试
+    1.你在布局优化过程中用到了哪些工具
+        统计线上FPS:Choreographer
+        统计布局加载耗时:AOP、Hook
+        统计线下检测耗时:Systrace、LayoutInspector
+    2.布局为什么会导致卡顿，你是如何优化的
+        IO、反射、遍历、重绘
+        异步Inflator,X2C,减少层级、重绘
+        AOP、监控
+    3.做完布局优化有哪些成果产出
+        体系化监控手段：线下+线上
+        指标:FPS、加载时间、布局层级
+
+
+
+
+
