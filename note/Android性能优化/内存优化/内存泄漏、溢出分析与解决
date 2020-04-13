@@ -96,14 +96,24 @@ https://www.jianshu.com/p/2d47d1cf5ccf
             1.leakCanary是在onDestrory中检测内存泄漏的,如果onDestroy不执行就无法检测到
             2.无法检测到Service的内存泄漏
     2.通过AndroidStudio的Android Profiler(As3.0以上)或者Android Monitor(AS3.0以下)进行简单分析
-        运行程序,反复打开关闭页面5次,然后点击GC此时看total内存还没有恢复到之前的数值,就可能发生了内存泄漏
-        此时再点击dump java heap按钮导出当前进程的内存堆栈文件.hprof,并转换成标准hprof文件
+        内存抖动
+            通过Memory Profiler可以直观查看内存图像,当存在连续的锯齿图像时可以判断发生了内存抖动
+            可以使用Record记录内存抖动区域,然后对内存分配大小排序找出分配内存最大的对象和类对应的源码位置
+        内存泄露
+            运行程序,反复打开关闭页面5次,然后点击GC此时看total内存还没有恢复到之前的数值,就可能发生了内存泄漏
+            此时再点击dump java heap按钮导出当前进程的内存堆栈文件.hprof,并转换成标准hprof文件
+
+
     3.使用Histogram直方图分析泄漏
         1.按包名查找,找到当前测试的Activity,如果引用了多个实例，则表明发生了内存泄漏
         2.怀疑那个Activity发生泄漏,使用正则表达式输入Activity名字，Objects会显示当前Activity的数量
         若数量大于1，可能泄漏就通过右键选择Merge Shortest Paths to GC Roots,exclude all phantom/weak/soft etc.references, 意思是查看排除虚引用/弱引用/软引用等的引用链 （这些引用最终都能够被GC干掉，所以排除）
         3.显示出GC Roots还能引用到的对象，这个对象便发生了泄漏
 三、内存优化
+        内存泄露
+            定义：内存中存在已经没有用的对象
+            表现: 内存抖动,可用内存逐渐减少
+
     1.内存泄漏的本质
         无法回收无用的对象，长生命周期的对象持有了短生命周期对象的引用
     2.常见的内存泄漏场景
@@ -126,16 +136,29 @@ https://www.jianshu.com/p/2d47d1cf5ccf
         7.监听未关闭
 
     3.常见的内存优化点
-        1.UI只提供一套高分辨率的图,图片建议放在drawable-xxhdpi文件夹下，这样在低分辨率设备中图片大小只是压缩，不会存在内存增大的情况
-        2.图片的优化，颜色模式使用RGB565替换RGB8888
-        3.item不可见时释放掉图片的引用
-            listView每次在item被回收后再次利用都会重新绑定数据,只需要在ImageView onDetachFromWindow的时候释放掉图片引用既可
-            RecycleView不可见时会放到mCacheView中,被回收时放进mRecyclePool中后拿出来复用才会重新绑定数据，所以在adapter中重写onViewRecycled方法释放图片引用
-        4.集合优化，如SparseArray、SparseBooleanArray、LongSparseArray,这些Api避免了基本数据类型转换成对象数据类型的时间
-        5.避免创建不必要的对象，用StringBuffer代替加号拼接字符串
-        6.onDraw方法不要执行对象的创建
-        7.静态内部类,避免内存泄漏
-
+        1.内存泄露
+            1.UI只提供一套高分辨率的图,图片建议放在drawable-xxhdpi文件夹下，这样在低分辨率设备中图片大小只是压缩，不会存在内存增大的情况
+            2.图片的优化，颜色模式使用RGB565替换RGB8888
+            3.item不可见时释放掉图片的引用
+                listView每次在item被回收后再次利用都会重新绑定数据,只需要在ImageView onDetachFromWindow的时候释放掉图片引用既可
+                RecycleView不可见时会放到mCacheView中,被回收时放进mRecyclePool中后拿出来复用才会重新绑定数据，所以在adapter中重写onViewRecycled方法释放图片引用
+            4.集合优化，如SparseArray、SparseBooleanArray、LongSparseArray,这些Api避免了基本数据类型转换成对象数据类型的时间
+            5.避免创建不必要的对象，用StringBuffer代替加号拼接字符串
+            6.onDraw方法不要执行对象的创建
+            7.静态内部类,避免内存泄漏
+        2.内存抖动
+            内存抖动是由于短时间内有大量的对象进入到新生代区域,它伴随着频繁的GC,GC会大量占用UI线程和CPU资源,会导致APP整体卡顿
+            避免发生内存抖动的方法
+                尽量避免在循环体里面创建对象
+                避免在onDraw方法里面创建对象
+                当需要大量使用Bitmap的时候可以使用
+        3.Bitmap
+            ARTHook优雅检测不合理图片
+                采用Epic框架,如当一个Bitmap宽高大小超过ImageView实际展示大小两倍时发出警告
+        4.优化细节
+            LargeHeap
+            onTrimMemory
+            SparseArray
     4.可达性分析算法
       原理:从GC Roots根节点开始持续找这些节点的引用节点,当所有的引用节点寻找完毕之后,剩余节点就是不可达的节点，即需要被回收的节点
       Java语言中,可作为GC Roots节点的对象包括以下几种
@@ -143,9 +166,16 @@ https://www.jianshu.com/p/2d47d1cf5ccf
           2.方法区中类静态属性引用的对象
           3.方法区中常量引用的对象
           4.本地方法栈中JNI引用的对象
-四、内存抖动
-    内存抖动是由于短时间内有大量的对象进入到新生代区域,它伴随着频繁的GC,GC会大量占用UI线程和CPU资源,会导致APP整体卡顿
-    避免发生内存抖动的方法
-        尽量避免在循环体里面创建对象
-        避免在onDraw方法里面创建对象
-        当需要大量使用Bitmap的时候可以使用
+
+四、内存优化模拟面试
+    1.你们内存优化项目的过程是怎么做的
+        1.分析现状、确认问题
+        2.针对性优化
+        3.效率提升
+    2.你做内存优化最大的感觉是什么
+        1.磨刀不误砍柴工
+        2.技术优化必须结合业务代码
+        3.系统化完善解决方案
+    3.如何检测所有不合理的地方
+        1.ARTHook
+

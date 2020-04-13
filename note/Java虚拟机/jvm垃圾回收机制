@@ -82,7 +82,7 @@ https://www.cnblogs.com/aspirant/p/8662690.html
         4.分代收集算法
             分代收集算法是目前大部分JVM的垃圾收集器采用的算法,它的核心思想就是根据对象存活的生命周期将内存划分为若干不同的区域
         一般情况将堆区划分为
-            年轻代(新生代,Young Generation)：年轻代的回收算法以复制算法为主
+            年轻代(新生代,Young Generation)：年轻代的回收算法以复制算法为主,因为新生的对象存活率低
 
                 a.所有新生产的对象首先都是放在年轻代的
                 b.年轻代内存按照8:1:1的比例分为一个Eden区和两个survivor区。大部分对象在Eden区中生成,
@@ -92,7 +92,7 @@ https://www.cnblogs.com/aspirant/p/8662690.html
                 c.如果复制到survivor1时,survivor1空间不足,就将存活对象放到老年代，如果老年代空间也满了时就触发一次Full GC(Major GC),也就是新生代,老年代都回收
                 d.新生代发生GC也叫做Minor GC，MinorGC发生频率比较高,不一定等Eden满了才触发
 
-            老年代(Tenured Generation)：老年代的算法以标记整理为主
+            老年代(Tenured Generation)：老年代的算法以标记整理为主,因为老年代对象存活率高
                 a.在年轻代经历了N次垃圾回收仍然存活的对象，就会被放到老年代中,因此可认为老年代中都存放一些生命周期比较长的对象
                 b.老年代比年轻代内存大很多，大概2:1,当老年代内存满时触发Full Gc
 
