@@ -92,3 +92,4 @@ https://www.jianshu.com/nb/8407779
         4.epic:         ARTHook无侵入式方法耗时检测,可以Hook系统方法,https://github.com/tiann/epic.git
         5.ANR-WatchDog: 检测ANR,获取堆栈信息,https://github.com/SalomonBrys/ANR-WatchDog.git
         6.X2C:          可以优化布局加载耗时,编译时动态创建View,避免加载布局时IO和反射耗时,https://github.com/iReaderAndroid/X2C.git
+        7.Lancet:       轻量级AOP框架
