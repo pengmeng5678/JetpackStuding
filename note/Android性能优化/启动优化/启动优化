@@ -132,7 +132,33 @@ https://github.com/NoEndToLF/AppStartFaster.git
         Complete
     获取在As中过滤Displayed字段也可看到整个应用的启动时间
 
-5.启动优化模拟面试
+5.界面秒开实现
+    1.实现方案
+        SysTrace,优雅异步+优雅延迟初始化
+        异步Inflate、X2C、绘制优化
+        提前获取页面数据
+    2.界面秒开率统计
+        onCreate到onWindowFocusChanged
+        特定接口
+    3.Lancet：轻量级Android AOP框架，编译速度快，支持增量编译,API简单
+        @Proxy 通常用于对系统API调用的Hook
+        @Insert常用于操作App与library的类
+        示例如下
+            public class ActivityHooker{
+                @Proxy("i")
+                @TargetClass("android.util.Log")
+                public static int i(String tag,String msg){
+                    //Hook日志类中的i方法,直接将方法签名拷贝过来,再加上注解和新增逻辑
+                    msg = msg + "ActivityHooker";
+                    return (int)Origin.call();
+                }
+            }
+    4.界面秒开监控维度
+        总体耗时
+        生命周期耗时
+        生命周期间隔耗时
+
+6.启动优化模拟面试
     1.你做启动优化是怎么做的
         分析现状、确认问题
         针对性优化

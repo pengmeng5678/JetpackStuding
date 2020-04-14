@@ -3,10 +3,44 @@
     2.检测卡顿的工具
         TraceView
         Systrace
-        StrictMode
-2.自动化检测方案
-    1.Leakcanary(AndroidPerformanceMonitor)
-        原理：判断主线程Looper在dispatchMessage前后的执行时间是否超过一段时间
-    2.ANR-WatchDog
-        原理:start-post消息改值-sleep-检测值是否被修改成功-判断是否发生了ANR
-3.卡顿单点问题检测方案
+
+2.卡顿优化工具建设
+    系统工具认识、使用
+        1、SysTrace:可以方便看出CPU使用情况,开销比较小
+        2、TraceView可以方便看出每个线程在特定时间在做什么,开销比较大
+        3. StrictMode
+    自动化监控及优化
+        1.blockcanary(AndroidPerformanceMonitor)
+            原理：判断主线程Looper在dispatchMessage前后的执行时间是否超过一段时间
+        2.ANR-WatchDog
+            原理:start-post消息改值-sleep-检测值是否被修改成功-判断是否发生了ANR
+        3.高频采集,找出重复率高的堆栈
+    卡顿监控工具
+        1.单点问题：AOP、Hook
+        2.盲区监控: (可适用于线上方案)
+            使用统一的Handler:定制具体方法，如sendMessageAtTime()和dispatchMessage()
+            定制gradle插件,编译器动态替换
+    卡顿监控指标
+        1.卡顿率、ANR率、界面秒开率
+        2.交互时间、生命周期时间
+        3.上报环境、场景信息
+
+3.卡顿优化实战经验
+    1.耗时操作：异步、延迟
+    2.布局优化：异步Inflate，X2C，重绘解决
+    3.内存:降低内存占用,减少GC时间
+
+4.模拟问题
+    1.你是怎么做卡顿优化的
+        1.第一阶段:系统工具定位、解决
+        2.第二阶段:自动化卡顿方案及优化
+        3.线上监控及线下监测工具建设
+
+    2.怎么自动化的获取卡顿信息
+        1.mLogging.println
+        2.高频采集,选择上报
+
+    3.卡顿的一整套解决方案是怎么做的
+        1.线上、线下工具相结合
+        2.特定难题突破:单点问题、盲区监控
+        3.线上监控建设
