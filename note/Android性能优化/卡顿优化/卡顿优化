@@ -15,6 +15,8 @@
         2.ANR-WatchDog
             原理:start-post消息改值-sleep-检测值是否被修改成功-判断是否发生了ANR
         3.高频采集,找出重复率高的堆栈
+            获取当前线程的调用堆栈栈信息
+                Log.i("TAG",currentThreadName+" stack:"+Log.getStackTraceString(new Throwable()))
     卡顿监控工具
         1.单点问题：AOP、Hook
         2.盲区监控: (可适用于线上方案)

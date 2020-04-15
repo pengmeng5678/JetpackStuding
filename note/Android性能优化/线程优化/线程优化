@@ -1,0 +1,109 @@
+1.Android线程调度原理剖析
+    1.线程调度原理
+        任意时刻,只有一个线程占用CPU,处于运行状态
+        多线程并发：轮流获取CPU使用权
+        JVM负责线程调度:按照特定机制分配CPU使用权
+
+    2.线程调度模型
+        1.分时调度模型：轮流获取、均分CPU时间
+        2.抢占式调度模型：优先级高的优先获取,JVM采用
+
+    3.Android线程调度
+        1.nice值:处理单个线程之间的优先级
+            Process.setThreadPriority()
+            值越小,优先级越高
+            默认是THREAD_PRIORITY_DEFAULT = 0
+
+        2.cgroup(处理单个高优先级线程和多个低优先级线程的CPU抢占问题)
+            更严格的群组调度策略
+            保证前台线程可以获取到更多的CPU
+    4.注意点
+        线程过多会导致CPU频繁切换,降低线程运行效率
+        正确认识任务重要性决定选择线程的类型
+        线程的优先级具有继承性
+
+2.Android异步方式汇总
+    1.Thread
+        最常见的、简单的异步方式
+        频繁创建和销毁多个线程对性能影响大
+    2.HandlerThread
+        在Thread中准备了一个Handler专门串行处理异步任务
+        适合长时间执行，需要不断从线程中取任务的场景
+    3.IntentService
+        继承Service，内部创建了HandlerThread
+        异步线程不会阻塞主线程
+        优先级较高,不易被系统Kill
+    4.AsyncTask
+        内部实现就是线程池
+        无需自己处理线程切换
+    5.ThreadPool
+        易复用,减少频繁创建、销毁的性能损耗
+        功能强大:定时、任务队列、并发数控制等
+    6.Rxjava
+        由强大的Scheduler集合提供IO、CPU等不同类型的线程
+
+    我们应该根据不同的场景使用不同的异步方式
+
+3.线程使用准则
+    1.严禁直接new Thread
+    2.每个线程都应该有名字,便于追溯；运行期也可以修改名字,Thread.currentThread.setName
+    3.提供基础线程池供各个业务线使用,避免各个业务线各自维护一套线程池,导致线程数过多;
+    4.根据任务类型选择合适的异步操作,如耗时任务可以使用HandlerThread
+    5.关键异步任务监控：异步不等于不耗时,可以使用AOP方式来监控
+    6.重视优先级设置：可以设置多次
+
+4.如何锁定线程创建者
+    1.锁定线程创建背景
+        项目变大之后要收敛线程
+        项目源码、三方库、AAR中都有线程的创建
+        避免恶化的一种监控预防手段
+    2.分析
+        创建线程的位置获取堆栈
+        所有的异步方式,都会走到new Thread()
+        特别适合Hook手段,找Hook点,构造函数或者特定方法,Thread的构造函数
+        在attachBaseContext中就开始Hook(使用epic框架)
+            DexposeBridge.hookAllConstructors(Thread.class,new XM_MethodHook(){
+                protected void afterHookedMethod(MethodHookParam param){
+                    super.afterHookedMethod(param)
+                    Thread thread = (Thread)param.thisObject;
+                    //打印当前线程的堆栈信息
+                    LogUtils.i(thread.getName()+" stack "+Log.getStackTraceString(new Throwable()))
+                }
+            })
+
+5.线程收敛常规方案
+    根据线程创建堆栈考量合理性,使用同一线程库
+    各个业务线下掉自己的线程库
+
+    基础库(如LogUtils)怎么使用线程
+        直接依赖线程库：缺点是线程库更新可能会导致基础库更新
+        基础库优雅使用线程
+            基础库内部暴露API：setExecutor,初始化的时候注入同一的线程库
+            public class LogUtils{
+                private static ExecutorService sExecutorService;
+                public static void setExecutor(ExecutorService executorService){
+                    sExecutorService = executorService
+                }
+                public static void i(String msg){
+                    //优先使用外部注入的线程库sExecutorService,如果sExecutorService为空就使用默认线程库
+                }
+            }
+
+        统一线程库
+            区分任务类型:IO、CPU密集型
+            IO密集型任务不销毁CPU，核心池可以很大
+            CPU密集型任务：核心池大小和CPU核心数相关
+
+6.模拟问题
+    1.线程使用为什么会遇到问题
+        项目发展阶段
+        问题原因及表现形式：
+            没有采用统一线程池,导致异步耗时很久;由于java线程是抢占式调度,我们没有区分IO密集型任务和CPU密集型任务,导致主线程无法抢占到CPU时间片而卡顿
+
+    2.怎么在项目中对线程进行优化
+        1.线程收敛
+            通过Hook获取所有创建的线程的堆栈信息,然后结合业务场景判断该线程是否应该被单独创建
+            我们尽可能的在业务层面将我们的线程放到我们统一的线程池库中;而对于我们的基础库,我们通过暴露接口的方式提供让线程库实现的能力
+            在基础库使用之前注入我们的线程库，来达到统一管理线程池库的能力
+        2.统一线程池：任务区分
+            IO和CPU密集型任务

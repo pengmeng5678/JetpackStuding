@@ -87,7 +87,8 @@ https://www.jianshu.com/nb/8407779
 
     5.性能优化相关的框架
         1.leakcanary:   内存泄漏检测
-        2.blockcanary:  卡顿检测
+        2.blockcanary:
+         卡顿检测
         3.Aspectjx:     AOP思想方法耗时检测,https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx.git
         4.epic:         ARTHook无侵入式方法耗时检测,可以Hook系统方法,https://github.com/tiann/epic.git
         5.ANR-WatchDog: 检测ANR,获取堆栈信息,https://github.com/SalomonBrys/ANR-WatchDog.git

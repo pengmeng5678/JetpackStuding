@@ -1,0 +1,81 @@
+1.网络优化介绍
+    1.网络优化维度
+        流量消耗
+            一段时间流量消耗的精准度量,网络类型、前后台
+            监控相关:用户流量消耗均值、异常率(消耗多、次数多)
+            完整链路全部监控(Request,Response),主动上报
+        网络请求质量
+            用户体验:请求速度、成功率
+            监控相关:请求时长、业务成功率、失败率、Top失败接口
+        其他
+            公司成本:带宽、服务器数、CDN
+            耗电
+    2.网络优化误区
+        1.只关注流量消耗，整体均值掩盖单点问题，忽视其他维度，
+        2.只关注均值、整体,忽视个体，粗粒度监控不能帮助我们发现、解决深层次问题
+
+2.网络优化工具
+    1.Network Profiler
+        显示实时网络活动:发送、接收数据及连接数
+        需要启用高级分析：Run->Edit Configurations->选中app->Profiling->enable advanced profiling
+        只支持HttpURLConnection和OkHttp网络库
+
+    2.抓包工具
+        Charles[[tʃɑ:lz]]、Fiddler、Wireshark、TcpDump
+        1.Charles使用
+            断点功能：右击拦截的(请求)响应,选中breakpoint,修改(request)response数据,点击Execute继续执行断点后的操作
+            Map Local:可以模拟服务器返回假数据：右击网址,选中Map Local,选中自己本地的数据
+            弱网环境模拟：Proxy-Throttling Settings
+
+    3.Stetho
+        介绍
+            强大的应用调试桥,连接Android和Chrome
+            网络监控、视图查看、数据库查看、命令行扩展
+        使用
+            com.facebook/stetho:stetho-okhttp3:1.5.0
+            Stetho.initializeWithDefaults(this)
+            addNetWorkInterceptor
+            Chrome浏览器：chrome://inspect
+
+3.精准获取流量消耗实战
+    如何判断App流量消耗偏高
+        绝对值看不出高低
+        对比竞品,相同Case对比流量消耗
+        异常监控超过正常指标
+    测试方案
+        设置-流量管理
+        抓包工具:只允许本App联网
+
+    1.线上线下流量获取
+        线上
+            TrafficStats:API18以上重启依赖的流量数据统计
+                getUidRxByte(int uid)指定Uid的接收流量
+                getTotalTxBytes()总发送流量
+                缺点:无法获取某个时间段内的流量消耗
+            NetworkStatsManager:API23之后的流量统计
+                可获取指定时间间隔内的流量信息
+                可获取不同网络类型下的消耗
+                private void getNetStats(long startTime,long endTime){
+                    long netDataRx = 0;
+                    long netDataTx = 0;
+                    TelephonyManager telephonyManager = (TelephonyManager)getSystemManager(Context.TELEPHONE_SERVICE)
+                    String subId = telephonyManager.getSubscriberId()
+                    NetworkStatsManager manager = (NetworkStatsManager)getSystemManager(...)
+                    NetworkStats.networkStats = null;
+                    NetworkStats.Bucket bucket = new NetworkStats.Bucket()
+                    //本月第一天0点时间到当前时间的流量统计
+                    networkStats = manager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,subId,getTimeMothMorning(),System.currentTimeMillis())
+                    while(networkStats.hasNextBucket()){
+                        networkStats.getNextBuket(bucket)
+                        int uid = bucket.getUid();
+                        if(getUidByPackageName() == uid){
+                            netDataRx += bucket.getRxBytes()
+                            netDataTx += bucket.getTxBytes()
+                        }
+                    }
+                }
+    2.前台后台流量获取方案
+        后台判断：应用所有Activity都onPause
+        前台判断: 至少有一个Activity的没有onPause,onResume时数量加1
+
+        后台定时任务、获取间隔内流量、记录前后台、分别计算、上报APM后台、流量治理依据
