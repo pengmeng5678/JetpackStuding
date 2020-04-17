@@ -1,3 +1,97 @@
+https://mp.weixin.qq.com/s/vn3KiV-ez79FmbZ36SX9lg
 1.手写冒泡排序
+    比较相邻的两个元素,如果第一个比第二个大就交换,每一轮循环就找到一个最大的数放到数组的最后面
+    代码记忆方法：
+        1.相邻数据两两比较，先写内层循环体比较代码arr[j]>arr[j+1]
+        2.再写内层循环边界参数从第一个数开始比较,且每次比较的数-1,所以初始化j=0,for(j=0;j<N-i;j++)
+        3.再写外层循环for(i = 1;i<N;i++),i=1的原因是内层循环体中用到了j<N-i,i从0开始arr[j+1]索引就会越界
+
+    public int[] BubbleSort(int[] sourceArray){
+        // 对 arr 进行拷贝，不改变参数内容
+        int[] arr = Arrays.copyOf(sourceArray, sourceArray.length);
+        int N = arr.length();
+        for(i = 1;i<N;i++){
+            for(int j=0;j<N-i;j++){
+                if(arr[j] > arr[j+1]){
+                    int temp = arr[j];
+                    arr[j] = arr[j+1];
+                    arr[j+1]= temp;
+                }
+            }
+        }
+        return arr;
+    }
+
 2.手写选择排序
+    先假定第一个数最小,然后依次和数组后面的每个数进行比较找出最小的数放在数组头部
+    每一轮循环选出一个最小的数的索引,放在已排序数组的末尾
+    代码记忆方法：
+        1.每轮循环的第一个数和剩下的所有数进行比较,每轮循环找出一个最小的数的索引min=i; arr[min]>arr[j]
+        2.i肯定从0开始,那j肯定从i+1开始,那就可以写出外层循环for(i = 0;i<N-1;i++),和内存循环条件for(j=i+1;j<N;j++)
+        3.内存循环体执行完毕,判断假定的索引i和遍历的最小值的索引是否一致，不一致就是交换过了
+    public int[] SelectionSort(int[] sourceArray){
+        int[] arr = Arrays.copyOf(sourceArray, sourceArray.length);
+        int N = arr.length();
+        for(i = 0;i<N-1;i++){
+            int min = i;
+            for(int j=i+1;j<N;j++){
+                if(arr[min] > arr[j]){
+                    min = j;
+                }
+            }
+            if(min != i){
+                int temp = arr[i];
+                arr[i] = arr[min];
+                arr[min]= temp;
+            }
+        }
+        return arr;
+    }
 3.手写快速排序
+    从数列中挑出一个元素,称为基准,重新排序数列,所有元素比基准值小的放左边,比基准值大的放右边
+    递归的把基准左边的数列和基准值右边的序列继续进行快速排序
+    public int[] sort(int[] sourceArray){
+        int[] arr = Arras.copyOf(sourceArray,sourceArray.length)
+        return quikSort(arr,0,arr.length-1)
+    }
+    public int[] quikSort(int[] arr,int left,int right){
+        if(left < right){
+            //获取基准值的索引
+            int partitionIndex = getPartitionIndex(arr,left,right)
+            quikSort(arr,left,partitionIndex)
+            quikSort(arr,partitionIndex+1,right)
+        }
+    }
+    public int getPartitionIndex(int[] arr,int left,int right){
+         //设定基准值（pivot）
+          int pivot = left;
+          int index = pivot + 1;
+          for (int i = index; i <= right; i++) {
+              if (arr[i] < arr[pivot]) {
+                  swap(arr, i, index);
+                  index++;
+              }
+          }
+          swap(arr, pivot, index - 1);
+          return index - 1;
+    }
+
+4.手写二分查找
+    public int binarySearch(int[] arr,int target){
+        int left=0;
+        int right = arr.length-1;
+        while(left <= right){
+            int mid = (left+right)/2;
+            int midVal = arr[mid];
+            if(midVal = target){
+                return mid;
+            }else if(midVal > target){
+                //目标值在中位值的左边
+                right = mid-1;
+            }else if(midVal < target){
+                //目标值在中位值的右边
+                left = mid+1;
+            }
+        }
+        return -1;
+    }
