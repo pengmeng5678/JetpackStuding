@@ -261,3 +261,4 @@ http://greenrobot.org/greendao/documentation/joins/
         QueryBuilder<ItemOneCourseBean> qb = ItemCourseListDaoManager.getInstance().getItemCourseListSession().getItemOneCourseBeanDao()
                         .queryBuilder();
                 List<ItemOneCourseBean> list = qb.where(qb.and(ItemOneCourseBeanDao.Properties.Chapter_id.eq(courseItemId), ItemOneCourseBeanDao.Properties.Fid.eq(courseId))).list();
+9.为什么使用GreenDao,它和其他数据库框架相比有什么优势

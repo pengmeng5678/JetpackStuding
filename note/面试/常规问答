@@ -1,0 +1,138 @@
+1.自我介绍
+    1.基本信息
+        面试官好,我叫彭猛,今年27岁,来自湖南常德
+    2.公司、岗位及公众方向
+        本科毕业将近五年,我从事过两家公司分别是旗翰科技和三宝创新,五年内我工作的岗位都是机器人平台的Android开发
+        经历了公司初期的项目应用定制到系统应用的整合与性能优化全过程,具备应用独立开发能力。
+        我负责开发并持续维护过的主要项目包括知音、心理咨询、AI助教、高清相机等。
+
+        其中知音可以说是机器人最核心的一个应用,所有涉及人机语音交互相关的功能业务都是以知音为基础进行扩展的。
+
+        心理咨询是一款为幼教行业专门打造的即时通讯类应用,这个应用和Web端建立两层通信,第一层就是音视频实时通话,通话过程中还可以实时变音
+        第二层就是依赖系统通信录和服务器建立的socket长连接,应用和Web端可以实时收发图文视频等信息。这样老师在后台就可以以机器人身份了解小朋友的心理状态进而做出专业辅导
+
+        AI助教是一款结合Web后台管理系统在课堂中使用的助教应用,老师在Web后台编辑好课件数据后,可以在机器人上进行播放或者投放到显示屏上,课件数据结合机器人自身语音、灯光、动作为老师提供课堂辅导
+
+        高清相机建立了和嵌入式系统的通信,嵌入式平台的高清相机和JNI层的socket建立了长连接,音视频数据经JNI传递到应用层,高清相机应用作为一个中转站,为机器人平台的所有应用提供数据支撑
+        我的自我介绍大概就是这些,谢谢！
+
+2.应用中用到了哪些设计模式
+    1.单例模式
+        源码中的context.getService(...)就是使用了单例模式,当XXXService对象不存在时就会创建,创建成功就会保存到一个ArrayList中
+        语音、导航模块、网络请求等模块
+        public class SpeechManager{
+            public SpeechManager getInstance(){
+                return sSpeechManagerHolder;
+            }
+            //静态内部类保证类延迟初始化和类加载安全(JVM初始化类是同步的)
+            private static SpeechManagerHolder{
+                private static SpeechManagerHolder sSpeechManagerHolder = new SpeechManager();
+            }
+        }
+
+        public class SpeechManager{
+            //第一层判空保证性能；第二次判空保证单例(避免两个线程同时通过第一层判断,线程A初始化后,线程B获取锁再创建一次对象);
+            //volatile保证有序性
+            private volatile mInstance;
+            public SpeechManager getInstance(){
+                if(mInstance == null){
+                    synchronize(SpeechManager.class){
+                        if(mInstance == null){
+                            mInstance = new SpeechManager();
+                        }
+                    }
+                }
+                return mInstance;
+            }
+    2.观察者模式
+        源码中的Adapter就是一个观察者模式,Adapter内部包含一个被观察者对象DataSetObservable,我们通过listView.setAdapter其实就是创建了一个观察者,
+        我们调用Adapter.notifyDatasetChange方法,就会调用DataSetObservable的setChange方法让所有的观察者重新绘制
+
+        高清相机中JNI层的数据流传递到应用层后,一方面我们要显示,一方面我们要推送给服务器就构成了一种一对多的依赖关系
+        我们统一管理所有监听者的请求来统一通知所有的观察者
+        public class Observerable{
+
+            private Vector<Observer> vector = new Vector()
+            public synchronized void registerObServer(Observer observer){
+                if(!vector.contains(observer)){
+                    list.add(observer)
+                }
+            }
+            public synchronized void unregisterObserver(Observer observer){
+                list.remove(observer)
+            }
+            public void publishData(String data){
+                for(int i=0;i<list.size;i++){
+                    list.get(i).updateData(data);
+                }
+            }
+        }
+        public class Observer{
+            public updateData(String data)
+        }
+        public class Client(){
+            Observer observer1 = new Observer();
+            Observer observer2 = new Observer();
+            Observer Observerable = new Observerable();
+            Observerable.registerObServer(observer1)
+            Observerable.registerObServer(observer2)
+        }
+    3.Builder模式
+        源码中的AlertDialog.Builder
+        在心理咨询项目中,对音视频推流的参数配置上采用了Builder模式
+        public class pushManager{
+            private String simpleRate;
+            private int simpleBit;
+            private String chanelType;
+            public pushManager(Builder build){
+                simpleRate = build.mSimpleRate;
+                simpleBit  = build.msimpleBit;
+                chanelType = build.mChanelType;
+            }
+            public static class Builder{
+                private String mSimpleRate;
+                private int    mSimpleBit;
+                private String mChanelType;
+                public Builder simpleRate(String simpleRate){
+                    this.mSimpleRate = simpleRate;
+                    return this;
+                }
+                public Builder simpleRate(String simpleBit){
+                    this.mSimpleBit = simpleRate;
+                    return this;
+                }
+                public Builder simpleRate(String chanelType){
+                    this.mChanelType = simpleRate;
+                    return this;
+                }
+                public pushManager build(){
+
+                    return new pushManager(this)
+                }
+            }
+        }
+
+    4.外观模式
+        源码中ComtextImpl
+        语音模块中使用了外观模式统一调配语音的识别、合成、唤醒、语义功能
+
+3.应用中用到了哪些数据结构和算法
+    知音中使用了HashMap保存缓存的Fragemnt
+    LindkedHashMap
+    AI助教中使用了递归解析硬件协议的算法
+4.说说面向对象设计思想
+    理解的面向对象设计思想它是一种“万物皆对象”的设计思想,现实世界中任何一个物体都可以属于某一类事物,
+    每一个个体就可以理解这类事物的一个实体。面向对象的编程就是以对象为中心,结合消息驱动，所以程序=对象+消息。
+    面向对象有三大特性
+        封装：将一类事物的属性和行为抽象成一个类。使其属性私密化和行为公开化。保证了数据的隐秘性,提高代码复用性
+        继承：将一类事物的共有属性和行为抽象成一个父类,使其子类可以使用父类的属性和行为,也可以自己扩展自己的属性和行为，提高代码的扩展性和复用性
+        多态：将父类引用指向子类对象，它通过接口重用,使其调用父类接口的方法时,不同的子类实现的逻辑也不同,从而达到解耦的目的
+5.说说Handler机制
+    定义本质实现原理
+6.内存模式和垃圾回收机制
+    内存模式定义
+    垃圾回收机制
+        检测垃圾和回收垃圾
+7.线程池
+    自定义和Executors方式创建线程池
+8.

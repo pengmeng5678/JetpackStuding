@@ -28,6 +28,11 @@ class MainActivity : AppCompatActivity() {
         RxjavaTest()
         RetrofitTest()
         Glide.with(this).load("www.baidu.com").into(ImageView(this))
+        ObserverTest()
+    }
+
+    private fun ObserverTest() {
+        var observable = java.util.Observable()
     }
 
     private fun RetrofitTest() {

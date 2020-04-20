@@ -18,7 +18,7 @@ https://cloud.tencent.com/developer/article/1428642
     最大容量时Integer.MAX_VALUE,每次扩容时如果当前容量小于5则扩容是8,否则扩容为原容量的2倍
 5.SparseArray get原理
     通过二分查找算法找到key对应的下标,如果没找到value就返回null，如果找到了就返回value值
-    因为查找时需要进行一次二分查找,所以相对于HashMap来说,SparseArray查找效率较低
+    因为查找时需要进行一次二分查找,所以当数据量大的时候(如超过1千)相对于HashMap来说,SparseArray查找效率较低
 6.SparseArray的put原理
     put方法中用到了ContainerHelpers提供的二分查找方法binarySearch,用于查找目标key在mKeys中的当前索引或者是目标索引
     binarySearch方法的返回值分为两种情况

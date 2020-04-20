@@ -70,5 +70,30 @@ public class SimpleRequest{
             线程2拿到未初始化的对象使用就会报错,不过JDK1.5以后，推出valotile关键字修饰可避免指令重排序，可以解决此问题
 
 4.手写观察者模式
-
+    public class Observerable{
+        private Vector<Observer> vector = new Vector()
+        public synchronized void registerObServer(Observer observer){
+            if(!vector.contains(observer)){
+                list.add(observer)
+            }
+        }
+        public synchronized void unregisterObserver(Observer observer){
+            list.remove(observer)
+        }
+        public void publishData(String data){
+            for(int i=0;i<list.size;i++){
+                list.get(i).updateData(data);
+            }
+        }
+    }
+    public class Observer{
+        public updateData(String data)
+    }
+    public class Client(){
+        Observer observer1 = new Observer();
+        Observer observer2 = new Observer();
+        Observer Observerable = new Observerable();
+        Observerable.registerObServer(observer1)
+        Observerable.registerObServer(observer2)
+    }
 5.手写代理模式
