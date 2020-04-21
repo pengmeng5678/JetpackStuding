@@ -13,7 +13,7 @@ https://www.jianshu.com/p/87bff5cc8d8c
         1.newFixedThreadPool:可重用固定线程数的线程池
             new ThreadPoolExecutor(nThreads,nThreads,0L,TimeUnit.MILLISECONDS,new LinkedBlockQueue)
             corePoolSize和maxnumPoolSize相等，表示只有固定数量的核心线程,没有非核心线程,所以KeepAlive为0L表示多余的线程会被立即终止,使用了无界阻塞的LindedBlockQueue
-            当线程数超过corePoolSize时,就将任务存储在任务队列中,当核心线程池有空闲任务时,就从任务队列中取取任务执行
+            当线程数超过corePoolSize时,就将任务存储在任务队列中,当核心线程池有空闲任务时,就从任务队列中取任务执行
         2.newCachedThreadPool:
             new TheadPoolExecutor(0,Integer.MAX_VALUE,keepAlive=60,TimeUnit.SECONDS,new SynchronousQueue)
             CacheThreadPool没有核心线程,非核心线程是无界的,使用了SynchrounQueue
@@ -97,3 +97,57 @@ https://www.jianshu.com/p/87bff5cc8d8c
         CountDownLatch并不是用来保护共享资源同步访问的，而是用来控制并发线程等待的；
         CountDownLatch只允许使用一次，一旦内部计数器等于0，再调用这个方法将不起作用，如果还有第二次并发等待，你还得创建一个新的CountDownLatch。
         有一个任务A，它要等待其他4个任务执行完毕之后才能执行，此时就可以利用CountDownLatch来实现这种功能了
+
+7.线程池的初始化
+    public class TaskExceutorManager {
+        private static volatile TaskExceutorManager taskExceutorManager;
+        //CPU 密集型任务的线程池
+        private ThreadPoolExecutor sCPUThreadPoolExecutor;
+        // IO 密集型任务的线程池
+        private ExecutorService sIOThreadPoolExecutor;
+         //CPU 核数
+        private  final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+        //线程池线程数
+        private  final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 5));
+        //线程池线程数的最大值
+        private  final int MAXIMUM_POOL_SIZE = CORE_POOL_SIZE;
+        //线程空置回收时间
+        private  final int KEEP_ALIVE_SECONDS = 5;
+        //线程池队列
+        private  final BlockingQueue<Runnable> sPoolWorkQueue = new LinkedBlockingQueue<>();
+        // 这个是为了保障任务超出BlockingQueue的最大值，且线程池中的线程数已经达到MAXIMUM_POOL_SIZE时候，还有任务到来会采取任务拒绝策略，这里定义的策略就是
+        //再开一个缓存线程池去执行。当然BlockingQueue默认的最大值是int_max，所以理论上这里是用不到的
+        private  final RejectedExecutionHandler sHandler = new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                Executors.newCachedThreadPool().execute(r);
+            }
+        };
+        public static TaskExceutorManager getInstance() {
+            if (taskExceutorManager==null){
+                synchronized (TaskExceutorManager.class){
+                    if (taskExceutorManager==null){
+                        taskExceutorManager=new TaskExceutorManager();
+                    }
+                }
+            }
+            return taskExceutorManager;
+        }
+        //初始化线程池
+        private TaskExceutorManager(){
+            sCPUThreadPoolExecutor = new ThreadPoolExecutor(
+                    CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,
+                    sPoolWorkQueue, Executors.defaultThreadFactory(), sHandler);
+            sCPUThreadPoolExecutor.allowCoreThreadTimeOut(true);
+
+            sIOThreadPoolExecutor = Executors.newCachedThreadPool(Executors.defaultThreadFactory());
+        }
+        //获得cpu密集型线程池,因为占据CPU的时间片过多的话会影响性能，所以这里控制了最大并发，防止主线程的时间片减少
+        public ThreadPoolExecutor getCPUThreadPoolExecutor() {
+            return sCPUThreadPoolExecutor;
+        }
+        //获得io密集型线程池，有好多任务其实占用的CPU time非常少，所以使用缓存线程池,基本上来着不拒
+        public ExecutorService getIOThreadPoolExecutor() {
+            return sIOThreadPoolExecutor;
+        }
+    }

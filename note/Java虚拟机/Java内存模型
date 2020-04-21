@@ -1,6 +1,6 @@
 https://blog.csdn.net/javazejian/article/details/72772461
 https://www.jianshu.com/p/cf57726e77f2
-并发编码的两大核心：JMM和happens-before规则。三天性质：原子性、有序性和可见性
+并发编码的两大核心：JMM和happens-before规则。三大性质：原子性、有序性和可见性
 1.java内存区域、Java内存模型以及Java对象模型之间的区别
     1.java内存区域
         Java虚拟在运行程序时会把其自动管理的内存划分为方法区、JVM堆、虚拟机栈、程序计数器、本地方法栈这五个区域。每个区域都有其用途及创建和销毁的时机
@@ -47,4 +47,3 @@ https://www.jianshu.com/p/cf57726e77f2
     总结
         synchronized具有原子性、可见性、有序性
         volatile具有可见性和有序性
-
