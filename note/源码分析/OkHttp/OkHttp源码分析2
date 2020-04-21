@@ -1,0 +1,155 @@
+4.源码分析
+    mOkhttpClient.newCall(requst).enqueue(callback)
+    以下着重分析这几个类
+        1.okhttp3.RealCall.java
+        2.okhttp3.Dispatcher.java
+        3.okhttp3.internal.http.RealInterceptorChain.java
+        4.
+    一.okhttp3.RealCall.java
+        1.newCall
+            @Override public Call newCall(Request request) {
+                return new RealCall(this, request, false /* for web socket */);
+             }
+            RealCall(OkHttpClient client, Request originalRequest, boolean forWebSocket) {
+                final EventListener.Factory eventListenerFactory = client.eventListenerFactory();
+
+                this.client = client;
+                this.originalRequest = originalRequest;
+                this.forWebSocket = forWebSocket;
+                this.retryAndFollowUpInterceptor = new RetryAndFollowUpInterceptor(client, forWebSocket);
+                this.eventListener = eventListenerFactory.create(this);
+            }
+
+        2.enquue
+            @Override public void enqueue(Callback responseCallback) {
+                synchronized (this) {
+                  if (executed) throw new IllegalStateException("Already Executed");
+                  executed = true;
+                }
+                captureCallStackTrace();
+                client.dispatcher().enqueue(new AsyncCall(responseCallback));
+            }
+
+        3.RealCall的内部类AsyncCall的execute实现方法,是dispatcher类的enqueue方法中的executorService().execute(call)的实现;
+            execute方法通过调用拦截链获取到响应结果,回调给用户。同时调用dispatcher的finish方法获取到队列中的下一个请求
+            final class AsyncCall extends NamedRunnable {
+                private final Callback responseCallback;
+
+                AsyncCall(Callback responseCallback) {
+                  super("OkHttp %s", redactedUrl());
+                  this.responseCallback = responseCallback;
+                }
+                ...
+                @Override protected void execute() {
+                  boolean signalledCallback = false;
+                  try {
+                    Response response = getResponseWithInterceptorChain();
+                    if (retryAndFollowUpInterceptor.isCanceled()) {
+                      signalledCallback = true;
+                      responseCallback.onFailure(RealCall.this, new IOException("Canceled"));
+                    } else {
+                      signalledCallback = true;
+                      responseCallback.onResponse(RealCall.this, response);
+                    }
+                  } catch (IOException e) {
+                    if (signalledCallback) {
+                      // Do not signal the callback twice!
+                      Platform.get().log(INFO, "Callback failure for " + toLoggableString(), e);
+                    } else {
+                      responseCallback.onFailure(RealCall.this, e);
+                    }
+                  } finally {
+                    client.dispatcher().finished(this);
+                  }
+              }
+    二、okhttp3.Dispatcher.java
+        1.重要的成员变量
+            private int maxRequests = 64;
+            private int maxRequestsPerHost = 5;
+            private @Nullable ExecutorService executorService;
+            private final Deque<AsyncCall> readyAsyncCalls = new ArrayDeque<>();
+            private final Deque<AsyncCall> runningAsyncCalls = new ArrayDeque<>();
+            private final Deque<RealCall> runningSyncCalls = new ArrayDeque<>();
+
+        2.enqueue方法
+            Dispatcher的enqueue方法主要将当前的请求添加到请求队列中,如果正在运行的请求队列小于64,并且请求同一主机小于5就添加到正在运行的请求队列中,否则就添加到准备运行的请求队列中
+            然后通过线程池执行这个请求,如果用户没有自定义线程池,就使用默认的线程池,类似于Excecutors的cacheThreadPool,不存储元素的阻塞队列,线程的插入需要等待另一个线程的移除
+            synchronized void enqueue(AsyncCall call) {
+                  if (runningAsyncCalls.size() < maxRequests && runningCallsForHost(call) < maxRequestsPerHost) {
+                    runningAsyncCalls.add(call);
+                    executorService().execute(call);//这里会执行RealCall的内部类AsyncCall的execute实现方法
+                  } else {
+                    readyAsyncCalls.add(call);
+                  }
+            }
+
+             public synchrounized ExecutorService executorService(){
+                if(executetorService == null){
+                    executetorService = new ThreadPoolExecutor(0,Inter.MAX_VAULE,60,TimeUnit.SECONS,new SynchronousQueue<Runnable>(),Util.threadFactory("OkHttp Dispatcher"),false)
+                }
+                return executetorService;
+             }
+             //如果用户自己没有传入线程池,就使用默认的线程池,类似于Executors中的CacheThreadPool
+             //核心线程数为0,最大线程数为Inter.MAX_NUM,线程闲置时间60s,
+             //同步阻塞队列SynchronousQueue：他是一个不存储元素的阻塞队列,每个线程的插入操作必须等待另一个线程的移除操作，每个线程的移除操作必须等待另一个线程的插入操作
+
+        3.finish方法
+            从正在运行的队列中移除掉当前的call，然后再promoteCalls方法中每次从readAsycCalls队列中取一个Call添加到runningAsncCalls去执行
+            private <T> void finished(Deque<T> calls, T call, boolean promoteCalls) {
+                int runningCallsCount;
+                Runnable idleCallback;
+                synchronized (this) {
+                  if (!calls.remove(call)) throw new AssertionError("Call wasn't in-flight!");
+                  if (promoteCalls) promoteCalls();
+                  runningCallsCount = runningCallsCount();
+                  idleCallback = this.idleCallback;
+                }
+                if (runningCallsCount == 0 && idleCallback != null) {
+                  idleCallback.run();
+                }
+              }
+
+            private void promoteCalls() {
+                if (runningAsyncCalls.size() >= maxRequests) return; // Already running max capacity.
+                if (readyAsyncCalls.isEmpty()) return; // No ready calls to promote.
+                for (Iterator<AsyncCall> i = readyAsyncCalls.iterator(); i.hasNext(); ) {
+                  AsyncCall call = i.next();
+                  if (runningCallsForHost(call) < maxRequestsPerHost) {
+                    i.remove();
+                    runningAsyncCalls.add(call);
+                    executorService().execute(call);
+                  }
+                  if (runningAsyncCalls.size() >= maxRequests) return; // Reached max capacity.
+                }
+              }
+
+    三、okhttp3.internal.http.RealInterceptorChain.java
+        1.构造方法
+            public RealInterceptorChain(List<Interceptor> interceptors, StreamAllocation streamAllocation,
+                  HttpCodec httpCodec, RealConnection connection, int index, Request request) {
+                this.interceptors = interceptors;
+                this.connection = connection;
+                this.streamAllocation = streamAllocation;
+                this.httpCodec = httpCodec;
+                this.index = index;
+                this.request = request;
+              }
+        2.proceed方法
+            @Override public Response proceed(Request request) throws IOException {
+                return proceed(request, streamAllocation, httpCodec, connection);
+             }
+
+            1.proceed方法
+                1.根据index索引创建RealInterceptorChain对象实例next
+                2.根据index索引获取Interceptors中的一个拦截器interceptor
+                3.通过interceptor.intercept(next)执行拦截器的逻辑
+
+            public Response proceed(Request request, StreamAllocation streamAllocation, HttpCodec httpCodec,RealConnection connection){
+               //......
+               calls++;
+               RealInterceptorChain next = new RealInterceptorChain(
+                                   interceptors, streamAllocation, httpCodec, connection, index + 1, request);
+                   Interceptor interceptor = interceptors.get(index);
+                   Response response = interceptor.intercept(next);
+               return response;
+            }
