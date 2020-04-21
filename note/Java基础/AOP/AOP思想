@@ -1,0 +1,209 @@
+https://www.jianshu.com/p/dca3e2c8608a
+https://blog.csdn.net/zlmrche/article/details/79643801
+https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx.git
+一、AOP
+    1.主要功能
+        1.日志记录
+        2.性能统计
+        3.安全控制
+        4.事务处理
+        5.异常处理
+    2.主要目标
+        将日志记录，性能统计等代码从业务逻辑中划分出来
+        通过对这些行为的分离,我们可以将他们独立到非指导业务逻辑的方法中
+        进而改变这些行为的时候不影响业务逻辑的代码
+    3.AOP和OOP的关系
+        OOP（面向对象编程）针对业务处理过程的实体及其属性和行为进行抽象封装，以获得更加清晰高效的逻辑单元划分。但是也有它的缺点，最明显的就是关注点聚焦时，面向对象无法简单的解决这个问题，一个关注点是面向所有而不是单一的类，不受类的边界的约束，因此OOP无法将关注点聚焦来解决，只能分散到各个类中。
+        AOP（面向切面编程）则是针对业务处理过程中的切面进行提取，它所面对的是处理过程中的某个步骤或阶段，以获得逻辑过程中各部分之间低耦合性的隔离效果。这两种设计思想在目标上有着本质的差异。
+        AOP并不是与OOP对立的，而是为了弥补OOP的不足。OOP解决了竖向的问题，AOP则解决横向的问题。因为有了AOP我们的调试和监控就变得简单清晰
+二、Aspectj介绍
+    1.切面Aspect
+        实现了cross­cutting功能，是针对切面的模块。最常见的是logging模块、方法执行耗时模块，这样，程序按功能被分为好几层，如果按传统的继承的话，商业模型继承日志模块的话需要插入修改的地方太多，而通过创建一个切面就可以使用AOP来实现相同的功能了，我们可以针对不同的需求做出不同的切面
+    2.连接点JoinPoint
+        连接点是切面插入应用程序的地方，该点能被方法调用，而且也会被抛出意外。连接点是应用程序提供给切面插入的地方，可以添加新的方法
+        AspectJ将面向对象的程序执行流程看成是JoinPoint的执行链，每一个JoinPoint是一个单独的闭包，在执行的时候将上下文环境赋予闭包执行方法体逻辑
+        详细介绍见:AspectJ的joinpoint.jpg
+    3.切点PointCut
+        切点的声明决定需要切割的JoinPoint的集合，就结果上来说，它是JoinPoint的一个实际子集合。
+        pointcut可以控制你把哪些advice应用于jointpoint上去，通常通过正则表达式来进行匹配应用，决定了那个jointpoint会获得通知。
+        分为call、execution、target、this、within等关键字，含义下面会附图AspectJ的pointCut直接针对.png
+        1.直接针对JoinPoint的选择
+            pointcuts中最常用的选择条件和Joinpoint的类型密切相关，见图
+        2.间接针对JPoint的选择
+            除了根据前面提到的Signature信息来匹配JPoint外，AspectJ还提供其他一些选择方法来选择JPoint。比如某个类中的所有JPoint，每一个函数执行流程中所包含的JPoint。
+            特别强调，不论什么选择方法，最终都是为了找到目标的JPoint,场景的非JPoint选择方法见
+        3.匹配规则
+            1.类型匹配发
+                *：匹配任何数量字符；
+                ..：匹配任何数量字符的重复，如在类型模式中匹配任何数量子包；而在方法参数模式中匹配任何数量参数。
+                +：匹配指定类型的子类型；仅能作为后缀放在类型模式后边。
+                AspectJ使用 且（&&）、或（||）、非（！）来组合切入点表达式。
+            2.匹配模式
+                call(<注解？> <修饰符?> <返回值类型> <类型声明?>.<方法名>(参数列表) <异常列表>？)
+                精确匹配
+                    //表示匹配 com.davidkuper.MainActivity类中所有被@Describe注解的public void方法。
+                    @Pointcut("call(@Describe public void com.davidkuper.MainActivity.init(Context))")
+                    public void pointCut(){}
+                单一模糊匹配
+                    //表示匹配 com.davidkuper.MainActivity类中所有被@Describe注解的public void方法。
+                    @Pointcut("call(@Describe public void com.davidkuper.MainActivity.*(..)) ")
+                    public void pointCut(){}
+
+                    //表示匹配调用Toast及其子类调用的show方法，不论返回类型以及参数列表，并且该子类在以com.meituan或者com.sankuai开头的包名内
+                    @Pointcut("call(* android.widget.Toast+.show(..)) && (within(com.meituan..*)|| within(com.sankuai..*))")
+                    public void toastShow() {
+                    }
+                组合模糊匹配
+                    //表示匹配任意Activity或者其子类的onStart方法执行，不论返回类型以及参数列表，且该类在com.meituan.hotel.roadmap包名内
+                    @Pointcut("execution(* *..Activity+.onStart(..))&& within(com.meituan.hotel.roadmap.*)")
+                    public void onStart(){}
+            3.获取参数
+                通过声明参数语法arg()显示获取参数
+                    @Around(value = "execution(* BitmapFacade.picasso.init(java.lang.String,java.lang.String)) && args(arg1,arg2)"
+                    public Object aroundArgs(String arg1,String arg2,ProceedingJoinPoint joinPoint){
+                       System.out.println("aspects arg = " + arg1.toString()+" " + arg2);
+                       Object resutObject = null;
+                       try {
+                          resutObject = joinPoint.proceed(new Object[]{arg1,arg2});
+                       } catch (Throwable e) {
+                          e.printStackTrace();
+                       }
+                       return resutObject;
+                    }
+                通过joinPoint.getArg()获取参数列表
+                    @Around("execution(static * tBitmapFacade.picasso.init(..)) && !within(aspectj.*) ")
+                    public void pointCutAround(ProceedingJoinPoint joinPoint){
+                       Object resutObject = null;
+                       try {
+                          //获取参数列表
+                          Object[] args = joinPoint.getArgs();
+                          resutObject = joinPoint.proceed(args);
+                       } catch (Throwable e) {
+                          e.printStackTrace();
+                       }
+                       return resutObject;
+                    };
+    4.通知Advise
+       advice是我们切面功能的实现，它是切点的真正执行的地方。比如像写日志到一个文件中，会在pointcut匹配到的连接点中插入advice（包括：before、after、around等）代码到应用程序中
+       1.@Before,@After
+            //所有实例方法调用截获
+            private static final String INSTANCE_METHOD_CALL =
+            "call(!static * com.meituan.hotel.roadmap..*.*(..))&&target(Object)";
+            @Pointcut(INSTANCE_METHOD_CALL) public void instanceMethodCall() {
+            }
+            //实例方法调用前后Advice
+            @Before("instanceMethodCall()") public void beforInstanceCall(JoinPoint joinPoint) {
+            printLog(joinPoint, "before instance call");
+            }
+            @After("instanceMethodCall()") public void afterInstanceCall(JoinPoint joinPoint) {
+            printLog(joinPoint, "after instance call");
+            }
+       2.@Around
+            //横切项目中所有Activity的子类，以Layout命名、以及它的子类的所有方法的执行
+            private static final String POINTCUT_METHOD =
+            "(execution(* android.app.Activity+.*(..)) ||execution(* *..Layout+.*(..)))&& within(com.meituan.hotel.roadmap.*)";
+            @Pointcut(POINTCUT_METHOD) public void methodAnnotated() {
+            }
+
+            @Around("methodAnnotated()") public Object weaveJoinPoint(ProceedingJoinPoint joinPoint)throws Throwable{
+               //调用原方法的执行。
+               Object result = joinPoint.proceed();
+               return result;
+            }
+三、Aspectj执行原理
+    AspectJ是通过对目标工程的.class文件进行代码注入的方式将通知(Advise)插入到目标代码中。
+    第一步：根据pointCut切点规则匹配的joinPoint；
+    第二步：将Advise插入到目标JoinPoint中。
+    这样在程序运行时被重构的连接点将会回调Advise方法，就实现了AspectJ代码与目标代码之间的连接。
+四、Android中使用Aspectj
+    1.Gradle配置
+        //在buildscript中添加该编织器，gradle构建时就会对class文件进行编织
+        classpath 'org.aspectj:aspectjweaver:1.8.9'
+        //在dependencies中添加该依赖，提供@AspectJ语法
+        compile 'org.aspectj:aspectjrt:1.8.9'
+
+    2.语法简介
+        @Before("execution(*android.app.Acivity.on**(..))")
+        public void onActivityCalled(JoinPoint joinPoint) throws Throwable{
+            ...
+        }
+    3.实例代码1——获取PerformanceApp这个类中每个方法的耗时
+        public class PerformanceAop{
+            @Around("call(* com.optimize.performance.PerformanceApp.**(..))")
+            public void getTime(ProceedingJoinPoint joinPoint){
+                Signature signature = joinPoint.getSignature()
+                long time = joinPoint.getSignature();
+                jointPoint.proceed();//执行原方法逻辑
+                LogUtils.i(signature.toShortString()+" cost "+System.currentTimeMillis()-time)
+            }
+        }
+    4.示例代码2——监控Activity页面的停留时间
+        1、编写横切项目中Activity的onStart()、onStop()的切点语法
+        2、然后在onStart()切点执行之前启动计时器，将其与该页面对象存入Map中进行绑定
+        3、在onStop()切点执行完毕之后，从通过该对象从Map中获取计时器，然后结束计时，输出日志
+
+        /**
+        * 时间监控
+        */
+        @Aspect public class TimeMonitorAspect {
+        private static final String TAG = "TimeMonitorAspect";
+        //存放<页面对象,计时器>
+        private HashMap<Object,StopWatch> map = new HashMap<>();
+        /**
+        * 横切页面的onStart和onStop方法，监控两个方法之间的耗时
+        */
+        @Pointcut("execution(* *..Activity+.onStart(..))&&this(java.lang.Object)&& within(com.meituan.hotel.roadmap.*)")
+        public void onStart(){}
+        @Pointcut("execution(* *..Activity+.onStop(..))&&this(java.lang.Object)&& within(com.meituan.hotel.roadmap.*)")
+        public void onStop(){}
+        @Pointcut("onStart() && !cflowbelow(onStart())")
+        public void realOnStart(){}
+        @Pointcut("onStop() && !cflowbelow(onStop())")
+        public void realOnStop(){}
+        /**
+        * 在onCreate()调用时，开启该页面的计时器，将计时器存入HashMap<Object，StopWatch>中。
+        * @param joinPoint
+        * @return
+        */
+        @Around("realOnStart()")
+        public Object AroundOnStart(ProceedingJoinPoint joinPoint){
+        Object result = null;
+        Object target = joinPoint.getTarget();
+        StopWatch stopWatch = new StopWatch();
+        if (target != null){
+        map.put(target,stopWatch);
+        }
+        try {
+        stopWatch.start();
+        result = joinPoint.proceed(joinPoint.getArgs());
+        } catch (Throwable throwable) {
+        throwable.printStackTrace();
+        }
+        return result;
+        }
+        /**
+        * 在onStop()结束时，从HashMap<Object，StopWatch>中获取该计时器，停止该页面的计时器，并将时间打印出来。
+        * @param joinPoint
+        * @return
+        */
+        @Around("realOnStop()")
+        public Object AroundOnStop(ProceedingJoinPoint joinPoint){
+        Object result = null;
+        Object target = joinPoint.getTarget();
+        StopWatch stopWatch = null;
+        if (target != null){
+        stopWatch = map.get(target);
+        }
+        try {
+        result = joinPoint.proceed(joinPoint.getArgs());
+        if (stopWatch != null){
+        stopWatch.stop();
+        //打印日志
+        Log.e(TAG,joinPoint.getTarget().getClass().getSimpleName() + " 停留时间： "+ stopWatch.getTotalTimeMillis() + " ms"
+        }
+        } catch (Throwable throwable) {
+        throwable.printStackTrace();
+        }
+        return result;
+        }
+        }
