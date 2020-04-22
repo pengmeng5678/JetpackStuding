@@ -197,10 +197,114 @@
             6.后面的传输过程就通过这个秘钥加密传输
 
     5.Okhttp实现原理
-        1.基本使用
-        2.拦截链
-        3.缓存和连接池
+        1.基本使用及特点
+            使用：
+                OkHttpClient client = new OkHttpClient.Builder().addIntercepter(..).build();
+                Request request = new Request.Builder().url(..).header(..);
+                client.newCall(request).enqueue(call);
+            特点
+                OkHttp是Square[skwer]公司开源的一个用于网络请求的开源框架,它包含以下特点
+                    支持Http2,对一台机器的所有请求共享同一个socket,提高请求效率
+                    内置连接池,支持连接复用,减少延迟
+                    支持透明的gzip压缩响应体
+                    通过缓存避免重复的请求
+                    请求失败时自动重试主机的其他IP,自动重定向
+
+        2.整体调用流程图
+
+        3.拦截链实现原理
+            请求条件：最多支持64个请求,且同一个主机的请求数不能超过5
+            1.添加请求任务
+                client.newCall(request).enqueue(call);
+                Dispather中三个ArrayDeque双端队列：readyAsyncCalls,runningAsyncCalls,runningSyncCalls
+                enqueue异步调用如果满足请求条件就放入runningAsyncCalls,如果不满足就放入readyAsyncCalls
+                execute同步调用直接放入runningSyncCalls
+                    如果是添加到runningxxx的容器中就会调用executorService().execute(call);
+                    并最终调用到AsycCall的execute方法
+                        @Override protected void execute() {
+                              boolean signalledCallback = false;
+                              try {
+                                Response response = getResponseWithInterceptorChain();
+                                if (retryAndFollowUpInterceptor.isCanceled()) {
+                                  signalledCallback = true;
+                                  responseCallback.onFailure(RealCall.this, new IOException("Canceled"));
+                                } else {
+                                  signalledCallback = true;
+                                  responseCallback.onResponse(RealCall.this, response);
+                                }
+                              } catch (IOException e) {
+                                if (signalledCallback) {
+                                  // Do not signal the callback twice!
+                                  Platform.get().log(INFO, "Callback failure for " + toLoggableString(), e);
+                                } else {
+                                  responseCallback.onFailure(RealCall.this, e);
+                                }
+                              } finally {
+                                //这个finish方法会调用promoteCalls将readyAsyncCalls的任务移到runningAsyncCalls并执行这个任务
+                                client.dispatcher().finished(this);
+                              }
+                            }
+                          }
+
+            2.执行任务时机
+                1.添加到runningxxx的容器中就会直接执行executorService().execute(call);
+                2.调用Dispather类中promoteCalls方法将readyAsyncCalls的任务移到runningAsyncCalls并执行这个任务
+                  promoteCalls在以下三种情况会被调用
+                        1.client.dispatcher().finished(this)
+                        2.dispather().setMaxRequests
+                        3.dispather().setMaxRequestsPerHost
+            3.链式调用
+                Response response = getResponseWithInterceptorChain();
+
+                public interface Interceptor {
+                  Response intercept(Chain chain) throws IOException;
+                  interface Chain {
+                    Request request();
+                    Response proceed(Request request) throws IOException;
+                    @Nullable Connection connection();
+                  }
+                }
+                1.准备所有的Interceptor列表,并调用RealInterceptorChain的proceed方法
+                    Response getResponseWithInterceptorChain() throws IOException {
+                        // Build a full stack of interceptors.
+                        List<Interceptor> interceptors = new ArrayList<>();
+                        interceptors.addAll(client.interceptors());
+                        interceptors.add(retryAndFollowUpInterceptor);
+                        interceptors.add(new BridgeInterceptor(client.cookieJar()));
+                        interceptors.add(new CacheInterceptor(client.internalCache()));
+                        interceptors.add(new ConnectInterceptor(client));
+                        if (!forWebSocket) {
+                          interceptors.addAll(client.networkInterceptors());
+                        }
+                        interceptors.add(new CallServerInterceptor(forWebSocket));
+
+                        Interceptor.Chain chain = new RealInterceptorChain(
+                            interceptors, null, null, null, 0, originalRequest);
+                        return chain.proceed(originalRequest);
+                      }
+
+                2.在RealInterceptorChain的proceed方法里面创建一个新的RealInterceptorChain,并保留已有的request或者response书籍
+                    并从Interceptor列表拿出一个新的interceptor,并调用intercept方法
+
+                    RealInterceptorChain next = new RealInterceptorChain(
+                          interceptors, streamAllocation, httpCodec, connection, index + 1, request);
+                      Interceptor interceptor = interceptors.get(index);
+                      Response response = interceptor.intercept(next);
+
+                3.interceptor的实现类中的intercept方法会执行自身的逻辑并调用proceed方法找下一个Interceptor
+                       response = ((RealInterceptorChain) chain).proceed(request, streamAllocation, null, null);
+
+                getResponseWithInterceptorChain这个方法采用递归调用方式,
+             依次调用了以下拦截链封装Request请求参数到CallServerInterceptor等服务器返回,然后又依次返回并封装Response对象
+                    1.CustomInterceptor
+                    2.RetryAndFollowUpInterceptor
+                    3.BridgeInterceptor
+                    4.CacheInterceptor
+                    5.ConnectInterceptor
+                    6.NetWorkInterceptor
+                    7.CallServerInterceptor
     6.Retrofit特点及实现原理
+
 
 
 
