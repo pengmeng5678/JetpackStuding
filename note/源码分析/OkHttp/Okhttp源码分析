@@ -6,6 +6,11 @@ https://www.jianshu.com/p/e88f648cb2c1
         1.网络请求流程-会使用
         2.拦截器模式-易于扩展
         3.缓存和连接池-高性能
+    Okhttp的特点
+        1.支持Http2.0和SPDY,针对同一主机的所有请求共享同一个socket
+        2.内置连接池,支持连接复用,减少延迟(当网络不可用时,Okhttp依然有效,它从常用的连接池恢复并复用)
+        3.支持Gzip压缩响应体
+        4.支持缓存减少重复的网络请求
 1.Okhttp的使用
     public final OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(new HttpLoggingInterceptor())

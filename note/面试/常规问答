@@ -296,13 +296,13 @@
 
                 getResponseWithInterceptorChain这个方法采用递归调用方式,
              依次调用了以下拦截链封装Request请求参数到CallServerInterceptor等服务器返回,然后又依次返回并封装Response对象
-                    1.CustomInterceptor
-                    2.RetryAndFollowUpInterceptor
-                    3.BridgeInterceptor
-                    4.CacheInterceptor
-                    5.ConnectInterceptor
-                    6.NetWorkInterceptor
-                    7.CallServerInterceptor
+                    1.CustomInterceptor             :自定义的拦截链，如日志和下载进度
+                    2.RetryAndFollowUpInterceptor   :重定向和失败重连
+                    3.BridgeInterceptor             :负责对Request和Response报文加工,将应用层与网络层的数据结构进行相互转换
+                    4.CacheInterceptor              :请求和响应数据缓存处理,避免重复请求,提高响应速度
+                    5.ConnectInterceptor            :和服务器开始建立连接
+                    6.NetWorkInterceptor            :用户自定义的Interceptor，仅在生产网络请求时时生效
+                    7.CallServerInterceptor         :向服务器发起网络请求的地方
     6.Retrofit特点及实现原理
 
 
