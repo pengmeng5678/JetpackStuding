@@ -1,2 +1,51 @@
 https://www.jianshu.com/p/0c055ad46b6c
-1.
+Retrofit特点及实现原理
+1.介绍
+    Restrofit是Square公司开源的基于OkHttp,且符合Restful设计风格的网络请求框架
+    优点
+        1.功能强大:支持同步异步请求,同时支持Rxjava
+        2.简洁易用：采用注解方式配置网络请求参数,采用大量的设计模式简化使用
+        3.可扩展性好:高度封装功能模块,解耦彻底,方便扩展，如自定义converter
+2.使用
+    1.创建Retrofit对象
+        Retrofit retorfit = new Retrofit.Builder()
+            .addCoverterFactory(GsonConverterFactory.create())
+            .baseUrl(xxx)
+            .build()
+    2.声明接口,创建网络请求接口的实例
+        public interface NewsService{
+            @Get("news/{newsId}")
+            call<News> getNews(@path("newsId") int newId)
+            //Observeable<News> getNews(@path("newsId") int newId)
+        }
+    3.发起网络请求
+        NewServer service =retrofit.create(NewsService.class)
+        Call<News> call = service.getNews(..)
+        call.execute()或者call.enqueue()
+        //Observeable<News> observeable = service.getNews(..)
+        observeable.createXXX().subscribe(xxx)
+    4.处理数据的回调
+
+    Retrofit配置网络请求接口时,请求参数中使用的字段
+        1.path:url问号前面的字段
+        2.Query:url问号后面的字段
+        3.filed:用于post请求,提交单个数据
+        4.Body:用于post请求,以对象的形式提交
+3.实现原理
+    Retrofit本质上是在OkHttp框架基础上使用了大量的设计模式进行封装,使得它简洁易用。
+    精髓是用动态代理的方式动态的将网络请求接口中的注解解析成HTTP请求并发起网络调用,具体过程如下
+        1.创建Retrofit实例
+            建造者模式,配置了平台类对象、baseUrl、数据转换工厂、回调方法执行器callbackExcutor(线程切换)
+            工厂方法模式,配置了callFactory,默认使用OkHttpCall
+        2.创建网络请求接口的实例
+            代理模式,动态代理方式创建了网络请求接口实例
+            建造者模式,用ServiceMethod对象封装网络请求参数、返回值、注解类型等
+        3.发送网络请求
+            根据ServiceMethod对象中的数据创建一个Okhttp的requst对象
+            代理模式,通过静态代理即Okhttp.call对象发送网络请求
+        4.解析数据
+            对OkHttp返回的数据采用GsonConvertorFactory解析成Response对象
+        5.切换线程
+            适配器模式,使用回调执行器进行线程切换(Handler)
+        6.处理结果
+            在主线程处理返回的数据结果
