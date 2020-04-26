@@ -107,7 +107,7 @@ https://blog.csdn.net/qian520ao/article/details/78262289
 
       2.ThreadLocal的大致实现思路
           Thread类中有个ThreadLocal.ThreadLocalMap的实例变量,所以说每个线程都有一个自己的ThreadLocalMap,ThreadLocalMap有自己的独立实现
-          可以简单的将它的key视为ThreadLocal(实际不是ThreadLocal本身,而是它的一个弱引用),value视为存入的值
+          可以简单的将它的key视为ThreadLocal(实际不是ThreadLocal本身,而是它的一个WeakRefrence弱引用),value视为存入的值
           所以每个线程往ThreadLocal里面存的值,都是往自己类里面的ThreadLocalMap里面存,读也是从某个ThreadLocal为引用,在自己的map里面找对应的key,从而实现了线程隔离
 
       3.java ThreadLocal的常用方法

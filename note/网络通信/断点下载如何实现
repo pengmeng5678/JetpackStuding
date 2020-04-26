@@ -17,7 +17,7 @@
             将要下载的数据流长度+已经下载好的数据流长度就是该文件的总长度
             bean.setTotal(responseBody.contentLength+downloadedContentLength)
         2.通过该ResponseBody写文件
-            accessFile = new RandomAccessFile(file,"rwd")
+            accessFile = new RandomAccessFile(file,"rwd")//因为RandomAccessFile可以自由访问文件的任意位置
             while(len = is.read(buf) != -1){
                 if(mIsPaused){
                     accessFile.write(buf, 0, len);

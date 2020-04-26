@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun RxjavaTest() {
+         Thread()
         Observable.create(object : ObservableOnSubscribe<Integer> {
             override fun subscribe(e: ObservableEmitter<Integer>) {
                 var num = 88

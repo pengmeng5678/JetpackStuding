@@ -354,6 +354,27 @@
                     适配器模式,使用回调执行器进行线程切换(Handler)
                 6.处理结果
                     在主线程处理返回的数据结果
+
+        4.Retrofit断点下载如何实现
+            我封装了一个DownLoadManager,可以实现一键下载,具体流程如下
+            1.配置下载参数
+                下载文件的时候,添加一个请求头Range,数据就是 "bytes=" + 0 + "-";
+                @Streaming
+                @GET
+                Observable<ResponseBody> download(@Header("Range") String range,@Url String url);
+            2.字节流写入文件
+                采用RadomAccessFile可以从文件的任意位置开始读写
+                accessFile = new RandomAccessFile(file,"rwd")
+                while(len = is.read(buf) != -1){
+                    if(mIsPaused){
+                        accessFile.write(buf, 0, len);
+                        targetDownLoadBean.setDownloadLocation(targetDownLoadBean.getDownloadLocation()+len);
+                        retrun;
+                    }
+                }
+            3.当取消下载或者出现异常的时候,要将已经下载好字节数据保存到数据库中，方便下次下载时从这个位置开始下载
+
+
 11.Rxjava
     1.基本介绍
         Rxjava是一个在JVM上由可观测的序列组成的异步和基于时间的库
@@ -451,6 +472,7 @@
 
 12.音视频的采集和编解码
     1.音频采集流程及注意点
+
     2.视频采集流程及注意点
     3.MediaCodec实现原理
     4.SoundTouch实现原理
@@ -458,6 +480,10 @@
     6.音视频开发中遇到的问题
 
 13.JNI/NDK开发
+14.GreenDao
+    1.介绍及特点
+    2.实现原理
+
 
 
 
