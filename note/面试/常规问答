@@ -303,6 +303,7 @@
                     5.ConnectInterceptor            :和服务器开始建立连接
                     6.NetWorkInterceptor            :用户自定义的Interceptor，仅在生产网络请求时时生效
                     7.CallServerInterceptor         :向服务器发起网络请求的地方
+
     6.Retrofit特点及实现原理
         1.介绍
             Restrofit是Square公司开源的基于OkHttp,且符合Restful设计风格的网络请求框架
@@ -354,7 +355,110 @@
                 6.处理结果
                     在主线程处理返回的数据结果
 11.Rxjava
+    1.基本介绍
+        Rxjava是一个在JVM上由可观测的序列组成的异步和基于时间的库
+        简单理解就是一个发送事件、接收事件的过程。
+        我们把发送事件的Observable称为上游,把接收事件的Observer称为下游,只有当上游和下游形成建立连接时,上游才开始发送时间,即subscribe()
+    2.基本元素
+        Observable:上游
+        ObservableOnSubscribe:上游create方法接收的参数
+        ObservableEmitter:上游事件的发送者
+            上游可以发送无限个onNext,下游也可以接收无限个onNext
+            当上游发送了一个onComplete/onError后,上游onComplete/onError后的时间依然会继续发送，下游在收到onComplete/onError后事件后不再继续接收事件
+            上游可以不发送onComplete/onError事件
+            onComplete和onError的调用情况有以下几种
+                onComplete可以发送多次,但只会收到一次回调
+                onError只可以发送一次,发送多次会报错
+                onComplete之后不可以发送onError,否则会报错
+                onError之后可以发送onComplete，但只会收到onError事件
+        observer:下游的接收者
+            subscribe方法可以接收三种类型的观察者
+                Comsumer:有参数回调
+                observer:
+                Action:没有参数回调
+        Disposable:用于维系上游、下游之间的联系；理解水管的机关
+            调用它的dispose方法时,将会切断上下游的联系,下游将收不到onComplete/onError在内的任何事件,若此时上游发送onError事件,那么将会报错
+            CompositeDisposable可以容纳Disposable,调用CompositeDisposable.cleare可以切断所有的水管
+    3.线程切换
+        默认是在主线程中发送和接收事件
+        subscribeOn:改变上游发送事件的线程,只有第一次调用有效。
+        ObserverOn:改变下游接收事件的线程,多次调用都有效
+
+        RxJava2的切换原理是 调用subscribe时的从下往上是subscribeOn切换线程,之后调用onNext传递数据时的从上往下是ObserveOn切换线程.
+    4.操作符
+        map:
+            将上游Observable发送每一个事件都应用到一个函数上进行变换,然后再输出所有变换后的事件
+        flatMap：
+            将上游发送的每一个事件Observable变换成多个发送事件的上游Observable,然后将变换后发送的事件合并后放到一个Observable里
+            flatMap不保证发送事件的顺序，如果要保证顺序,可以使用concatMap
+        zip:
+          zip操作符通过一个函数,将多个Observable对象发送的事件合并到一个observable里面,合并时严格保证顺序,最后下游接收的事件数量与合并前最少的那个Observable事件数相等
+
+          多个Observable对象发送事件在同一个线程时,是先发送完Observable1的所有事件,然后Observable每发送一个事件,就合并一个事件后发送,如1,2,3,A,1A,B,2B,C,3C,其中1A是下游接收的事件
+          多个Observable对象发送事件不在同一个线程时,那Observable1和Observable2的事件会同时发送并立即组合
+
+        Flowable
+            1.Backpressure背压概念
+               背压介绍
+                  背压其实就是为了控制流量,毕竟水缸存储的能力有限,使用BackPresure可以解决上下游流速不一致造成的问题
+               同步、异步订阅
+                 当上下游在同一个线程中时,是同步订阅关系,上游每发送一个事件都会等待下游处理完一个事件,所以不会造成上下游流速偏离很大的问题
+                 而当上下游不在同一个线程中时,就是异步订阅关系,此时很容易造成上下楼流速不一致的问题
+
+                 同步订阅和异步订阅最大的不同就是看是否存在"水缸",异步订阅时上下游不能直接发送数据,所以上游会把事件发送到水缸里，流速不一致时,容易造成OOM
+
+            2.Flowable
+                1.使用
+                    Flowable<Integer> upstream = Flowable.create(new FlowableOnSubscribe<Integer>() {
+                                @Override
+                                public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                                    emitter.requested()//获取下游处理事件的能力
+                                    emitter.onNext(1);
+                                    ...
+                                }
+                            }, BackpressureStrategy.ERROR); //创建Flowable相比创建Observable增加了一个参数
+
+                    Flowable和Observable的区别
+                        1.创建Flowable相比创建Observable增加了一个参数
+                        2.Flowable在下游的onSubscribe方法中返回Subscription,而Observable在下游的onSubscribe方法中返回Disposable
+
+                2.Flowable如何解决流速不一致问题
+                    Flowable水缸的默认大小是128
+
+                    1.Subscription的request(n)方法
+                        同步订阅时(上下游在同一个线程)：
+                            在上游我们可以通过emitter.requested()获取下游处理事件的能力(水缸的大小),上游每发送一个事件requested返回值就减一
+                            在下游我们可以调用request(n)方法,告诉上游,下游处理数据的能力,调用多次request,水缸大小会累加
+                        异步订阅时(上下游不在同一个线程)：
+                            在下游我们可以调用request(n)方法后,上游通过emitter.requested()获取的值并不是下游设置的值
+                            因为上下游工作在不同的线程里时，每一个线程里都有一个requested，
+                            而我们调用request（1000）时，实际上改变的是下游主线程中的requested，而上游中的requested的值是由RxJava内部调用request(n)去设置的，这个调用会在合适的时候自动触发
+
+                    2.内置的BackpressureStrategy
+                        BackpressureStrategy.DROP:把存不下的事件丢弃
+                        BackpressureStrategy.LATEST:只保留最新的事件
+                        BackpressureStrategy.ERROR:抛出异常
+                        BackpressureStrategy.BUFFER:换大水缸
+
+    5.项目中使用Rxjava的场景
+        1.知音中识别到用户问的语音后,根据这个问题会经历以下几个步骤
+            使用Map将int转换成String,再通过Map转换成boolean
+
+            1.地图导航点命令词拦截,返回一个int类型的ID或者默认ID(没匹配上)
+            2.普通本地命令词拦截,返回一个String类型的命令词key
+        2.助教的录像功能
+            使用interval(initDelayTime,scheduleTime)操作符，头部左右摆动
+
 12.音视频的采集和编解码
+    1.音频采集流程及注意点
+    2.视频采集流程及注意点
+    3.MediaCodec实现原理
+    4.SoundTouch实现原理
+    5.H264协议
+    6.音视频开发中遇到的问题
+
+13.JNI/NDK开发
+
 
 
 

@@ -1,16 +1,18 @@
 #https://www.jianshu.com/p/2be492c1df96
 https://www.jianshu.com/p/e99b5e8bd67b
 #本文主要记录事件分发流程和原理
-    假设整个事件传递流程经历Activity-->viewGroup-->view三个视图层级
+    整个事件传递流程经历Activity-->viewGroup-->view三个视图层级
     三个重要方法
     dispatchTouchEvent,onInterceptTouchEvent,onTouchEvent
+
+我们的手指触摸到屏幕时,会触发一个ACTION_DOWN事件,当前Activity会最先做出反应,即回调Activity的dispatchTouchEvent方法
 
 1.这里先讲解ACTION_DOWN的事件，暂不考虑ACTION_MOVE和ACTION_UP做最后的分析
     图解：images/ui/EventDispatch_ACTION_DOWN.png.png
     当点击事件落在Activity的某一个点时
         从Activity的dispatchTouchEvent开始分发
-            return true，事件由Activity消费
-            return super/false,事件传到下一级ViewGroup的dispatchTouchEvent方法处理
+            return true/false，事件由Activity消费
+            return super,即调用getWindow.superDispatchTouchEvent(),其实是调用了这个Activity的DecorView开始进行事件传递
 
         ViewGroup的dispatchTouchEvent方法
             return true,事件在这里被消费掉
@@ -69,3 +71,51 @@ https://www.jianshu.com/p/e99b5e8bd67b
   int rawY = event.getRawY();
   其中坐标(x,y)是以实现这个接口的view的左上角为坐标原点
   而坐标(rawX,rawY)是以屏幕的左上角为原点的坐标点
+
+4.ScrollView嵌套ListView会产生什么问题,如何解决
+    问题
+        1.ListView显示不全(当ListView被ScrollView嵌套时，ListView使用的测量模式是ScrollView传入的MeasureSpec.UNSPECIFIED)
+        2.ListView无法滑动
+    解决
+        1.自定义ListView重写onMeasure方法
+            @Override
+           protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+               int newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE>>2, // 设计一个较大的值和AT_MOST模式
+                       MeasureSpec.AT_MOST);
+               super.onMeasure(widthMeasureSpec, newHeightMeasureSpec);//再调用原方法测量
+           }
+        2.自定义ListView重写dispatchTouchEvent方法,
+          并在ACTION_DOWN事件中请求父容器不要拦截,调用getParent().requestDisallowInterceptTouchEvent(true);
+          同时还是考虑滑动区域超过ListView时,把滑动权交给ScrollView
+            @Override
+            public boolean dispatchTouchEvent(MotionEvent ev) {
+                int action = ev.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        super.onInterceptTouchEvent(ev);
+                        //不允许上层viewGroup拦截事件.
+                        getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        //满足listView滑动到顶部，如果继续下滑，那就让scrollView拦截事件
+                        if (getFirstVisiblePosition() == 0 && (ev.getY() - mLastY) > 0) {
+                            //允许上层viewGroup拦截事件
+                            getParent().requestDisallowInterceptTouchEvent(false);
+                        }
+                        //满足listView滑动到底部，如果继续上滑，那就让scrollView拦截事件
+                        else if (getLastVisiblePosition() == getCount() - 1 && (ev.getY() - mLastY) < 0) {
+                            //允许上层viewGroup拦截事件
+                            getParent().requestDisallowInterceptTouchEvent(false);
+                        } else {
+                            //不允许上层viewGroup拦截事件
+                            getParent().requestDisallowInterceptTouchEvent(true);
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        //不允许上层viewGroup拦截事件
+                        getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+                }
+                    mLastY = ev.getY();
+                    return super.dispatchTouchEvent(ev);
+            }

@@ -1,0 +1,41 @@
+https://blog.csdn.net/sinat_27154507/article/details/79748010
+https://juejin.im/post/5b8f15e26fb9a01a031b12d9#heading-44
+
+1.什么时候会触发View绘制
+    1.屏幕刷新:每一次Vsyc信号来的时候,会执行ScheduleTraversal方法,这个方法会通过Choreographer去Post一个绘制任务,最终执行performTraversals方法执行绘制流程
+    2.view.invalidate，View.requestLayout,view.requestFocus
+
+    所以View绘制流程的起点是ViewRootImpl类的performTraversals方法,这个方法会以DecorView为起点,依次遍历View树执行绘制流程
+
+2.View绘制具体流程
+    performTraversals方法会根据条件依次执行View树measure、layout、draw方法,这个三个阶段分别为测量阶段、布局阶段、绘制阶段
+    测量阶段:确定View的大小
+        ViewGroup的onMeasure方法会调用所有的子View的measure方法进行自我测量和保存(方法入口measureChildWithMargins()),然后通过子View的尺寸和位置计算自己的尺寸和位置
+        view的onMeasure方法会计算自己的尺寸并通过setMeasureDimension保存
+
+        测量阶段有个很重要的概念:
+            Measurespec:
+                Measurespec是View的内部类,封装了从父View传递到子View的布局需求,每个MesureSpec代表了宽度和高度,且包含size(大小)和Mode(模式)
+                基本都是二进制运算,由于int是32位的,高两位表示Mode,低30位表示size,三种测量模式如下:
+                    MeasureSpec.EXACTLY:
+                        父容器已经测量出子View的大小。对应是 View 的LayoutParams的match_parent 或者精确数值
+                    MeasureSpec.AT_MOST:
+                        父容器已经限制子view的大小，View 最终大小不可超过这个值。对应是 View 的LayoutParams的wrap_content
+                    MeasureSpec.UNSPECIFIED[[ʌnˈspesɪfaɪd]]:
+                        父容器不对View有任何限制，要多大给多大，这种情况一般用于系统内部，表示一种测量的状态。(这种不怎么常用，下面分析也会直接忽略这种情况)
+
+            理解就是:View的MeasureSpec并不是父View独自决定,他是根据父View的MeasureSpec加上子View自己的layoutparams,通过相应的规则转化的
+
+
+    布局阶段:确定View的位置
+        ViewGroup:ViewGroup中的onLayout方法会调用所有子View的layout方法,把尺寸和位置传给他们,让他们完成自我的内部布局
+        View:因为View是没有子View的，所以View的onLayout里面什么也不做
+
+    绘制阶段
+        draw方法会做一些调度工作,然后会调用onDraw方法进行View的自我绘制,具体绘制流程如下
+            绘制背景:drawBackground(canvas)
+            绘制主体:对应onDraw(canvas)
+            绘制子View:对应dispatchDraw(canvas)
+            绘制滑动相关:对应onDrawForeground(canvas)
+
+
