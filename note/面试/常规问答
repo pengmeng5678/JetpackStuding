@@ -374,7 +374,46 @@
                 }
             3.当取消下载或者出现异常的时候,要将已经下载好字节数据保存到数据库中，方便下次下载时从这个位置开始下载
 
+        5.自定义拦截链回调下载进度,如何实现
+            1.创建OkHttpClient对象时添加自定义的intercepter,ProgressInterceptor
+            2.在ProgressInterceptor的intercep方法中根据proceed方法返回的Response对象,封装自定义的ResponseBody
+                public class ProgressInterceptor implements Interceptor {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Response originalResponse = chain.proceed(chain.request());
+                        return originalResponse.newBuilder()
+                                .body(new ProgressResponseBody(originalResponse.body(),originalResponse.request().url().toString()))
+                                .build();
+                    }
+                }
+            3.在ProgressResponseBody创建时读取该文件下载的断点位置,在其内部类Source的read方法中将累加的字节流大小数据传递出去
+                public class ProgressResponseBody extends ResponseBody {
+                    @Override
+                        public BufferedSource source() {
+                            if (bufferedSource == null) {
+                                bufferedSource = Okio.buffer(source(responseBody.source()));
+                            }
+                            return bufferedSource;
+                        }
 
+                        private Source source(Source source) {
+                            return new ForwardingSource(source) {
+                                //断点705285,已读709381
+                                long bytesReaded = bytesLoaded;
+                                long total = contentLength() + downloadLocation;
+
+                                @Override
+                                public long read(Buffer sink, long byteCount) throws IOException {
+                                    long bytesRead = super.read(sink, byteCount);
+                                    bytesReaded += bytesRead == -1 ? 0 : bytesRead;
+                                    //使用RxBus的方式，实时发送当前已读取(上传/下载)的字节数据
+                    //                RxBus.getDefault().post(new DownLoadStateBean(contentLength(),bytesReaded, tag));
+                                    RxBus.getDefault().post(new DownLoadStateBean(total,bytesReaded, tag));
+                                    return bytesRead;
+                                }
+                            };
+                        }
+                }
 11.Rxjava
     1.基本介绍
         Rxjava是一个在JVM上由可观测的序列组成的异步和基于时间的库
@@ -472,17 +511,39 @@
 
 12.音视频的采集和编解码
     1.音频采集流程及注意点
-
+        1.创建AudioRecord对象,确定采样率、采样位数、声道数、缓冲区(recordBufSize = getMinBufferSize)这些参数
+        2.初始化Buffer,byte[] data = new Byte[recordBufSize]
+        3.开始录音，audioRecord.startRecording
+        4.循环从AudioRecord中读取音频数据到buffer中
+            while(){
+                audioRecord.read(data,0,recordBufSize)
+                //将data写入到队列发送出去,或者保存
+            }
     2.视频采集流程及注意点
+        1.打开相机,设置帧数据的回调camera.setPreviewcallback(),
+        2.摄像头回调一帧帧的YUV420数据到Previewcallback.onPreviewFrame方法中
+        3.在视频帧回调后对每一帧视频数据转换成YUV420SP数据(MediaCodeC支持YUV420SP和NV21)
+        4.通过MeadiaCodeC对每一帧视频数据进行编码
+        5.在MediaCodeC的ouputBuffer中取一帧,说明关键帧
+
     3.MediaCodec实现原理
+        1.初始MediaCodec对象
     4.SoundTouch实现原理
     5.H264协议
     6.音视频开发中遇到的问题
 
 13.JNI/NDK开发
+    1.使用流程
+    2.静态注册和动态注册
+
 14.GreenDao
     1.介绍及特点
     2.实现原理
+
+15.组件化
+
+16.热修复、插件化实现思路
+
 
 
 

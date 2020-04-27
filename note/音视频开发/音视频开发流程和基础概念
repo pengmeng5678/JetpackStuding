@@ -100,6 +100,7 @@ https://blog.csdn.net/huangmindong/article/details/79397948
     8.Android推荐的PreView Format是NV21,在PreviewCallback中会返回preview的NV21图片
         如果是软编的话由于H264支持I420的图片格式,因此需要将N21格式转为I420格式,然后交给H264库
         如果是硬编的话，由于Android的编解码库支持I420和NV21,因此可以将NV21图片转换为I420或者NV12,然后交给硬编解码器
+
     9.Android对视音频提供的类
         1.MediaMetadataReceiver，获取视频相关信息，例如视频宽高、时长、旋转角度、码率等等
         2.MediaExtractor:视音频分离器，将一些格式的视频分离出视频轨道和音频轨道

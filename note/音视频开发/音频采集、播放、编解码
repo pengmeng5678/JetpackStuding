@@ -92,7 +92,7 @@ https://www.jianshu.com/p/2cb75a71009f
     3.MediaCodec使用基本流程
         1.大致流程
             -createEncoderByType/createDecodeByType
-            -configure
+            -configure,配置编/解码格式,H264或者AAC
             -start
             -while(){//音视频流的回调函数中
             -   dequeueInputBuffer
