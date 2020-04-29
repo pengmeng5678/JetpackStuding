@@ -86,6 +86,8 @@ https://www.jianshu.com/nb/8407779
         5.插件化热修复开发
 
     5.性能优化相关的框架
+        Hook 可以分为消息Hook和API Hook
+
         1.leakcanary:   内存泄漏检测
         2.blockcanary:
          卡顿检测

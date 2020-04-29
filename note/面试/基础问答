@@ -3,11 +3,99 @@
 2.soket/https
 
 3. android各大版本差异
+    5.x:
+        RecycleView,
+        Android运行时由Davilk虚拟机改成了ART模式；
+            两者的区别是：DVM采用的是JIT模式的解释器进行动态编译,而ART是使用AOT模式在Apk预安装的时候进行了预编译
+    6.x:
+        运行时权限机制
+        增加了待机模式、休眠模式等电量管理功能
+    7.0
+        增加了分屏模式
+        增加了通知栏快捷回复功能
+    8.0
+        禁止从后台启动服务
+            8.0还有一个比较狠的是,启动了一个service，app退到后台后很快service会在短时间内（一分钟左右）就被系统干掉。
+        原因是这样的，ActivityManagerService有个方法叫updateOomAdjLocked，用来计算进程adj值的，这个方法会被频繁调用，
+        调用的时候还会发送一个调用idleUids 这个方法的广播，idleUids里面会去判断进程在后台的时间，
+        接着会调用ActiveServices.stopInBackgroundLocked(uid);这个方法，把后台服务给杀掉
+            两种解决方案：
+                1.当sdkTagetVersion>26,就使用startForegroundService代替startService
+                2.创建一个JobIntentService代替Service,在重写方法onHandleWork里面处理具体的逻辑
+
+    9.0
+        刘海屏API支持
+        多摄像头支持
 
 4.性能优化
 
-5.组件化中组件与组件之间的依赖如何处理
+5.组件化中组件与组件之间的通信如何处理
+    1.基础库中暴露接口：
+        基础库中定义一个接口如HomeExportService 继承自 IProvider
+        public interface HomeExportService extends IProvider {
+            String sayHello(String s);
+        }
+    2.A组件提供接口服务
+        谁具备这个ITestService的能力,就在它对应的组件中实现这种能力
+        @Route(path = "/home/HomeService",name = "测试服务")
+        public class HomeService implements HomeExportService {
+            private String name;
+            @Override
+            public String sayHello(String s) {
+                return "HomeService say hello to" + s;
+            }
+
+            @Override
+            public void init(Context context) {
+               initData();
+            }
+
+            private void initData() {
+                name="yc";
+            }
+        }
+    3.B组件使用暴露出来的服务
+        通过注解的方式来定义基础库中暴露的服务,编译时就会根据
+
+        @Autowired(name = "/home/HomeService")
+        public HomeExportService baseService;//通过这个baseService引用可以调用sayHello方法
+
+        为什么会存在这个baseService,因为添加了@Autowired(name = "/home/HomeService")注解,代码在编译后就会根据注解生成相关的类
+        可以让用户之间使用暴露的出来的服务,编译生成的类如下
+            public class MainActivity$$ARouter$$Autowired implements ISyringe {
+              private SerializationService serializationService;
+
+              @Override
+              public void inject(Object target) {
+                serializationService = ARouter.getInstance().navigation(SerializationService.class);
+                MainActivity substitute = (MainActivity)target;
+                substitute.baseService = (HomeExportService)ARouter.getInstance().build("/home/HomeService").navigation();;
+              }
+            }
+
 
 6.四大组件生命周期和启动模式
 
 7.约束布局某个控件隐藏时会出现什么问题
+8.如何加载大图避免OOM
+    1.使用BitmapFactory.Option类,先将inJustDecodeBounds属性设为true,即不加载图片到内存中,根据图片的宽高选定inSampleSize的具体压缩比例
+    2.然后将inJustDecodeBounds属性属性设为false,根据计算的inSampleSize真正加载压缩过的图片
+    Android9.0废弃了BitmapFactory.Option类,可以使用
+9.接口和抽象类的区别
+    1.接口要么被子类实现,抽象类要被子类继承
+    2.接口只能做方法声明,抽象类中可以作方法声明,也可以做方法实现
+    3.接口里只能有抽象方法和静态常量,而抽象类中可以有具体的方法和属性
+    4.接口是设计的结果,而抽象类是重构的结果
+10.虚引用的应用场景
+11.Activity中静态Handler如何避免内存泄漏
+   在Activity中使用静态Handler且持有Activity的弱引用,这样既避免内存泄漏,handler又可以调用到Activity的属性
+12.MVVM双向绑定实现原理
+
+13.Kotlin特性和协程
+    1.空安全、字符模板、延迟加载、默认参数、when表达式、循环表达式、协程等
+    2.协程
+        简介：可以理解为轻量级的线程，它是在线程内使用的,但是不像线程是由CPU调度,它不会被操作系统内核管理，而完全是由程序内部处理的(用户态),这样可以避免线程间频繁切换造成的性能问题
+        作用：可以替换回调来简化代码；因为协程在子程序中是可以中断执行的,执行完一半又可以转而执行其他程序,然后其他程序执行完再返回来接着执行
+14.网络通信客户端如何加密
+
+15.Android安全机制、等级

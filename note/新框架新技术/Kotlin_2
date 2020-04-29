@@ -45,16 +45,18 @@
 2.Kotlin常见问答
     1.Kotlin相对于Java有哪些优缺点
     https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650829355&idx=1&sn=3a7087d2cfa9087107aad8d8b369ce0d&chksm=80b7a6b5b7c02fa3b0025fb600644456f267e619b7b15d5814ff93eead4f0fdf2811e0b39a05&mpshare=1&scene=1&srcid=0219hCjNYsx4XRMrgksz8Gds&sharer_sharetime=1582097543018&sharer_shareid=b91a3062fa43e169a7da0f016e38637e&exportkey=AcWCcmIxsakJOY3Hyqk15Mw%3D&pass_ticket=MBdOe6nebVJnejquEfwTIDeyuvFoOZsO57r8C65JtPzhIwyEmp7fsoBgRZ3uK5Su#rd
-        字符模板，
-        空安全，
-        延迟加载，
-        when表达式，
-        默认参数，
-        方便易读的循环,
-        强大的迭代器，
+        字符模板:
+        空安全:
+        延迟加载:等到要使用到变量的时候才去加载,而不是类加载的时候就加载
+            val userInfo:UserInfo by lazy{UserInfo()}
+            lateinit var person:InvationPerson
+        when表达式:
+        默认参数:
+        方便易读的循环:
+        强大的迭代器:
         Datacalss
         标准函数库：let,with,run,apply,also
-
+        协程
     2.Kotlin实现空安全的原理是什么
         AndroidStudio-Tool-kotlin-Show Kotlin Bytecode,通过这个工具可以显示kotlin编译后的字节码，通过左上角的Decompile可以反编译字节码查看java代码形式
         通过查看代码，kotlin实现空安全原理如下
@@ -63,3 +65,29 @@
             3、可空类型，如果是?.判空，不空才执行后续代码，否则返回null；如果是!!，空的话直接抛出NPE异常。
             4、as操作符会判空，空的话直接抛出异常，不为空才执行后续操作，没做类型判断！运行时可能会报错！
             5、as?则是新建一个变量，参数赋值给它，然后判断是否为特定类型，赋值为null，接着把这个变量的值赋值给另一个新的变量，这里有一点注意：as?处理后的参数可能为空！！！所以调用as?转换后的对象还需要添加安全调用操作符(?.)
+    3.协程
+        扔物线
+        https://blog.csdn.net/c10WTiybQ1Ye3/article/details/94415256
+
+        1.介绍
+            协程是一个线程框架,它好在方便,它能在同一个代码块里面进行多次的线程切换(怎么切换呢,通过withContext)
+            以下代码中launch函数中的两行代码就是一个协程
+            launch(Dispatchers.Main){
+                val image = suspendingGetImage(iamgeId)
+                avatarIv.setImage(image)
+            }
+            //suspend修饰的函数称为挂起函数
+            suspend fun suspendingGetImage(imageId:String){
+                //怎么指定协程中执行任务的线程呢? 使用withContext指定
+                withContext(Dispatchers.IO){
+                    getImage(imageId)
+                }
+            }
+            挂起函数：
+                1.从suspendingGetImage这行代码开始,我们不再执行这个协程了,而是兵分两路,分别执行当前线程逻辑和执行协程里面的逻辑
+                    1.线程继续剩下的代码
+                    2.挂起函数在指定线程执行新的业务逻辑,且挂起函数执行完毕之后
+
+        2.和线程的区别
+
+        3.项目中哪里用到了协程

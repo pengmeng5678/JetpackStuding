@@ -1,7 +1,7 @@
 https://www.jianshu.com/p/dca3e2c8608a
 https://blog.csdn.net/zlmrche/article/details/79643801
 https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx.git
-一、AOP
+一、AOP(Aspect Oriented Programming):面向切面编程
     1.主要功能
         1.日志记录
         2.性能统计
