@@ -172,7 +172,7 @@
         应用层、表示层、会话层、传输层、网络层、数据链路层、物理层
         应用层、传输层、网络层、数据链路层、物理层
     2.TCP/UDP特点及异同
-        TCP     面向连接      可靠    面向字节流   速度慢
+        TCP     面向连接      可靠    面向字节流    速度慢
         UDP     无连接       不可靠    数据报文端   速度快
     3.TCP三次握手和四次挥手
         三次握手
@@ -188,6 +188,7 @@
     4.Http和Https区别
         https是在Http的基础上加入了一层安全套接字SSL(Secure socket layer)
         传统的Http是直接和TCP通信，而Https是先和SSL进行通信，然后SSL再和TCP通信
+        传输层安全性协议（英语：Transport Layer Security，缩写作TLS），及其前身安全套接层（Secure Sockets Layer，缩写作SSL）是一种安全协议，目的是为互联网通信提供安全及数据完整性保障
 
         而https保证安全的原理是使用的对称加密+非对称加密结合的方式保证的
             1.客户端发起请求，生成随机数1
@@ -202,7 +203,7 @@
                 OkHttpClient client = new OkHttpClient.Builder().addIntercepter(..).build();
                 Request request = new Request.Builder().url(..).header(..);
                 client.newCall(request).enqueue(call);
-            特点
+            特点:
                 OkHttp是Square[skwer]公司开源的一个用于网络请求的开源框架,它包含以下特点
                     支持Http2,对一台机器的所有请求共享同一个socket,提高请求效率
                     内置连接池,支持连接复用,减少延迟

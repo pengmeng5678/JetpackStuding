@@ -84,6 +84,7 @@ https://zhuanlan.zhihu.com/p/43789231
         即HTTP+SSL(Secure Socket Layer),SSL最高版本为3.0，后面的版本叫TLS(Transport layer security)
         HTTPS并非应用层的一种新协议,只是HTTP通讯接口部分用SSL和TLS协议替换
         通常HTTP直接和TCP通信，当使用HTTPS后，则演变为HTTP先和SSL通信，再由SSL和TCP通信
+
     2.HTTPS的优势
         1.内容加密，建议一个信息的安全通道,保证数据传输的安全性(解决明文数据被窃听)
         2.身份认证，确认网站的真实性(解决对请求来者不拒的问题)

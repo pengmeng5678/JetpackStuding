@@ -26,7 +26,6 @@ https://juejin.im/post/5b8f15e26fb9a01a031b12d9#heading-44
 
             理解就是:View的MeasureSpec并不是父View独自决定,他是根据父View的MeasureSpec加上子View自己的layoutparams,通过相应的规则转化的
 
-
     布局阶段:确定View的位置
         ViewGroup:ViewGroup中的onLayout方法会调用所有子View的layout方法,把尺寸和位置传给他们,让他们完成自我的内部布局
         View:因为View是没有子View的，所以View的onLayout里面什么也不做
