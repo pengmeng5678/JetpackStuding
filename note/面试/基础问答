@@ -3,7 +3,10 @@
 2.soket/https
 
 3. android各大版本差异
-
+    5.x：将Dalvik更改了ART,MertilralDesign,CardView和RecycleView
+    6.x: 新增了运行时权限机制,新增了瞌睡模式和待机模式,移除了对Apache HTTP client的支持
+    7.x: 通知栏快捷回复，新增了分屏多任务功能,VR,安全(更安全的加密模式)
+    8.0：
 4.性能优化
 
 5.组件化中组件与组件之间的依赖如何处理
@@ -11,3 +14,5 @@
 6.四大组件生命周期和启动模式
 
 7.约束布局某个控件隐藏时会出现什么问题
+
+8.ContentProvider可以访问文件系统吗
