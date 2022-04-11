@@ -1,0 +1,109 @@
+一、简介
+    1、模块说明：library-temp
+    2、厂商类型：海康、海曼、巨哥、承恩
+    3、硬件参数：
+        巨哥：USB通信，分辨率120*160，焦距6.5mm，像元尺寸25μm
+        海康：USB通信，分辨率120*160(显示580*772)，焦距3mm，像元尺寸17μm
+            1-5米人脸区域测温
+            测温误差0.3℃以内
+            红外视频显示
+        承恩:USB通信，分辨率192*256，焦距3.2mm，像元尺寸12μm
+            1-5米人脸区域测温
+            测温误差0.3℃以内
+            红外视频显示
+        海曼：
+            USB转串口通信,通过CH34系列芯片实现,CH34提供UART、RS232、RS485、RS422等接口
+            1.5米人脸区域测温
+            测温误差0.3℃以内
+            不支持红外显示，分辨率只有33*33
+
+二、实现流程
+    接口和类说明
+        TempCameraHelper外观类,由Activity调用
+        TempProvider向业务层提供接口，真正的逻辑由TempCameraManager实现
+        TempCameraManager所有测温模块的，继承ITempCamera接口
+        BaseTempCameraHelper各类测温模块通用抽象基类，包括获取区域温度，切换测温显示模式、亮度、对比度、人脸距离、温度补偿等参数
+        OnGetTempListener测温结果数据回调接口，包括点位测温值、区域最高温度、测温参数、版本号
+
+    使用流程
+        1.测温模块初始化
+          a.TempCameraHelper
+            当Activity启动或者红外USB进行拔插时，开始初始化红外测温模块
+            TempCameraHelper会通过TempProvider调用TempCameraManager.Companion.getInstance().init
+            设置红外测温的视频显示容器
+          b.TempCameraManager
+            init方法，获取所有的USB设备列表,把所有设备的vendorId和productId和我们已知的测温设备进行比对,根据设备类型进行初始化
+            海康:
+               vid==0x2bdf&&pid==0x0101
+            巨哥：
+               vid==0x833c&&pid==0x0001
+            海曼:
+               vid==0x1a86&&(pid==0x7523||pid==0x5523||pid==0x5512||pid==0xe010)
+               海曼模块没有红外显示和画框功能，且需要通过CH34XUARTManager对驱动进行初始化
+
+          通过TempCameraInterfaces的init方法获取当前测温helper、保存到SP、通过FaceRectParams配置画框的参数(K/N/X/Y/Z)、并调用helper的init方法
+
+        2.根据测温厂商类型进行init具体初始化操作,主要是对各厂商SDK进行初始化
+            HkHelper
+               HCUsbHelper.getInstance().ChangeSurFaceView
+            JugeHelper
+                MagDevice.init(mActivity)
+                mDev = MagDevice()
+                videoFragment = VideoFragment()
+            HmHelper
+                HmManager.getInstance().init(activity)
+                    CH34XUARTManager.getInstance(context).init()
+                    initFsdk()
+                    addListener()
+
+        3.Activity的onResume方法执行后，红外视频开始显示
+
+三、天下云海曼测温说明
+1.简介
+    海曼测温是通过USB转串口方式(CH34系列串口驱动)获取的红外图和温度信息，
+    串口波特率:115200视场角度:33*33
+    探测器分辨率:32*32帧率:8HZ
+    推荐测温距离:50cm(测温范围20-100cm)
+
+    从获取温度，到显示温度，理想时间是1秒以内
+    MCU收到指令开始计时，已过50ms了，MCU得到温度1ms至499ms(250ms从传感器循环采集一次)，MCU算法出体温值，传到主板要500ms，换算显示数值要200ms多
+
+    当距离越远，温度就会衰减约厉害，所以最佳方式是通过黑体和恒温箱做测温距离衰减测试，然后线性补偿，但是机器人的距离是靠人脸估算的，所以也不准确
+    目前的方式是，限制用户测温距离为1.5米内，这样就可以保障测温误差在0.3度以内的需求；或者测温距离每增加20cm,就补偿0.05度。
+
+2.海曼测温流程及耗时分析(HmHelper)
+    1.商汤或者虹软，检测到人脸，且限制人脸至少1/3要在测温区域内，且trackid不相同(不是同一个人)就清空上一次测温数据，重新开始测温
+    2.每隔200毫秒，连续取三次温度，获取平均值,再显示温度，(从检测到人脸到显示温度总共耗时0.5秒-4秒，其实单次测温耗时为200ms内)
+    3.测温耗时长的原因有两种:
+        a.三次测温最大值-最小值温差大于0.4，就得重新走第二步，重新测温
+        b.三次测温中，任一次为温度值为0，就得重新走第二步，重新测温
+    以上原因才会要求用户站在摄像头前保持2秒，以保证测温准确性
+
+4.优化方案
+    1.将人脸检测和测温的距离限制到1.5米以内，虹软已验证OK,商汤的待验证
+    2.三次测温中，即使某一次温度值不为0，还是要计算出不为0的温度平均值，将测温结果反馈给用户
+    该方案，可以将测温反馈的速度反馈提高到1秒以内
+
+5.待优化点
+    1.人脸视频显示卡顿
+
+
+四、兼容安智物联海曼测温说明
+    部分天下云海曼存在测温速度慢(2秒),经分析原因如下：
+        1.为兼容安智物联海曼测温模块，修改了CH34XUARTManager中readThread获取温度的api(由readData,改成了ReadDataFromUsb)
+        2.改了api之后，天下云不同USB驱动，存在测温速度差异
+
+    计划优化方案是保留两种api分别应用在天下云和安智物联两中测温模块，更新内容如下：
+    1.BaseUtils新增vid和pid(483和1155)
+    2.HmManager
+        (1)将获取温度的方式改为：GetBodyBodyTempTxy和GetBodyTempByAnz
+            以前获取温度的方式是调用HmManager.getBodyTemp方法后，将温度结果回调到bodyTemp方法异步回调的
+        (2)GetBodyBodyTempTxy这个方法的返回数据,需要从bodyTemp方法回调的数据去读取,TODO
+        (3)handleData需要区分安智物联和天下云两种型号
+            handleData数据是由CH34XUARTManager回调的
+    3.CH34XUARTManager
+        readThread应该同事保留两种api，兼容安智物联和天下云两种型号 TODO
+    4.CH34xUARTDriver_Plus
+        (1)setDeviceType不能注释setConfig TODO
+        (2)openUsbDevice的天下云类型应该启动readThread TODO
+        (3)usbdata区分处理 TODO

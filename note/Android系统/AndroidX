@@ -1,0 +1,13 @@
+1.如何切换AndroidX
+    项目右键refactor,migrate to AndroidX
+2.转成AndroidX遇到的坑
+    1.dagger2相关类报错
+        解决方案：将dagger2版本改为2.16
+    2.multidex的MultiDex包找不到
+        解决方案:dex依赖升级成2.0
+    3.xml文件和support相关的逐一修改
+        修改前android.support 	                                修改后androidx
+        <android.support.v4.widget.NestedScrollView/> 	    <androidx.core.widget.NestedScrollView/>
+        <android.support.v4.widget.Space/> 	                        <Space/>
+        <android.support.v7.widget.AppCompatTextView/> 	            <TextView/>
+        <androidx.appcompat.widget.CardView/> 	            <androidx.cardview.widget.CardView/>

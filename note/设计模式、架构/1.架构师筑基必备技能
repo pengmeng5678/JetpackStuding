@@ -1,0 +1,57 @@
+一.泛型
+    1.作用与定义
+        定义：JDK1.5，推出泛型
+        作用：
+            1.可以写出更加灵活通用的代码
+            2.将安全性检查由运行期提前到编译期，解决类型容器安全问题
+    2.通配符与嵌套
+    3.泛型上下边界
+        https://blog.csdn.net/hhllf61/article/details/108443398?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1.pc_relevant_default&spm=1001.2101.3001.4242.2&utm_relevant_index=4
+        1) 常用的 T，E，K，V等泛型字母为有类型，类型参数赋予具体的值
+
+        2) 无界通配符?未知类型  类型参数赋予不确定值，任意类型
+            ?是通配符（占位符），可以表示任意一个，T只是一种替代，只能表示其中一个
+            假设有A，B，C三个类
+            <?>可以是A，B，C任意一个,每一个<?>之间没有关联
+            <T>如果确定了是A那之后的都是A，每一个<T>代表的是相同的
+        3) 上界通配符 < ? extends E>
+            能够接收E类或者E类的子类,上边界通配符直接使用add()方法受限，但是可以用来获取各种数据类型的数据
+        4) 下界通配符 < ? super E>
+            下边界通配符使用get()方法受限（不使用强转），但是可以添加特定类型的值
+    4.Rxjava深入理解泛型
+        泛型分为:
+        1.自定义泛型接口 interface Observer<T>
+        2.泛型类 class ImplObserver<T> implements Observer<T>
+        3.泛型方法 <T> Observer<T> call(T t)
+        说一下泛型的作用域:
+            如果将泛型声明放在泛型接口,泛型类上,则该泛型在该类中就是确定的了,如果将泛型声
+        明放在了泛型方法上,则该泛型只在该方法中有效,如果泛型方法上声明的泛型类型和类或
+        接口中声明的泛型一致,则会在该方法中隐藏类或接口上的泛型
+
+        //创建被观察者
+        public class ImplObservable<T> implements Observable<T>{
+            T t;
+            private ImplObservable(T t){
+                this.t = t;
+            }
+            public static <T> Observable<T> create(T t) {
+                return new ImplObservable<T>(t);
+            }
+        }
+        Observable<Student> create = ImplObservable.create(new Student());
+        //转换方法T转R
+        public interface Func1<T,R> {
+            R call(T t);
+        }
+        创建map方法
+        public <R> Observable<R> map(Func1<T, R> fun1) {
+            Observable<R> ob = ImplObservable.create(fun1.call(t));
+            return ob;
+        }
+        //
+        public Observable<T> next(Action<T> action) {
+            action.callAction(t);
+            return this;
+        }
+
+二、注解

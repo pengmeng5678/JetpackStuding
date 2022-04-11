@@ -1,0 +1,70 @@
+一、简介
+    1、模块说明：library-face
+    2、人脸相机硬件参数：
+        视鑫：焦距6f,像元尺寸3μm X3μm,分辨率1920*1080，200万像素，帧率30p/s，视场广角水平(horizontal) :80°，垂直(Vertical):45°，对角线(Diagonal):115°
+        健德源:焦距6f,像元尺寸2μm X2μm,分辨率1920*1080，200万像素，帧率30p/s，视场广角H:93° V:63° D:101°,PID:6200  VID:26E0
+        睿识:焦距6f,像元尺寸3μm X3μm,分辨率1920*1080，200万像素，帧率30p/s，视场广角H:50° V:26°   D:76°,
+        舜宇:焦距6f,像元尺寸?μm X?μm,分辨率1920*1080，200万像素，帧率30p/s，视场广角H:55° V:48°   D:28°,
+
+    3、通信方式：硬件均采用USB通信，支持UVC协议
+    4、人脸识别：支持虹软人脸识别、商汤人脸识别、百度人脸识别(验证中)
+    5、功能支持：
+        5米内人脸检测
+        活体检测
+        人脸识别(1万个人脸,离线识别速度400ms以内)
+        支持人脸特征值提取
+        支持口罩检测
+        性别、年龄属性分析
+        人脸距离估算
+
+二、使用说明
+    1、参数配置
+        /**
+         * @param activity           监听生命周期
+         * @param previewView       人脸摄像头载体View
+         * @param faceRectView      人脸框载体View
+         * @param isOpenTemp        是否开启测温
+         * @param isOpenMask        是否检测口罩
+         * @param faceThreshold     人脸相似度阈值
+         * @param tempThreshold     报警体温
+         */
+        FaceLogicManager.instance.activeSdk(
+                    this,
+                    mFacePreview,
+                    mMyFaceView,
+                    mPresenter!!.isOpenTemp(),
+                    AppSpUtil.getInstance().wearMarker,
+                    AppSpUtil.getInstance().faceThreshold,
+                    AppSpUtil.getInstance().tempThreshold
+        )
+    2、初始化与反初始化
+        FaceManager.getInstance().initSdk(ContextUtil.getContext())
+           (1)选定人脸识别方案是商汤或者虹软
+                虹软方案需要从平台请求一次激活码
+                商汤方案是通过调用加密芯片的api实现的
+           (2)选定成功后，初始化流程由FaceManagerHelper接口实现
+           (3)FaceManagerHelper接口管控以下内容
+                A:人脸识别引擎(ArcSoftHelper和SenseTimeHelper)初始化与反初始化
+                B:引擎初始化成功后，再处理人脸摄像头(CameraHelper)打开、关闭、预览、人脸框绘制等逻辑
+                C:摄像头数据处理CameraListener.onPreview，分别回调以下两个人脸识别引擎中
+                    ArcSoftHelper：
+                        *通过FaceHelper处理人脸画框区域、特征提取、活体检测,结果数据汇总到List<FacePreviewInfo>
+                        *ArcSoftHelper根据List<FacePreviewInfo>,通过drawPreviewInfo方法绘制人脸框、获取并绘制测温数据
+                        *ArcSoftHelper根据List<FacePreviewInfo>,通过FaceHelper进行活体检测和特征值提取,特征值结果由FaceListener.onFaceFeatureInfoGet回调
+                        *ArcSoftHelper的faceRecognize方法根据回调的特征值，和虹软人脸库进行比对，获取结果CompareResult
+                        *如果CompareResult人脸比对阈值大于设定的阈值,就根据UUID从本地数据库查找这个人脸的全部信息
+                        *最终人脸识别的结果由faceEventListener.onIdentifyPerson回调给业务层
+                    SenseTimeHelper：
+                        *在initSdk方法中会读取本地的配置contextInit，进行初始化，初始化成功后会打开摄像头并启动一些线程
+                        *onPreview回调一帧帧图片之后，会添加到一个队列中mAllImagesQueue，
+                            TrackThread从mAllImagesQueue中会取出一帧帧质量较高的图片，在trackElePush中分别放到不同的队列中
+                                *含有特征信息的放到mVerifyQueue队列，用于人脸比对
+                                *含有属性信息的放到mAttributeQueue队列，用于属性分析
+                                *含有活体信息的放到mAllAnalyzerQueue队列，用于活体分析
+                        *人脸跟踪线程TrackThread，实现人脸实时画框，人脸质量检测
+                                *属性分析线程AttributeThread，从mAttributeQueue队列里取图片实现年龄、口罩、性别的识别
+                                *人脸比对线程VerifyThread，从mVerifyQueue队列里取图片实现人脸特征值提取及人脸比对功能
+                                *活体检测线程AnalyzerThread,从mAllAnalyzerQueue队列里取图片实现活体检测
+                D:人脸识别状态回调FaceEventListener(引擎初始化状态、人脸检测和识别状态、人脸库管理)
+
+        FaceManager.getInstance().unIntSdk()
