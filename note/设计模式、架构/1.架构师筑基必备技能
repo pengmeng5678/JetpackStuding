@@ -55,3 +55,77 @@
         }
 
 二、注解
+    1.注解
+        定义：ANNOTATIONS,注解将元信息与定义相关联
+        作用：1.注解确保编码的正确性；2.影响代码生成的注释@inline；3.java注解依赖特定的name-value对来初始化他们的元素
+            //定义注解
+            @interface Source{
+                public String URL();
+                public String mail();
+            }
+            //使用方式
+            @Source(URL = "http://coders.com/"
+
+    2.元注解
+        定义：用于定义注解的注解
+        作用：定义注解的作用范围，使用在什么元素上
+        种类：四种
+            @Retation:保留的范围，默认值为CLASS,可选值有三种：SOURCE,只在源码中可用；CLASS，在源码和字节码中可用；RUNTIME,在源码、字节码、运行时都可用
+            @Target:用于修饰哪些程序元素，如TYPE,METHOD,CONSTRUCTURE,FIELD,PARAMETER,未标注表示可以修饰所有
+            @Inherited:是否可以被继承，默认为false
+            @Documented:是否会保存到Javadoc文档中
+
+    3.自定义注解
+        @Retention(RetentionPolicy.RUNTIME)@Target(ElementType.FIELD)
+        public @interface TestAnnotation {
+            String value();
+            String[] value2() default "value2";
+        }
+
+    4.APT
+        定义：Anotation Processing Tool，编译时注解处理器，Javac的一个工具，核心类是AbstractProcessor类
+        作用：APT可以用来在编译时扫描和处理注解，
+             通过 APT 可以获取到注解和被注解对象的相关信息，在拿到这些信息后我们可以根据需求来自动的生成一些代码，省去了手动编写
+        使用场景：ButterKnife,EventBus,Dagger2,ARouter等开源框架
+        如何构建APT项目：
+            1.至少需要两个Java Library模块组成：
+                一个Annotation模块
+                一个Compiler模块(Compiler模块依赖Annotation模块),
+                    且App模块和其他业务模块都需要依赖 Annotation 模块
+                    同时需要通过 annotationProcessor 依赖 Compiler 模块
+                    app 模块的 gradle 中依赖关系如下
+                        implementation project(':annotation')
+                        annotationProcessor project(':factory-compiler')
+
+    5.插桩
+        定义：将一段代码插入或者替换原本的代码
+        作用:利用注解标记需要插桩的方法，结合编译后的字节码帮助我们自动插入，这种AOP思想让我们只需要关注插桩代码本身
+        字节码插桩：在我们编写的源码编译成字节码(class)后，在Android下生成dex之前修改Class文件，修改或者增强原有代码逻辑的操作
+        应用场景：QQ空间《热修复解决方案》中利用 Javaassist 库实现向类的构造函数中插入一段代码解决 CLASS_ISPREVERIFIED 问题
+        字节码操作框架：ASM,Javaassist。(根据Class字节码的规则格式，通过字节码操作框架对字节码进行修改)
+        AS插件：ASM Bytecode Viewer
+
+    6.反射
+        https://www.jianshu.com/p/f67182a482eb
+        定义：反射是一种机制，利用该机制可以在程序运行过程中对类进行解剖并操作类中的方法、属性、构造方法等成员
+        实现步骤：
+            1.获取Class字节码对象
+            2.获取你要操作对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
+            如果操作是private类型，就提前设置允许暴力操作，setAccessible(true)
+            public class Person {
+                private String name;
+                private int age;
+                private String msg="hello wrold";
+                public Person() {}
+                public void fun(String name,int age) {
+                    System.out.println("我叫"+name+",今年"+age+"岁");
+              }
+            }
+
+            Class c = Class.forName("com.tengj.reflect.Person");
+            Object o = c.newInstance();
+            Method method = c.getMethod("fun", String.class, int.class);
+            method.invoke(o, "tengj", 10);
+
+三、并发编程
+    1.

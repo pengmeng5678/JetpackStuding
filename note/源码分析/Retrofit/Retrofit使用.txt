@@ -158,14 +158,22 @@ POST请求：
 		@Path("newsId") String commentId,
 		@Query("access_token") String access_token,
 		@Body CommentBean bean)；
-		
+
+    8.动态的url请求
+        Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("https://api.github.com/")
+            .build()
+        public interface GitHubService {
+            @GET
+            Call<List<Repo>> listRepos(@Url String user);
+        }
 五.Retrofit	网络请求的service类型小结：
-	1.@Path：所有再网址中的参数，URL问号前面
+	1.@Path：所有在网址中的参数，URL问号前面(半静态的url地址请求)
 	2.@Query：URL问号后面的参数
 	3.@QueryMap：相当于多个@Query
 	4.@Field：用于POST请求，提交单个数据。使用Field时要记得添加 @FormUrlEncoded
 	5.@Body：相当于多个@Field,以对象的形式提交
-	
+	6.@url：动态的url地址请求
 	
 	
 	
