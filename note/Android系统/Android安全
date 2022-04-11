@@ -1,0 +1,9 @@
+https://blog.csdn.net/zhwadezh/article/details/79301885
+Android系统从哪些方面实现了安全机制
+     1.进程沙箱隔离机制
+     2.应用程序签名机制
+     3.权限声明机制
+     4.访问控制机制
+     5.进程通信机制
+     6.内存管理机制
+     7.SELinux

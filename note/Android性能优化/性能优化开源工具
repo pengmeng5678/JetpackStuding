@@ -1,0 +1,13 @@
+1.Lancet:轻量级AOP框架
+2.epic
+    ARTHook无侵入式方法耗时检测,可以Hook系统方法,https://github.com/tiann/epic.git
+    所有的异步方式,都会走到new Thread(),检测所有创建线程的位置,在attachBaseContext中就开始Hook(使用epic框架)检测
+
+    DexposeBridge.hookAllConstructors(Thread.class,new XM_MethodHook(){
+        protected void afterHookedMethod(MethodHookParam param){
+            super.afterHookedMethod(param)
+            Thread thread = (Thread)param.thisObject;
+            //打印当前线程的堆栈信息
+            LogUtils.i(thread.getName()+" stack "+Log.getStackTraceString(new Throwable()))
+        }
+    })

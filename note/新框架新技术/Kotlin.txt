@@ -519,7 +519,7 @@ https://blog.csdn.net/u013064109/article/details/78786646
 
 第六章 koltin内联扩展函数
     let
-        it指代对象,返回函数最后一行或者return表达式,let?.{}
+        it指代对象, 返回函数最后一行或者return表达式,let?.{}
     with
         this指代对象，返回函数最后一行或者return表达式,执行with函数前要判空
     run
@@ -535,6 +535,8 @@ https://blog.csdn.net/u013064109/article/details/78786646
     1.基础介绍
         本质上，协程是轻量级的线程。它们在某些CoroutineScope上下文中与lauch协程构建器一起启动
         作用:协程可以通过替代回调(callback)来简化代码
+        协程与线程的区别：
+
         示例1
             fun main() {
                 GlobalScope.launch { // 在后台启动一个新的协程并继续

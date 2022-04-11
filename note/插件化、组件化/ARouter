@@ -2,4 +2,69 @@
 https://github.com/alibaba/ARouter
 ARouter使用：   https://www.jianshu.com/p/7cb2cc9b726a
 ARouter源码解析：https://www.jianshu.com/p/46d174f37e82
+一.如何使用
+    1.添加依赖
+         buildscript {
+             repositories {
+                 jcenter()
+             }
+             dependencies {
+                 classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+             }
+         }
 
+         apt {
+             arguments {
+                 moduleName project.getName();
+             }
+         }
+
+         dependencies {
+             apt 'com.alibaba:arouter-compiler:x.x.x'
+             compile 'com.alibaba:arouter-api:x.x.x'
+             ...
+         }
+
+5.组件化中组件与组件之间的通信如何处理
+    1.基础库中暴露接口：
+        基础库中定义一个接口如HomeExportService 继承自 IProvider
+        public interface HomeExportService extends IProvider {
+            String sayHello(String s);
+        }
+    2.A组件提供接口服务
+        谁具备这个ITestService的能力,就在它对应的组件中实现这种能力
+        @Route(path = "/home/HomeService",name = "测试服务")
+        public class HomeService implements HomeExportService {
+            private String name;
+            @Override
+            public String sayHello(String s) {
+                return "HomeService say hello to" + s;
+            }
+
+            @Override
+            public void init(Context context) {
+               initData();
+            }
+
+            private void initData() {
+                name="yc";
+            }
+        }
+    3.B组件使用暴露出来的服务
+        通过注解的方式来定义基础库中暴露的服务,编译时就会根据
+
+        @Autowired(name = "/home/HomeService")
+        public HomeExportService baseService;//通过这个baseService引用可以调用sayHello方法
+
+        为什么会存在这个baseService,因为添加了@Autowired(name = "/home/HomeService")注解,代码在编译后就会根据注解生成相关的类
+        可以让用户之间使用暴露的出来的服务,编译生成的类如下
+            public class MainActivity$$ARouter$$Autowired implements ISyringe {
+              private SerializationService serializationService;
+
+              @Override
+              public void inject(Object target) {
+                serializationService = ARouter.getInstance().navigation(SerializationService.class);
+                MainActivity substitute = (MainActivity)target;
+                substitute.baseService = (HomeExportService)ARouter.getInstance().build("/home/HomeService").navigation();;
+              }
+            }

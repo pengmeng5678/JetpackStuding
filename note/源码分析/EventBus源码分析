@@ -4,6 +4,7 @@ https://blog.csdn.net/lmj623565791/article/details/40920453
 	EventBus.getDefault().register(this);
     EventBus.getDefault().post(param);
     EventBus.getDefault().unregister(this);
+
 2.原理概述
     EventBus其实就是内部存储了一堆onEvent开头的方法,
     然后当调用EventBus.getDefault().post(param)时，
