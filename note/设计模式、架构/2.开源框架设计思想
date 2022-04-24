@@ -1,0 +1,34 @@
+一、AOT/JIT &dexopt与dex2oat
+    JIT:just in time:
+        即时编译，运行时编译，边运行边编译，比如java虚拟机是在运行时，将解释执行的语言（比如字节码）编译成机器指令，以提高运行速度
+        Android2.2，Android虚拟机首次加入JIT编译器
+        优点：可以对执行频繁的dex/odex进行编译和优化，提升编译器性能
+        缺点：每次启动应用都需要重新编译，运行时比较耗电
+
+    AOT:ahead of time：
+        预编译，运行前编译，应用在安装的时候会启动dex2oat过程把dex预编译成ELF文件，每次运行程序不用重新编译
+        Android4.4首次引入ART虚拟机和AOT编译器，Android5.5全面替换成ART虚拟机+AOT编译
+        优点：启动速度快
+        缺点：应用安装和系统升级后的应用优化时间长，占用内存大
+
+    dexopt针对Dalvik虚拟机：是对dex文件进行verification和optimization操作，操作完成的文件变成Odex File
+    dex2oat针对Art虚拟机：是对dex文件的AOT提前编译操作，编译结果是一个本地可执行的ELF文件，可以被本地处理器执行
+        Art虚拟机的dex2oat是提前编译所有的dex字节码，而Dalvik虚拟机只编译使用启发式检测中最频繁执行的热点字节码
+        https://blog.csdn.net/jason0539/article/details/50440669?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-2&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-2
+
+    JVM/DVM/ART差异
+        https://www.jianshu.com/p/8cdc8873b49b
+        JVM:java virtual machine
+            不同的java平台使用JVM加载字节码文件(.class),java编译成的字节码文件与硬件和操作系统无关，这是跨平台基础
+            每个类或者接口单独占据一个class文件，每个类单独处理，没有交叉
+            弊端：内存占用大，不适合于移动端；堆栈的加载模式导致加载速度慢；文件IO操作多，查询慢
+
+        DVM:dalvik virtual machine
+            AndroidSDK中有个dx工具将java字节码转换成Dalvik字节码dex
+            使用JIT即时编译，只对编译执行次数较多的dex转换成机器码
+            每次启动App都要JIT编译，启动速度慢
+
+        ART:Android runtime
+            AndroidSDK中有个dx工具将java字节码转换成Dalvik字节码dex
+            Android4.4推出ART，Android5.5全面切换成ART(OAT编译),Android7.0使用AOT+JIT结合的方式
+            应用第一次安装时，字节码就会优先编译成机器码，启动速度快，但安装速度慢，且占用内存空间大(10%-20%)
