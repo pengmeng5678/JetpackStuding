@@ -70,8 +70,11 @@
         定义：用于定义注解的注解
         作用：定义注解的作用范围，使用在什么元素上
         种类：四种
-            @Retation:保留的范围，默认值为CLASS,可选值有三种：SOURCE,只在源码中可用；CLASS，在源码和字节码中可用；RUNTIME,在源码、字节码、运行时都可用
-            @Target:用于修饰哪些程序元素，如TYPE,METHOD,CONSTRUCTURE,FIELD,PARAMETER,未标注表示可以修饰所有
+            @Retention:保留的范围，可选值有三种(默认值为CLASS)：
+                SOURCE,只在源码中可用；
+                CLASS，在源码和字节码中可用；
+                RUNTIME,在源码、字节码、运行时都可用
+            @Target:用于修饰哪些程序元素，如TYPE(类的注解),METHOD,CONSTRUCTURE,FIELD,PARAMETER,未标注表示可以修饰所有
             @Inherited:是否可以被继承，默认为false
             @Documented:是否会保存到Javadoc文档中
 
