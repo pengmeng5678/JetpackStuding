@@ -79,7 +79,7 @@ https://github.com/android/architecture-components-samples
            }
       2.使用ViewModel
             Activity中简单初始化
-                MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
+                MyViewModel model = ViewModelProviders.of(this).get(MyViewModel.class);
                 model.getName().observe(this,new Observer<String>{
                     @Override
                     public void onChange(@Nullable String s){
