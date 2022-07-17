@@ -1,0 +1,75 @@
+http://liuwangshu.cn/tags/Android-Jetpack/
+https://juejin.cn/post/6844903889574051848
+    定义：用于处理和UI相关的数据的类
+    优点：设备信息发生变更后不会消失，同一个Activity之间的Fragment可以实现资源共享
+
+1.自定义ViewModel
+           public class MyViewModel extends ViewModel {
+               private MutableLiveData<String> name;
+               public LiveData<String> getName() {
+                   if (name == null) {
+                       name = new MutableLiveData<String>();
+                       addName();
+                   }
+                   return name;
+               }
+               private void addName() {
+                   name.setValue("Android进阶解密");
+               }
+           }
+      2.使用ViewModel
+            1.Activity中简单初始化
+                MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
+                model.getName().observe(this,new Observer<String>{
+                    @Override
+                    public void onChange(@Nullable String s){
+                        Log.d(TAG, "畅销书："+s);
+                    }
+                })
+            2.另一种初始化方式(自定义Factory,为ViewModel注入数据仓库等对象)
+                ProductViewModel.Factory factory = new ProductViewModel.Factory(
+                        requireActivity().getApplication(), getArguments().getInt(KEY_PRODUCT_ID));
+
+                final ProductViewModel model = new ViewModelProvider(this, factory)
+                        .get(ProductViewModel.class);
+
+                这里创建ProductViewModel的时候,在Factory中就会注入productId,Respository等数据,Factory类如下所示
+                public static class Factory extends ViewModelProvider.NewInstanceFactory {
+                    ...
+                    private final DataRepository mRepository;
+                    public Factory(@NonNull Application application, int productId) {
+                        mApplication = application;
+                        mProductId = productId;
+                        mRepository = ((BasicApp) application).getRepository();
+                    }
+
+                    @Override
+                    public <T extends ViewModel> T create(Class<T> modelClass) {
+                        //noinspection unchecked
+                        return (T) new ProductViewModel(mApplication, mRepository, mProductId);
+                    }
+                }
+            3.Kotlin初始化ViewModel(自定义Factory注入数据仓库)
+                1.初始化viewModel
+                    private val viewModel: GardenPlantingListViewModel by viewModels {InjectorUtils.provideGardenPlantingListViewModelFactory(requireContext())}
+                2.获取repository
+                    fun provideGardenPlantingListViewModelFactory(context: Context): GardenPlantingListViewModelFactory {
+                        val repository = getGardenPlantingRepository(context)
+                        return GardenPlantingListViewModelFactory(repository)
+                    }
+                    private fun getPlantingListRepository(context: Context): PlantRepository {
+                        val dao = AppDatabase.getInstance(context.applicationContext).plantDao()
+                        return PlantRepository.getInstance(dao)
+                    }
+                3.factory
+                    class GardenPlantingListViewModelFactory(
+                            private val repository: GardenPlantingRepository
+                    ) :ViewModelProvider.NewInstanceFactory(){
+                        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                            return GardenPlantingListViewModel(repository) as T
+                        }
+                    }
+                4.viewModel类
+                    class GardenPlantingListViewModel internal constructor(repository: GardenPlantingRepository): ViewModel() {
+                        val plantAndGardenPlantings:LiveData<List<PlantAndGardenPlantings>> = repository.getPlantedGardens()
+                    }

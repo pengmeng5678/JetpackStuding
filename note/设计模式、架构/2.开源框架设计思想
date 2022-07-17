@@ -1,0 +1,81 @@
+一、AOT/JIT &dexopt与dex2oat
+    JIT:just in time:
+        即时编译，运行时编译，边运行边编译，比如java虚拟机是在运行时，将解释执行的语言（比如字节码）编译成机器指令，以提高运行速度
+        优点：可以对执行频繁的dex/odex进行编译和优化，提升编译器性能
+        缺点：每次启动应用都需要重新编译，运行时比较耗电
+
+    AOT:ahead of time：
+        预编译，运行前编译，应用在安装的时候会启动dex2oat过程把dex预编译成ELF文件，每次运行程序不用重新编译
+        优点：启动速度快
+        缺点：应用安装和系统升级后的应用优化时间长，占用内存大
+
+    dexopt针对Dalvik虚拟机：是对dex文件进行verification和optimization操作，操作完成的文件变成Odex File
+    dex2oat针对Art虚拟机：是对dex文件的AOT提前编译操作，编译结果是一个本地可执行的ELF文件，可以被本地处理器执行
+        Art虚拟机的dex2oat是提前编译所有的dex字节码，而Dalvik虚拟机只编译使用启发式检测中最频繁执行的热点字节码
+        https://blog.csdn.net/jason0539/article/details/50440669?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-2&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-2
+
+    JVM/DVM/ART差异
+        https://www.jianshu.com/p/8cdc8873b49b
+        版本差异：
+            Android2.2，Android虚拟机首次加入JIT编译器
+            Android 4.0 之前是主要是的 Dalvik 虚拟机,使用JIT编译器
+            Android4.4首次引入ART虚拟机和AOT编译器
+            Android5.5全面替换成ART虚拟机+AOT编译
+            Android7开始引入了JIT和AOT的混合模式，用于解决7.0之前AOT编译器dex优化成 odex,系统和应用更新非常耗时
+               混合模式简要说明：在 ART 的时候，先把 dex 解释成中间态的，不编译成机器码。在运行的时候，或者充电的时候，只编译“热代码”
+
+        JVM:java virtual machine
+            不同的java平台使用JVM加载字节码文件(.class),java编译成的字节码文件与硬件和操作系统无关，这是跨平台基础
+            每个类或者接口单独占据一个class文件，每个类单独处理，没有交叉
+            弊端：内存占用大，不适合于移动端；堆栈的加载模式导致加载速度慢；文件IO操作多，查询慢
+
+        DVM:dalvik virtual machine
+            AndroidSDK中有个dx工具将java字节码转换成Dalvik字节码dex
+            使用JIT即时编译，只对编译执行次数较多的dex转换成机器码
+            每次启动App都要JIT编译，启动速度慢
+
+        ART:Android runtime
+            AndroidSDK中有个dx工具将java字节码转换成Dalvik字节码dex
+            Android4.4推出ART，Android5.5全面切换成ART(AOT编译),Android7.0使用AOT+JIT结合的方式
+            应用第一次安装时，字节码就会优先编译成机器码，启动速度快，但安装速度慢，且占用内存空间大(10%-20%)
+
+    热修复设计之CLASS_ISPREVERIFIED
+        1.怎么将修复后的Bug类打包进dex
+            制作补丁：
+                修复后的类文件Cat.class，复制到类所属的包目录com中,然后执行以下指令生成补丁包
+                jar -cvf patch.jar com
+                dx --dex --output=patch_dex.jar patch.jar
+                之所以不使用javac -d制作补丁包，是因为可能会遇到ParseException，原因是jar包版本和dx工具版本不一致
+            加载补丁
+                dex保存位置：BaseDexClassLoader–>pathList–>dexElements
+                apk的class.dex可以从应用本身的DexClassLoader中获取
+                path_dex的dex需要new一个DexClassLoader加载后再获取
+                分别通过反射去除dex文件，重新合并成一个数组，然后赋值给应用本身的ClassLoader的dexElements
+
+                运行的时候会报错CLASS_ISPREVERIFIED,因为Apk在安装的时候，虚拟机会将dex优化成odex才执行，在这个过程中会对所有的class进行校验
+                class校验方式：
+                    假设A类在它的static、构造、private、override方法中直接引用B类，如果A类和B类在同一个dex中，那么A类就被标记为CLASS_ISPREVERIFIED
+                而被标记为CLASS_ISPREVERIFIED的类不能引用其他dex中的类。
+                所以我们直接调用补丁包的内容就报错了，那我们应该如何做呢？
+
+                    A 类如果还引用了一个 C 类，而 C 类在其他 dex 中，那么 A类并不会被打上标记。换句话说，只要在 static 方法，构造方法，private 方法，
+                override 方法中直接引用了其他 dex 中的类，那么这个类就不会被打上CLASS_ISPREVERIFIED 标记
+
+                    所以我们让所有类都引用其他dex中的某个类就不会报错了
+
+        2.怎么将外部的dex插入到ClassLoader中
+
+二、热修复原理
+    1.源码类到机器执行的过程
+        主要过程：java-class/dex-opt/oat-odex
+        DVM:java-dex-opt-D类型的odex，还需要通过JIT翻译
+        ART:java-dex-oat-A类型的odex(机器码类型文件),使用AOT，在应用安装的时候进行编译
+        混合模式：java-dex-oat-(D类型的odex,base.art:热缓存,image)JIT;AOT全时段编译
+    2.补丁包
+        补丁包主要有class,资源文件，so的改动
+        1.资源文件:替换AssertManager-加载resources.arsc
+        2.类:底层替换和类加载器方案
+        3.so,暂未方案
+    3.类补丁生效原理
+        1.底层替换方案AndFix
+        2.类加载器方案QFix,tinker,Sophix

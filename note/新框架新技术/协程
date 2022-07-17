@@ -1,0 +1,56 @@
+https://juejin.cn/post/6854573211418361864
+一、介绍
+    定义：轻量级的线程
+    优点：能够通过阻塞的方式写出非阻塞的代码，解决开发中常见的回调地狱
+
+二、使用
+    1.基本使用
+        GlobalScope.lauch(Dispatch.IO){
+            val res = getResult(2)
+            mNumTv.text = res.toString()
+        }
+        以上方法包含三个重要部分，GlobalScope、Dispatch、lauch，分别对应协程的作用域、调度器、构建器
+    2.协程的作用域
+        runBlocking：顶层函数，它和 coroutineScope 不一样，它会阻塞当前线程来等待，所以这个方法在业务中并不适用 。
+        GlobalScope：全局协程作用域，可以在整个应用的声明周期中操作，且不能取消，所以仍不适用于业务开发。
+        自定义作用域：自定义协程的作用域，不会造成内存泄漏。
+            class MainActivity : AppCompatActivity() {
+                // 1. 创建一个 MainScope
+                val scope = MainScope()
+
+                override fun onCreate(savedInstanceState: Bundle?) {
+                    super.onCreate(savedInstanceState)
+                    setContentView(R.layout.activity_main)
+
+                    // 2. 启动协程
+                    scope.launch(Dispatchers.Unconfined) {
+                        val one = getResult(20)
+                        val two = getResult(40)
+                        mNumTv.text = (one + two).toString()
+                    }
+                }
+
+                // 3. 销毁的时候释放
+                override fun onDestroy() {
+                    super.onDestroy()
+
+                    scope.cancel()
+                }
+
+                private suspend fun getResult(num: Int): Int {
+                    delay(5000)
+                    return num * num
+                }
+            }
+
+    3.协程调度器
+    4.协程构建器
+
+三、结合Jetpack
+
+四、Flow
+
+五、通道
+
+六、多协程数据处理
+

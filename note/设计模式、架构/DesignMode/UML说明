@@ -1,0 +1,21 @@
+https://xiaojin21cen.blog.csdn.net/article/details/104718622?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-104718622-blog-116015342.pc_relevant_multi_platform_whitelistv1&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-104718622-blog-116015342.pc_relevant_multi_platform_whitelistv1&utm_relevant_index=1
+
+（1）泛化（Generalization），简单说就是父类和子类的关系，extends/:
+
+（2） 实现（Realization），简单说就是接口和实现的关系，implements
+
+（3）关联（Association)，简单说就是一个类中的成员变量是另一个类的实例，两者之间是引用的关系
+
+（4）聚合（Aggregation），简单说就是一种整体/局部的关系，局部离开整体仍然能单独存在
+
+（5）组合(Composition)，简单说就是另一种整体/局部的关系，局部离开整体不能单独存在
+
+（6）依赖(Dependency)，简单说就是一个类的方法的输入参数类型是另一个类
+
+
+Generalization（泛化、继承）： 实线 的三角箭头，箭头指向父类。
+Realization（实现） ： 虚线 的 三角箭头 ，箭头指向接口。
+Dependency（依赖）： 虚线 的 箭头，指向被使用者。
+Association（关联） ： 带普通箭头或不带箭头的 实线 ，指向被拥有者。
+Aggregation（ 聚合） ： 实线 的 空心菱形 ，菱形指向整体 。
+Composition（组合）： 实线 的 实心菱形 ，菱形指向整体 。

@@ -1,0 +1,187 @@
+http://liuwangshu.cn/tags/Android-Jetpack/
+https://juejin.cn/post/6844903889574051848
+1.Lifecycle基本介绍
+        1.作用：可以方便的检测Activity/fragemnt的生命周期方法
+        2.重要角色
+            被观察者：lifecycleOwner接口或者其实现类Activity/fragemnt
+            观察者:lifecycleObserver接口或者其实现类
+            连接：在被观察者中通过调用addOberser方法将观察者的实现类添加到被观察者中，这样被观察者的生命周期变化时，观察者就能感知到了
+                getLifeCycle.addOberser(new lifecycleObser{
+                    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                        void onResume(){
+                            Log.d(TAG, "Lifecycle call onResume");
+                        }
+                        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                        void onPause(){
+                            Log.d(TAG, "Lifecycle call onPause");
+                        }
+                })
+
+        3.基本使用：
+            public class MyObserver implements LifecycleObserver {
+                @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                public void connectListener() {
+                    ...
+                }
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                public void disconnectListener() {
+                    ...
+                }
+            }
+            myLifecycleOwner.getLifecycle().addObserver(new MyObserver());//1
+
+        4.MVP使用
+            public class MyPresenter implements IPresenter {
+                private static final String TAG = "test";
+                @Override
+                public void onResume() {
+                    Log.d(TAG, "Lifecycle call onResume");
+                }
+                @Override
+                public void onPause() {
+                    Log.d(TAG, "Lifecycle call onPause");
+                }
+            }
+
+            interface IPresenter extends LifecycleObserver {
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                void onResume();
+                @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                void onPause();
+            }
+
+            public class MainActivity extends AppCompatActivity {
+                private static final String TAG = "test";
+                private IPresenter mPresenter;
+                @Override
+                protected void onCreate(Bundle savedInstanceState) {
+                    super.onCreate(savedInstanceState);
+                    setContentView(R.layout.activity_main);
+                    mPresenter = new MyPresenter();
+                    getLifecycle().addObserver(mPresenter);
+                }
+
+                @Override
+                protected void onResume() {
+                    super.onResume();
+                    Log.d(TAG, "onResume");
+                }
+
+                @Override
+                protected void onPause() {
+                    super.onPause();
+                    Log.d(TAG, "onPause");
+                }
+            }
+
+二、lifecycle原理
+
+        getLifeCycle.addOberser(new lifecycleObser{
+            @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                void onResume(){    }
+
+            @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                void onPause(){}
+        })
+         实现LifecycleObserver接口的类中，注解修饰的方法和事件会被保存起来，通过反射对事件的对应方法进行调用
+
+        2.类之间的关系
+            Lifecycle接口
+                使用两个枚举来跟踪其关联组件的生命周期状态，这两个枚举分别是Event和State。
+                State指的是Lifecycle的生命周期所处的状态。
+                Event代表Lifecycle生命周期对应的事件，这些事件会映射到Activity和Fragment中的回调事件中
+            LifecycleOwner接口
+                只有一个getLifeCycle方法，返回一个LifeCycle接口
+            LifecycleRegistery接口
+                继承了Lifecycle接口
+                LifecycleOwner和Lifecycle有一个”弱拥有的关系”
+            CompenentActivity
+                继承了Activity并实现了LifecycleOwner接口
+                创建了LifecycleRegistery对象，并通过getLifecycle方法返回了LifecycleRegistery对象
+
+        3.lifecycle并不是通过某个Activity去直接回调State和EVENT枚举事件的，而是通过ReportFragment
+
+        二.Android9中Lifecycle的源码
+        public interface LifecycleOwner {
+            @NonNull
+            Lifecycle getLifecycle();
+        }
+        public abstract class Lifecycle {
+
+            @MainThread
+            public abstract void addObserver(@NonNull LifecycleObserver observer);
+
+            @MainThread
+            public abstract void removeObserver(@NonNull LifecycleObserver observer);
+
+            @MainThread
+            @NonNull
+            public abstract State getCurrentState();
+
+            @SuppressWarnings("WeakerAccess")
+            public enum Event {
+                ON_CREATE,
+                ON_START,
+                ON_RESUME,
+                ON_PAUSE,
+                ON_STOP,
+                ON_DESTROY,
+                ON_ANY
+            }
+
+            @SuppressWarnings("WeakerAccess")
+            public enum State {
+                DESTROYED,
+                INITIALIZED,
+                CREATED,
+                STARTED,
+                RESUMED;
+                public boolean isAtLeast(@NonNull State state) {
+                    return compareTo(state) >= 0;
+                }
+            }
+        }
+
+        三.Android9中ComponentActivity 的源码
+            @RestrictTo(LIBRARY_GROUP)
+            public class ComponentActivity extends Activity implements LifecycleOwner {
+                private SimpleArrayMap<Class<? extends ExtraData>, ExtraData> mExtraDataMap =
+                        new SimpleArrayMap<>();
+
+                private LifecycleRegistry mLifecycleRegistry = new LifecycleRegistry(this);//1
+
+                @RestrictTo(LIBRARY_GROUP)
+                public void putExtraData(ExtraData extraData) {
+                    mExtraDataMap.put(extraData.getClass(), extraData);
+                }
+
+                @Override
+                @SuppressWarnings("RestrictedApi")
+                protected void onCreate(@Nullable Bundle savedInstanceState) {
+                    super.onCreate(savedInstanceState);
+                    ReportFragment.injectIfNeededIn(this);//2
+                }
+
+                @CallSuper
+                @Override
+                protected void onSaveInstanceState(Bundle outState) {
+                    mLifecycleRegistry.markState(Lifecycle.State.CREATED);//3
+                    super.onSaveInstanceState(outState);
+                }
+
+                @RestrictTo(LIBRARY_GROUP)
+                public <T extends ExtraData> T getExtraData(Class<T> extraDataClass) {
+                    return (T) mExtraDataMap.get(extraDataClass);
+                }
+
+                @Override
+                public Lifecycle getLifecycle() {
+                    return mLifecycleRegistry;//4
+                }
+
+                @RestrictTo(LIBRARY_GROUP)
+                public static class ExtraData {
+                }
+            }

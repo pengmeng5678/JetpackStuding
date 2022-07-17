@@ -1,0 +1,23 @@
+一个产品的属性：
+    //产品类别
+	"cate_id"::1
+	"cate_name":"手机"
+	//产品系列
+    "series_id":1001
+    "series_name":"华为P系列/奔驰"
+    "series_desc":"产品类别描述"
+    "series_pic":"产品类别图片链接"
+    //产品详情
+    "prod_id":10011
+    "prod_name":"华为P50"
+    "prod_poster_pic_url": "海报图片链接地址"
+    "prod_full_pic_url": "全尺寸图片链接地址"
+    "prod_front_pic_url": "正面图片链接地址"
+    "prod_back_pic_url": "背面图片链接地址"
+    "prod_video_url": "产品宣传视频地址"
+    "original_price": 4598.00
+    "current_price": 3845.00
+    "memory": [{"mem_id":1, "mem_name":"12G+256G"}, {"mem_id":2,
+    "mem_name":"12G+512G"}, {"mem_id":3, "mem_name":"8G+128G"}],
+    "color": [{"color_id":1, "color_val":"#ffffff", "color_name":"蓝色"},
+    {"color_id":2, "color_val":"#ffffff","color_name":"黑色"}]
