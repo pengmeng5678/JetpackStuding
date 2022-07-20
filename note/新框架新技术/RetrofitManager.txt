@@ -1,0 +1,541 @@
+package com.ciot.networklib
+
+import android.content.Intent
+import android.text.TextUtils
+import com.ciot.commonlib.config.CommonConfig
+import com.ciot.commonlib.util.ContextUtil
+import com.ciot.commonlib.util.LogUtils
+import com.ciot.networklib.api.SemanticApiService
+import com.ciot.networklib.api.SemanticIntentApiService
+import com.ciot.networklib.api.TopicApiService
+import com.ciot.networklib.api.WuhanApiService
+import com.ciot.networklib.interceptor.HttpLoggingInterceptor
+import com.example.sroslibrary.OnSrosManagerListener
+import com.example.sroslibrary.SrosManager
+import com.example.sroslibrary.contents.NetConstants
+import com.example.sroslibrary.utils.AppSpUtil
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.ObservableSource
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
+
+/**
+    公司语义、武汉服务器网络请求管理类
+ 语音交互请求流程
+    1.选服：获取连接武汉Tcp连接的ip
+    2.激活：TCP连接武汉云平台,通过机器人id进行注册,激活
+    3.登录：激活成功后能够获取到user和pwm,然后调用requestWuHanLogin接口登录，登录成功后能够获取到token
+    4.资源获取：获取账户下的project、area、company、peopleName、语音授权码等信息保存到成员变量
+
+    5.信息上传：上传项目下所有的公司名(别名)、人名信息到科大讯飞技能工作室定义的动态实体中，提高实体的识别率
+    6.语音交互：科大讯飞问答中匹配到了某个意图,将问题、意图、项目、token等相关信息传递给语义服务器获取答案。
+*/
+class RetrofitManager {
+    private val TAG = CommonConfig.NETWORK_TAG
+
+    /*请求服务器超时时间*/
+    private val SERVER_TIMEOUT: Long = 5000
+
+    /*武汉平台相关参数*/
+    var mWuHanInitDisposable :Disposable? = null
+    //初始化状态：0表示获取到IP;1表示激活成功获取到账户和密码;2表示登录成功;3表示获取到token;4表示获取到projectId等属性信息
+    var initState = NetConstant.INIT_STATE_IDLE
+
+    @Volatile
+    private var mWuHanUserName: String? = null
+    @Volatile
+    private var mWuHanPassWord: String? = null
+    private var mToken: String? = null
+    private var mProject: String? = null
+    private var mArea: String? = null
+
+    private lateinit var mCurTopicUrl: String
+    private var retrofit: Retrofit? = null
+    private var mSemanticApiService: SemanticApiService? = null
+    private var mSemanticIntentApiService: SemanticIntentApiService? = null
+    private var mWuhanApiService: WuhanApiService? = null
+    private var mTopicApiService: TopicApiService? = null
+
+    private object RetrofitHelperHolder {
+        val holder = RetrofitManager()
+    }
+    companion object{
+        val instance: RetrofitManager
+            get() = RetrofitHelperHolder.holder
+    }
+
+    fun getSemanticApiService(): SemanticApiService {
+        if (mSemanticApiService == null) {
+            mSemanticApiService = Retrofit.Builder()
+                    .baseUrl(getSemanticBaseUrl())
+                    .client(getOkHttpClient())
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(SemanticApiService::class.java)
+            LogUtils.Logd(TAG,"getSemanticApiService")
+        }
+        return mSemanticApiService!!
+    }
+    fun getSemanticIntentApiService(): SemanticIntentApiService {
+        if (mSemanticIntentApiService == null) {
+            mSemanticIntentApiService = Retrofit.Builder()
+                    .baseUrl(getSemanticIntentBaseUrl())
+                    .client(getOkHttpClient())
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(SemanticIntentApiService::class.java)
+            LogUtils.Logd(TAG,"getSemanticApiService")
+        }
+        return mSemanticIntentApiService!!
+    }
+
+    fun getTopicApiService(url: String): TopicApiService {
+        if (mTopicApiService == null || url != mCurTopicUrl) {
+            mTopicApiService = Retrofit.Builder()
+                    .baseUrl(url)
+                    .client(getOkHttpClient())
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(TopicApiService::class.java)
+            LogUtils.Logd(TAG,"getSemanticApiService")
+            mCurTopicUrl = url
+        }
+        return mTopicApiService!!
+    }
+
+    fun getWuHanApiService(): WuhanApiService {
+        if (mWuhanApiService == null) {
+            mWuhanApiService = Retrofit.Builder()
+                    .baseUrl(getWuHanBaseUrl())
+                    .client(getOkHttpClient())
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build()
+                    .create(WuhanApiService::class.java)
+            LogUtils.Logd(TAG, "getWuHanApiService")
+        }
+        return mWuhanApiService!!
+    }
+
+    private fun getSemanticBaseUrl(): String {
+
+        return NetConstant.URL_DEFAULT_SEMANTIC
+    }
+    private fun getSemanticIntentBaseUrl(): String {
+        return NetConstant.URL_DEFAULT_SEMANTIC_INTENT
+    }
+
+    private fun getTopicBaseUrl(): String {
+        return NetConstant.URL_DEFAULT_TOPIC
+    }
+
+    private fun getWuHanBaseUrl(): String {
+        return NetConstant.URL_DEFAULT_WUHAN
+    }
+
+    private fun getOkHttpClient(): OkHttpClient {
+        val builder = OkHttpClient().newBuilder()
+        //设置 请求的缓存的大小跟位置
+        builder.run {
+            addInterceptor(HttpLoggingInterceptor(TAG))
+            connectTimeout(HttpConstant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            readTimeout(HttpConstant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            writeTimeout(HttpConstant.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            retryOnConnectionFailure(true) // 错误重连
+            // cookieJar(CookieManager())
+            LogUtils.Logd(TAG,"getOkHttpClient")
+        }
+        return builder.build()
+    }
+
+    /*---------------------------------------武汉云服务平台相关start---------------------------------------*/
+
+    /*fun init() {
+        AppSpUtil.getInstance().robotNumber = NetConstant.ROBOT_ID
+        AppSpUtil.getInstance().robotRealType = NetConstant.ROBOT_TYPE
+        AppSpUtil.getInstance().robotModel = NetConstant.ROBOT_NUM
+        setAccountListener()
+        //flatMap:将一个发送事件的上游Observable变换成为多个发送事件的Observable,然后将他们发射的事件合并后放进到一个单独的Observable里
+        //但是flatMap不保证事件的顺序，要保证事件顺序的话需要用concatmap
+        val robotAllowObservable = getWuHanApiService().robotAllow()
+        //1，2，3三个步骤耗时2938ms,其中robotAllow耗时2797ms
+        mWuHanInitDisposable?.dispose()
+        mWuHanInitDisposable = Observable.interval(10, 200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .takeUntil<Boolean> {
+                    //等待武汉平台返回账户名和密码,200毫秒轮询请求一次
+                    !TextUtils.isEmpty(getWuHanUserName()) && !TextUtils.isEmpty(getWuHanPassWord())
+                }.flatMap(Function<Long, ObservableSource<out ResponseBody?>> { num ->
+                    //1.选服：轮询的过程中获取一次武汉服务器的ip;2.激活:选服成功后,会启动TCP执行激活流程,等TCP回调登录的账户和密码
+                    if (getIp(num, robotAllowObservable)) return@Function
+                    //3.轮询的过程中检测到登录条件满足就执行登录流程;4.登录成功后自动
+                    login()
+
+                }).subscribe ()
+
+    }*/
+
+    fun init() {
+        AppSpUtil.getInstance().robotNumber = NetConstant.ROBOT_ID
+        AppSpUtil.getInstance().robotRealType = NetConstant.ROBOT_TYPE
+        AppSpUtil.getInstance().robotModel = NetConstant.ROBOT_NUM
+        setAccountListener(null)
+
+        //flatMap:将一个发送事件的上游Observable变换成为多个发送事件的Observable,然后将他们发射的事件合并后放进到一个单独的Observable里
+        //但是flatMap不保证事件的顺序，要保证事件顺序的话需要用concatmap
+        val defaultResponseBody = Observable.create<ResponseBody?> {
+            null
+        }
+        val robotAllowObservable = getWuHanApiService().robotAllow()
+        //1，2，3三个步骤耗时2938ms,其中2797ms
+        mWuHanInitDisposable?.dispose()
+        mWuHanInitDisposable = Observable.interval(10, 200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .takeUntil<Boolean> {
+                    //等待武汉平台返回账户名和密码,200毫秒轮询请求一次
+                    !TextUtils.isEmpty(getWuHanUserName()) && !TextUtils.isEmpty(getWuHanPassWord())
+                }.flatMap(Function<Long, ObservableSource<out ResponseBody?>> { num ->
+                    //1.选服:轮询的过程中获取一次武汉服务器的ip;2.激活：选服成功了就启动TCP服务,并等待TCP返回账户名和密码
+                    //Log.v(TAG,"interval num=$num,getWuHanUserName=${getWuHanUserName()},getWuHanPassWord=${getWuHanPassWord()}")
+                    getIpAndUser(num, robotAllowObservable)
+                    if(num.toInt() == 10){
+                        //20秒还未获取到userName就认为获取失败了
+                        sendNetErrorMsg(NetConstant.INIT_STATE_GET_USER,"get UserName & password timeout")
+                    }
+                    //3.登录并获取token
+                    login()
+                    //4.根据token查询机器人的相关属性信息,如projectId,这里执行完成后就关闭轮询
+                    getRobotInfo()
+                    //这里条件不满足(账户名和密码没有获取到)就直接返回
+                    defaultResponseBody
+                }).subscribe ()
+
+    }
+
+    fun init1() {
+        AppSpUtil.getInstance().robotNumber = NetConstant.ROBOT_ID
+        AppSpUtil.getInstance().robotRealType = NetConstant.ROBOT_TYPE
+        AppSpUtil.getInstance().robotModel = NetConstant.ROBOT_NUM
+
+        //flatMap:将一个发送事件的上游Observable变换成为多个发送事件的Observable,然后将他们发射的事件合并后放进到一个单独的Observable里
+        //但是flatMap不保证事件的顺序，要保证事件顺序的话需要用concatmap
+
+        val getUserObservable = Observable.create<Boolean> {e->
+            setAccountListener(e)
+        }
+        val robotAllowObservable = getWuHanApiService().robotAllow()
+        //1，2，3三个步骤耗时2938ms,其中2797ms
+        mWuHanInitDisposable?.dispose()
+        mWuHanInitDisposable = robotAllowObservable.subscribeOn(Schedulers.io())
+                .doOnNext { getIpResponseBody->
+                    val json = String(getIpResponseBody.bytes())
+                    LogUtils.Logi(TAG, "requestWuHanSrosIp result: $json")
+                    val obj = JSONObject(json)
+                    val dataObj: JSONObject
+                    val success = obj.getBoolean("success")
+                    val message: String
+                    val host: String
+                    if (success) {
+                        initState = NetConstant.INIT_STATE_GET_IP
+                        dataObj = obj.getJSONObject("data")
+                        host = dataObj.getString("host")
+                        //{"success":true,"data":{"host":"39.100.247.202"},"message":""}
+                        AppSpUtil.getInstance().tcpIp = host
+
+                        val intent = Intent()
+                        intent.action = NetConstant.ACTION_BROADCAST_START_TCP_SERVICE
+                        ContextUtil.getContext().sendBroadcast(intent)
+                        //var intent = Intent(ContextUtil.getContext(), TcpService::class.java)
+                        //ContextUtil.getContext().startService(intent)
+                    } else {
+                        //异常消息
+                        message = obj.getString("message")
+                        LogUtils.Logw(TAG, "requestWuHanSrosIp failed: $message")
+                        sendNetErrorMsg(NetConstant.INIT_STATE_GET_IP, message)
+                    }
+                }
+                .flatMap(Function<ResponseBody,ObservableSource<Boolean>> {e->
+                    //App中启动服务,执行注册、激活、获取userName,password的数据回调
+                     getUserObservable
+                })
+                .map {isGetUserAndPwm->
+                    if(initState == NetConstant.INIT_STATE_GET_IP && isGetUserAndPwm){
+                        LogUtils.Logd(TAG, "login condition is get")
+                    }
+                    //这里条件(账户名和密码)都满足后才开始登录
+                    initState = NetConstant.INIT_STATE_GET_USER
+                    val root = JSONObject()
+                    root.put("username", getWuHanUserName())
+                    root.put("password", getWuHanPassWord())
+                    val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), root.toString())
+                    LogUtils.Logd(TAG, "ready login wuhan Server")
+                    requestBody
+                }
+
+                .flatMap(Function<RequestBody,ObservableSource<ResponseBody>> {logInRequestBody->
+
+                    return@Function getWuHanApiService().login(logInRequestBody)
+
+                })
+                .map(Function<ResponseBody,Boolean>{loginResponseBody->
+                    var token = ""
+                    if (loginResponseBody != null) {
+                        //登录成功后拿到token,并通过这个token获取机器人的相关属性信息,如所属项目、区域等
+                        try {
+                            val json = String(loginResponseBody.bytes())
+                            LogUtils.Logd(TAG, "requestWuHanLogin result:$json")
+                            val obj = JSONObject(json)
+                            token = obj.getString("token")
+                        } catch (e: Exception) {
+                            LogUtils.Logd(TAG, "parse WuHanLogin Exception:$e")
+                        }
+                        initState = NetConstant.INIT_STATE_GET_TOKEN
+                        if (TextUtils.isEmpty(token)) {
+                            sendNetErrorMsg(NetConstant.INIT_STATE_GET_TOKEN, "get Token is Empty")
+                            return@Function false
+                        }
+                        setToken(token)
+                        LogUtils.Logd(TAG, "requestWuHanLogin getToken:${getToken()}")
+                        return@Function true
+                    } else {
+                        LogUtils.Logi(TAG, "requestWuHanLogin loginResponseBody is null")
+                        sendNetErrorMsg(NetConstant.INIT_STATE_GET_TOKEN, "requestWuHanLogin loginResponseBody is null")
+                        return@Function false
+                    }
+                    return@Function true
+
+                })
+                .flatMap(Function<Boolean,ObservableSource<ResponseBody>>{isGetToken->
+                    return@Function getWuHanApiService().robots(NetConstant.ROBOT_ID, getToken())
+                })
+                .subscribe { robotInfoResponse->
+                    if (robotInfoResponse == null) {
+                        LogUtils.Logi(TAG, "get robotProperty failed,result is null")
+                        sendNetErrorMsg(NetConstant.INIT_STATE_GET_PROPERTITY, "get robotProperty failed,responseBody is null")
+                        return@subscribe
+                    }
+                    initState = NetConstant.INIT_STATE_GET_PROPERTITY
+                    val json = String(robotInfoResponse!!.bytes())
+                    LogUtils.Logi(TAG, "get robotProperty result: $json")
+                    val obj = JSONObject(json)
+                    val projectid = obj.getString("projectid")
+                    val area = obj.getString("area")
+                    setProject(projectid)
+                    setArea(area)
+                    mWuHanInitDisposable?.dispose()
+                }
+
+
+        /*mWuHanInitDisposable = Observable.interval(10, 200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .takeUntil<Boolean> {
+                    //等待武汉平台返回账户名和密码,200毫秒轮询请求一次
+                    !TextUtils.isEmpty(getWuHanUserName()) && !TextUtils.isEmpty(getWuHanPassWord())
+                }.flatMap(Function<Long, ObservableSource<out ResponseBody?>> { num ->
+                    //1.选服:轮询的过程中获取一次武汉服务器的ip;2.激活：选服成功了就启动TCP服务,并等待TCP返回账户名和密码
+                    //Log.v(TAG,"interval num=$num,getWuHanUserName=${getWuHanUserName()},getWuHanPassWord=${getWuHanPassWord()}")
+                    getIpAndUser(num, robotAllowObservable)
+                    if(num.toInt() == 10){
+                        //20秒还未获取到userName就认为获取失败了
+                        sendNetErrorMsg(NetConstant.INIT_STATE_GET_USER,"get UserName & password timeout")
+                    }
+                    //3.登录并获取token
+                    login()
+                    //4.根据token查询机器人的相关属性信息,如projectId,这里执行完成后就关闭轮询
+                    getRobotInfo()
+                    //这里条件不满足(账户名和密码没有获取到)就直接返回
+                    defaultResponseBody
+                }).subscribe ()*/
+
+    }
+
+    private fun login() {
+        if(initState != NetConstant.INIT_STATE_GET_IP || TextUtils.isEmpty(getWuHanUserName()) || TextUtils.isEmpty(getWuHanPassWord())){
+            return
+        }
+        //这里条件(账户名和密码)都满足后才开始登录
+        LogUtils.Logd(TAG, "login condition is get")
+        initState = NetConstant.INIT_STATE_GET_USER
+        val root = JSONObject()
+        try {
+            root.put("username", getWuHanUserName())
+            root.put("password", getWuHanPassWord())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        val requestBody: RequestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), root.toString())
+        LogUtils.Logd(TAG, "ready login wuhan Server")
+        getWuHanApiService().login(requestBody).subscribe { loginResponseBody ->
+            if (loginResponseBody != null) {
+                //登录成功后拿到token,并通过这个token获取机器人的相关属性信息,如所属项目、区域等
+                var token = ""
+                try {
+                    val json = String(loginResponseBody.bytes())
+                    LogUtils.Logd(TAG, "requestWuHanLogin result:$json")
+                    val obj = JSONObject(json)
+                    token = obj.getString("token")
+                } catch (e: Exception) {
+                    LogUtils.Logd(TAG, "parse WuHanLogin Exception:$e")
+                }
+                initState = NetConstant.INIT_STATE_GET_TOKEN
+                if (TextUtils.isEmpty(token)) {
+                    sendNetErrorMsg(NetConstant.INIT_STATE_GET_TOKEN, "get Token is Empty")
+                    return@subscribe
+                }
+                setToken(token)
+                LogUtils.Logd(TAG, "requestWuHanLogin getToken:${getToken()}")
+
+                //getProperty()
+            } else {
+                LogUtils.Logi(TAG, "requestWuHanLogin loginResponseBody is null")
+                sendNetErrorMsg(NetConstant.INIT_STATE_GET_TOKEN, "requestWuHanLogin loginResponseBody is null")
+            }
+        }
+    }
+
+    private fun getRobotInfo() {
+        if(initState != NetConstant.INIT_STATE_GET_TOKEN || TextUtils.isEmpty(getToken())){
+            return
+        }
+        getWuHanApiService().robots(NetConstant.ROBOT_ID, getToken()).subscribe { robotPropertyResponseBody ->
+            if (robotPropertyResponseBody == null) {
+                LogUtils.Logi(TAG, "get robotProperty failed,result is null")
+                sendNetErrorMsg(NetConstant.INIT_STATE_GET_PROPERTITY, "get robotProperty failed,responseBody is null")
+                return@subscribe
+            }
+            initState = NetConstant.INIT_STATE_GET_PROPERTITY
+            val json = String(robotPropertyResponseBody!!.bytes())
+            LogUtils.Logi(TAG, "get robotProperty result: $json")
+            val obj = JSONObject(json)
+            val projectid = obj.getString("projectid")
+            val area = obj.getString("area")
+            setProject(projectid)
+            setArea(area)
+            mWuHanInitDisposable?.dispose()
+        }
+    }
+
+    private fun getIpAndUser(num: Long, robotAllowObservable: Observable<ResponseBody>) {
+        if (num.toInt() == 1) {
+            robotAllowObservable.subscribe { responseBody ->
+                val json = String(responseBody.bytes())
+                LogUtils.Logi(TAG, "requestWuHanSrosIp result: $json")
+                val obj = JSONObject(json)
+                val dataObj: JSONObject
+                val success = obj.getBoolean("success")
+                val message: String
+                val host: String
+                if (success) {
+                    initState = NetConstant.INIT_STATE_GET_IP
+                    dataObj = obj.getJSONObject("data")
+                    host = dataObj.getString("host")
+                    //{"success":true,"data":{"host":"39.100.247.202"},"message":""}
+                    AppSpUtil.getInstance().tcpIp = host
+
+                    //App中启动服务,执行注册、激活、获取userName,password的数据回调
+                    val intent = Intent()
+                    intent.action = NetConstant.ACTION_BROADCAST_START_TCP_SERVICE
+                    ContextUtil.getContext().sendBroadcast(intent)
+                    //var intent = Intent(ContextUtil.getContext(), TcpService::class.java)
+                    //ContextUtil.getContext().startService(intent)
+                } else {
+                    //异常消息
+                    message = obj.getString("message")
+                    LogUtils.Logw(TAG, "requestWuHanSrosIp failed: $message")
+                    sendNetErrorMsg(NetConstant.INIT_STATE_GET_IP, message)
+                }
+            }
+        }
+    }
+
+    private fun sendNetErrorMsg(errorType: Int, errorMsg: String) {
+        LogUtils.Logd(TAG,"sendNetErrorMsg errorType=$errorType,errorMsg=$errorMsg")
+    }
+
+    private fun setAccountListener(e: ObservableEmitter<Boolean>?) {
+        SrosManager.getInstance().setMsgListener(object : OnSrosManagerListener {
+            override fun sendMsg(msgType: String, msgContent: String?) {
+                LogUtils.Logd(TAG, "SrosManager sendMsg:msgType=$msgType,msgContent=$msgContent")
+                when (msgType) {
+                    NetConstants.MSG_SROS_SET_USER_NAME -> {
+                        setWuHanUserName(msgContent)
+                    }
+                    NetConstants.MSG_SROS_SET_PASSWORD -> {
+                        setWuHanPassWord(msgContent)
+                    }
+                }
+
+                if(initState == NetConstant.INIT_STATE_GET_IP && !TextUtils.isEmpty(getWuHanUserName()) && !TextUtils.isEmpty(getWuHanPassWord())){
+                    e?.onNext(true)
+                }
+            }
+
+            override fun getMsgContent(msgType: String): String? {
+                LogUtils.Logd(TAG, "SrosManager getMsgContent:msgType=$msgType")
+                when (msgType) {
+                    NetConstants.MSG_SROS_GET_TOKEN -> {
+                        return getToken()
+                    }
+                }
+                return null
+            }
+        })
+    }
+
+    fun setToken(token:String){
+        this.mToken = token
+    }
+     fun getToken():String? {
+         return mToken
+    }
+    fun setArea(area: String) {
+        this.mArea = area
+    }
+    fun getArea(): String? {
+        return mArea
+    }
+    fun getProject(): String? {
+        return mProject
+    }
+    fun setWuHanUserName(userName: String?) {
+        mWuHanUserName = userName
+    }
+
+    /*将武汉服务器返回的userName作为语义服务器的deviceId*/
+    fun getWuHanUserName(): String? {
+        return mWuHanUserName
+    }
+
+    fun setWuHanPassWord(passWord: String?) {
+        mWuHanPassWord = passWord
+    }
+
+    fun getWuHanPassWord(): String? {
+        return mWuHanPassWord
+    }
+
+    fun setProject(project: String) {
+        this.mProject = project
+    }
+
+    /*-------------------------武汉云服务平台相关 end------------------------------------------*/
+    fun release(){
+        retrofit = null
+        mWuHanInitDisposable?.dispose()
+    }
+
+}

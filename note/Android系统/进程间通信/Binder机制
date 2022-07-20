@@ -58,3 +58,5 @@ https://mubu.com/doc/uRmziI6te0
     6.整个调用过程是一个同步过程,在server处理的时候,client会Block
 
     从一个进程传递到另一个进程，然后把它映射到进程的内存空间
+
+5.

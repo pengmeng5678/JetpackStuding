@@ -57,7 +57,7 @@ ARouter源码解析：https://www.jianshu.com/p/46d174f37e82
         public HomeExportService baseService;//通过这个baseService引用可以调用sayHello方法
 
         为什么会存在这个baseService,因为添加了@Autowired(name = "/home/HomeService")注解,代码在编译后就会根据注解生成相关的类
-        可以让用户之间使用暴露的出来的服务,编译生成的类如下
+        可以让用户直接使用暴露的出来的服务,编译生成的类如下
             public class MainActivity$$ARouter$$Autowired implements ISyringe {
               private SerializationService serializationService;
 
@@ -68,3 +68,4 @@ ARouter源码解析：https://www.jianshu.com/p/46d174f37e82
                 substitute.baseService = (HomeExportService)ARouter.getInstance().build("/home/HomeService").navigation();;
               }
             }
+

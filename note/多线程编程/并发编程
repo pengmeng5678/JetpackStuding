@@ -259,3 +259,5 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         2.修改缓存中的共享变量后立即刷新到主存中。
         3.当执行写操作时会导致其他CPU中的缓存无效。
 
+11.CAS
+    Compare And Swap

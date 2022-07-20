@@ -1,56 +1,192 @@
 https://juejin.cn/post/6854573211418361864
-一、介绍
+一、基本介绍
     定义：轻量级的线程
-    优点：能够通过阻塞的方式写出非阻塞的代码，解决开发中常见的回调地狱
+    优点：可以通过阻塞的方式写出非阻塞的代码，解决常见的回调地狱，还可以结合jetpack相关组件一起使用
 
-二、使用
-    1.基本使用
-        GlobalScope.lauch(Dispatch.IO){
-            val res = getResult(2)
-            mNumTv.text = res.toString()
-        }
-        以上方法包含三个重要部分，GlobalScope、Dispatch、lauch，分别对应协程的作用域、调度器、构建器
-    2.协程的作用域
-        runBlocking：顶层函数，它和 coroutineScope 不一样，它会阻塞当前线程来等待，所以这个方法在业务中并不适用 。
-        GlobalScope：全局协程作用域，可以在整个应用的声明周期中操作，且不能取消，所以仍不适用于业务开发。
-        自定义作用域：自定义协程的作用域，不会造成内存泄漏。
-            class MainActivity : AppCompatActivity() {
-                // 1. 创建一个 MainScope
+二、基本使用
+    GlobalScope.launch(Dispatchers.IO){//}
+    上面代码包含三个部分，Global、Dispatcher、launch，分别表示：
+        1.协程作用域：
+            三种作用域类型
+            runblocking:顶层函数，它会阻塞当前线程来等待，所以在业务中不适用
+            GlobalScope:全局协程作用域，可以在整个应用的生命周期中操作，且不能取消，所以在业务中不适用
+            自定义作用域：自定义的协程作用域，不会造成内存泄露
+
+        2.协程调度器：
+            Dispatchers.Main:执行的线程是主线程
+            Dispatchers.IO：执行的线程是IO线程
+            Dispatchers.Default：执行的线程是CPU线程
+            Dispatchers.Unconfined：非限制的调度器，指定的线程会随挂起函数发生变化
+
+        3.构建器：
+            lauch的作用是启动一个新协程，它返回一个Job对象，我们可以通过job.cancel取消这个协程
                 val scope = MainScope()
-
-                override fun onCreate(savedInstanceState: Bundle?) {
-                    super.onCreate(savedInstanceState)
-                    setContentView(R.layout.activity_main)
-
-                    // 2. 启动协程
-                    scope.launch(Dispatchers.Unconfined) {
-                        val one = getResult(20)
-                        val two = getResult(40)
-                        mNumTv.text = (one + two).toString()
-                    }
+                scope.launch(Dispatchers.Unconfined) {
+                    val one = getResult(20)
+                    val two = getResult(40)
+                    mNumTv.text = (one + two).toString()
                 }
-
-                // 3. 销毁的时候释放
-                override fun onDestroy() {
-                    super.onDestroy()
-
-                    scope.cancel()
-                }
-
                 private suspend fun getResult(num: Int): Int {
                     delay(5000)
                     return num * num
                 }
+
+            除了lauch还有一个方法是asnc，他的作用是创建一个协程后返回一个Deferred<T>对象，我们可以通过Deferred.wait去获取返回的值
+                scope.launch(Dispatchers.Unconfined) {
+                    val one = async { getResult(20) }
+                    val two = async { getResult(40) }
+                    mNumTv.text = (one.await() + two.await()).toString()
+                }
+            除了上面的并发执行任务，async还可以对它的start入参设置成懒加载，这样系统只有在调用它时才会为它分配资源
+                val one = async(start=CoroutineStart.LAZY){getResult(20)}
+
+        4.suspend
+            修饰函数的关键字，意思是当前函数是可以挂起的，起到提醒的作用，当我们函数没有必要挂起的时候，编译器会提醒Redudant suspend modifier
+            挂起函数使用场景
+                (1)耗时操作：使用withContext切换到指定IO线程进行网络或者数据请求
+                    private suspend fun getResult(num:Int):Int{
+                        return withContext(Dispatcher.IO){
+                            num*num
+                        }
+                    }
+                (2)延迟操作:使用delay方法去等待某个事件
+                    private suspend fun getResult(num:Int):Int{
+                        delay(5000)
+                        return num*num
+                    }
+        5.协程结合Android jetpack
+            lifecycleScope.lauch{
+                whenResumed{//代码}
+            }
+            viewModelScope.lauch{//代码}
+
+三、流Flow
+    Flow的使用和Rxjava非常相似
+    1.Flow基础
+        特点：
+            1.冷流：有点类似Kotlin懒加载，只有当collect方法执行的时候，数据才开始发射
+            2.有序:每个数据都是经过 emit、filter 、map和 collect 这一套完整的处理流程后，下个数据才会开始处理，而不是所有的数据都先统一 emit，完了再统一 filter，接着 map，最后再 collect
+            3.协作取消：Flow 采用和协程一样的协作取消，也就是说，Flow 的 collect 只能在可取消的挂起函数中挂起的时候取消，否则不能取消。
+        基本使用：
+            lifecycleScope.lauch{
+                createFlow()
+                    .collect{num->
+
+                    }
+            }
+            Flow中的数据源Flow<T>相当于Rxjava的Observable<T>
+            Flow中的订阅collect相当于Rxjava的subscribe
+
+        创建Flow对象
+            fun createFlow():Flow<Int> = flow{
+                for (i in 1..10)
+                    emit(i)
             }
 
-    3.协程调度器
-    4.协程构建器
+            一直调用emit不方便，Flow提供了和Rxjava.just类似的方法
+            flowof(vararg elements: T)：帮助可变数组生成 Flow 实例
+            扩展函数 .asFlow()：面向数组、列表等集合
 
-三、结合Jetpack
+        消费数据
+            collect方法和Rxjava中的subscribe方法一样，都是用来消费的
+            collect方法是一个suspend方法，所以它必须发生在协程或者带有suspend方法里面
 
-四、Flow
+    2.Flow线程切换
+        协程切换线程
+           lifecycleScope.launch {
+               // 创建一个协程 Flow<T>
+               createFlow()
+                   // 将数据发射的操作放到 IO 线程中的协程
+                   .flowOn(Dispatchers.IO)
+                   .collect { num ->
+                       // 具体的消费处理
+                       // ...
+                   }
+               }
+           }
+        改变数据发射的线程：Flow的flowOn方法类似Rxjava的subscribeOn
+        改变数据消费的线程：Flow消费数据的线程在启动协程时就已经通过调度器(Dispatcher)确定好了
 
-五、通道
+    3.Flow异常和完成
+        异常捕获
+            Flow通过catch捕获异常，Rxjava通过onError捕获异常
+                lifecycleScope.launch {
+                    flow {
+                        //...
+                    }.catch {e->
 
-六、多协程数据处理
+                    }.collect()
+                }
+        完成
+            lifecycleScope.launch {
+                createFlow()
+                    .onCompletion {
+                        // 处理完成操作
+                    }
+                    .collect {
 
+                    }
+            }
+
+    4.操作符对比
+        普通操作符：
+            map:转换操作符，将A变成B
+            take:后面跟Int类型的参数，表示接收多少个emit的值
+            filter过滤操作符
+        特殊操作符(发送数据是并发的)
+            buffer:数据发射并发,collect不并发
+
+
+
+四、通道
+    Channel是一个面向多协程之间数据传输的BlockQueue，使用如下
+        lifecycleScope.launch {
+            // 1. 生成一个 Channel
+            val channel = Channel<Int>()
+
+            // 2. Channel 发送数据
+            launch {
+                for(i in 1..5){
+                    delay(200)
+                    channel.send(i * i)
+                }
+                channel.close()
+            }
+
+            // 3. Channel 接收数据
+            launch {
+                for( y in channel)
+                    Log.e(TAG, "get $y")
+            }
+        }
+    1.创建Channel
+        方式一：直接创建Channel对象
+        方式二：通过produce函数
+            lifecycleScope.launch {
+                // 1. 生成一个 Channel
+                val channel = produce<Int> {
+                    for(i in 1..5){
+                        delay(200)
+                        send(i * i)
+                    }
+                    close()
+                }
+
+                // 2. 接收数据
+                // ... 省略 跟之前代码一致
+            }
+    2.发送数据
+        Channel#send()方法，当数据发送完毕后，可以用Channel#close方法表明通道已经结束数据的发送
+    3.接收数据
+        获取一次数据
+            Channel#receive()
+        获取指定次数的数据
+            repeate(4){
+                Log.e(TAG, "get ${channel.receive()}")
+            }
+        获取未知数量的数据，需要迭代Channel
+            for( y in channel)
+                Log.e(TAG, "get $y")
+
+五、多协程数据处理
+    多协程处理并发数据的时候，原子性同样也得不到保证，协程中出了一种叫 Mutex 的锁，区别是它的 lock 操作是挂起的，非阻塞的
