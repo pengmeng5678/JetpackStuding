@@ -1,0 +1,614 @@
+https://github.com/android/architecture-components-samples
+http://liuwangshu.cn/tags/Android-Jetpack/
+一.架构组件
+    1.Lifecycle
+        1.作用：可以方便的检测Activity/fragemnt的生命周期方法
+        2.重要角色
+            被观察者：lifecycleOwner接口或者其实现类Activity/fragemnt
+            观察者:lifecycleObserver接口或者其实现类
+            连接：在被观察者中通过调用addOberser方法将观察者的实现类添加到被观察者中，这样被观察者的生命周期变化时，观察者就能感知到了
+                getLifeCycle.addOberser(new lifecycleOber{
+                    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                        void onResume(){
+                            Log.d(TAG, "Lifecycle call onResume");
+                        }
+                        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                        void onPause(){
+                            Log.d(TAG, "Lifecycle call onPause");
+                        }
+                })
+        3.原理
+            Lifecycle使用两个枚举来跟踪其关联组件的生命周期状态，这两个枚举分别是Event和State。
+            State指的是Lifecycle的生命周期所处的状态。
+            Event代表Lifecycle生命周期对应的事件，这些事件会映射到Activity和Fragment中的回调事件中
+            public abstract class Lifecycle {
+
+                @MainThread
+                public abstract void addObserver(@NonNull LifecycleObserver observer);
+
+                @MainThread
+                public abstract void removeObserver(@NonNull LifecycleObserver observer);
+
+                @MainThread
+                @NonNull
+                public abstract State getCurrentState();
+
+                @SuppressWarnings("WeakerAccess")
+                public enum Event {
+                    ON_CREATE,
+                    ON_START,
+                    ON_RESUME,
+                    ON_PAUSE,
+                    ON_STOP,
+                    ON_DESTROY,
+                    ON_ANY
+                }
+
+                @SuppressWarnings("WeakerAccess")
+                public enum State {
+                    DESTROYED,
+                    INITIALIZED,
+                    CREATED,
+                    STARTED,
+                    RESUMED;
+                    public boolean isAtLeast(@NonNull State state) {
+                        return compareTo(state) >= 0;
+                    }
+                }
+            }
+        4.基本使用：
+            public class MyObserver implements LifecycleObserver {
+                @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                public void connectListener() {
+                    ...
+                }
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                public void disconnectListener() {
+                    ...
+                }
+            }
+            myLifecycleOwner.getLifecycle().addObserver(new MyObserver());//1
+
+        5.MVP使用
+            public class MyPresenter implements IPresenter {
+                private static final String TAG = "test";
+                @Override
+                public void onResume() {
+                    Log.d(TAG, "Lifecycle call onResume");
+                }
+                @Override
+                public void onPause() {
+                    Log.d(TAG, "Lifecycle call onPause");
+                }
+            }
+
+            interface IPresenter extends LifecycleObserver {
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                void onResume();
+                @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                void onPause();
+            }
+
+            public class MainActivity extends AppCompatActivity {
+                private static final String TAG = "test";
+                private IPresenter mPresenter;
+                @Override
+                protected void onCreate(Bundle savedInstanceState) {
+                    super.onCreate(savedInstanceState);
+                    setContentView(R.layout.activity_main);
+                    mPresenter = new MyPresenter();
+                    getLifecycle().addObserver(mPresenter);
+                }
+
+                @Override
+                protected void onResume() {
+                    super.onResume();
+                    Log.d(TAG, "onResume");
+                }
+
+                @Override
+                protected void onPause() {
+                    super.onPause();
+                    Log.d(TAG, "onPause");
+                }
+            }
+    2.LiveData
+        1.在Activity中监听LiveData的变化后，会回调onChange方法
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {//1
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:"+s);
+                }
+            });
+        2.一般在ViewModel层更新数据
+            mutableLiveData.postValue("Android进阶三部曲");//setValue只能在主线程中使用
+        3.更改LiveData的数据,Transformations
+            如果我们想在LiveData对象分发给观察者之前对其中存储的值进行更改，可以使用Transformations.map和Transformations.switchMap()
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged1:"+s);
+                }
+            });
+            LiveData transformedLiveData =Transformations.map(mutableLiveData, new Function<String, Object>() {
+                @Override
+                public Object apply(String name) {
+                   return name + "+Android进阶解密";
+                }
+            });
+            transformedLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged2:"+s);
+                }
+            });
+            mutableLiveData.postValue("Android进阶之光");
+            打印结果：
+                onChanged1:Android进阶之光
+                onChanged2:Android进阶之光+Android进阶解密
+        4.监听某个数据的变化，且能随时切换监听，可以使用Transformations.switchMap()
+            LiveData transformedLiveData= Transformations.switchMap(liveDataSwitch, new Function<Boolean, LiveData<String>>() {
+                @Override
+                public LiveData<String> apply(Boolean input) {
+                    if (input) {
+                        return mutableLiveData1;
+                    } else {
+                        return mutableLiveData2;
+                   }
+                }
+            });
+
+            transformedLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:" + s);
+                }
+            });
+            liveDataSwitch.postValue(false);//2
+            mutableLiveData1.postValue("Android进阶之光");
+            mutableLiveData2.postValue("Android进阶解密");
+            输出的结果是Android进阶解密
+
+        5.合并多个MutableLiveData,使用MediatorLiveData.addSource，将多个MutableLiveData合并到一起，
+        这样当任何一个MutableLiveData数据发生变化时,MediatorLiveData都能感知到
+            public class MainActivity extends AppCompatActivity {
+               private static final String TAG="MainActivity";
+                @Override
+                protected void onCreate(Bundle savedInstanceState) {
+                    super.onCreate(savedInstanceState);
+                    setContentView(R.layout.activity_main);
+                    MutableLiveData<String> mutableLiveData1  = new MutableLiveData<>();
+                    MutableLiveData<String> mutableLiveData2  = new MutableLiveData<>();
+                    MediatorLiveData liveDataMerger = new MediatorLiveData<String>();
+                    liveDataMerger.addSource(mutableLiveData1, new Observer() {
+                        @Override
+                        public void onChanged(@Nullable Object o) {
+                            Log.d(TAG, "onChanged1:"+o.toString());
+                        }
+                    });
+
+                    liveDataMerger.addSource(mutableLiveData2, new Observer() {
+                        @Override
+                        public void onChanged(@Nullable Object o) {
+                            Log.d(TAG, "onChanged2:"+o.toString());
+                        }
+                    });
+                    liveDataMerger.observe(this, new Observer() {
+                        @Override
+                        public void onChanged(@Nullable Object o) {
+                            Log.d(TAG, "onChanged:"+o.toString());
+                        }
+                    });
+                    mutableLiveData1.postValue("Android进阶之光");
+                }
+            }
+            输出结果为Android进阶之光
+
+    3.ViewModel
+        1.自定义ViewModel
+           public class MyViewModel extends ViewModel {
+               private MutableLiveData<String> name;
+               public LiveData<String> getName() {
+                   if (name == null) {
+                       name = new MutableLiveData<String>();
+                       addName();
+                   }
+                   return name;
+               }
+               private void addName() {
+                   name.setValue("Android进阶解密");
+               }
+           }
+      2.使用ViewModel
+            Activity中简单初始化
+                MyViewModel model = ViewModelProviders.of(this).get(ViewModel.class);
+                model.getName().observe(this,new Observer<String>{
+                    @Override
+                    public void onChange(@Nullable String s){
+                        Log.d(TAG, "畅销书："+s);
+                    }
+                })
+            另一种初始化方式(自定义Factory,为ViewModel注入数据仓库等对象)
+                ProductViewModel.Factory factory = new ProductViewModel.Factory(
+                        requireActivity().getApplication(), getArguments().getInt(KEY_PRODUCT_ID));
+
+                final ProductViewModel model = new ViewModelProvider(this, factory)
+                        .get(ProductViewModel.class);
+
+                这里创建ProductViewModel的时候,在Factory中就会注入productId,Respository等数据,Factory类如下所示
+                public static class Factory extends ViewModelProvider.NewInstanceFactory {
+                    ...
+                    private final DataRepository mRepository;
+                    public Factory(@NonNull Application application, int productId) {
+                        mApplication = application;
+                        mProductId = productId;
+                        mRepository = ((BasicApp) application).getRepository();
+                    }
+
+                    @Override
+                    public <T extends ViewModel> T create(Class<T> modelClass) {
+                        //noinspection unchecked
+                        return (T) new ProductViewModel(mApplication, mRepository, mProductId);
+                    }
+                }
+            Kotlin初始化ViewModel(自定义Factory注入数据仓库)
+                1.初始化viewModel
+                    private val viewModel: GardenPlantingListViewModel by viewModels {InjectorUtils.provideGardenPlantingListViewModelFactory(requireContext())}
+                2.获取repository
+                    fun provideGardenPlantingListViewModelFactory(context: Context): GardenPlantingListViewModelFactory {
+                        val repository = getGardenPlantingRepository(context)
+                        return GardenPlantingListViewModelFactory(repository)
+                    }
+                    private fun getPlantingListRepository(context: Context): PlantRepository {
+                        val dao = AppDatabase.getInstance(context.applicationContext).plantDao()
+                        return PlantRepository.getInstance(dao)
+                    }
+                3.factory
+                    class GardenPlantingListViewModelFactory(
+                            private val repository: GardenPlantingRepository
+                    ) :ViewModelProvider.NewInstanceFactory(){
+                        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                            return GardenPlantingListViewModel(repository) as T
+                        }
+                    }
+                4.viewModel类
+                    class GardenPlantingListViewModel internal constructor(repository: GardenPlantingRepository): ViewModel() {
+                        val plantAndGardenPlantings:LiveData<List<PlantAndGardenPlantings>> = repository.getPlantedGardens()
+                    }
+    4.Room
+        1.创建实体类并添加相应注解
+            @Entity(tableName = "products")
+            public class ProductEntity implements Product {
+                @PrimaryKey
+                private int id;
+                ...
+            }
+            如果有多表级联时，子表要绑定外键
+                @Entity(tableName = "comments",
+                        foreignKeys = {
+                                @ForeignKey(entity = ProductEntity.class,
+                                        parentColumns = "id",
+                                        childColumns = "productId",
+                                        onDelete = ForeignKey.CASCADE)},
+                        indices = {@Index(value = "productId")
+                        })
+                public class CommentEntity implements Comment {
+                    @PrimaryKey(autoGenerate = true)
+                    private int id;
+                    private int productId;
+                        ...
+                }
+
+        2.创建抽象类AppDatabase继承RoomDatabase
+            @Database(entities = {ProductEntity.class, ProductFtsEntity.class, CommentEntity.class}, version = 2)
+            @TypeConverters(DateConverter.class)
+            public abstract class AppDatabase extends RoomDatabase {
+                private static AppDatabase sInstance;
+                @VisibleForTesting
+                public static final String DATABASE_NAME = "basic-sample-db";
+
+                public abstract ProductDao productDao();
+                public abstract CommentDao commentDao();
+            }
+        3.在AppDatabase中初始化表
+            private static AppDatabase buildDatabase(final Context appContext,
+                    final AppExecutors executors) {
+                return Room.databaseBuilder(appContext, AppDatabase.class, DATABASE_NAME)
+                        .addCallback(new Callback() {
+                            @Override
+                            public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                                super.onCreate(db);
+                                executors.diskIO().execute(() -> {
+                                    // Add a delay to simulate a long-running operation
+                                    addDelay();
+                                    // Generate the data for pre-population
+                                    AppDatabase database = AppDatabase.getInstance(appContext, executors);
+                                    List<ProductEntity> products = DataGenerator.generateProducts();
+                                    List<CommentEntity> comments =
+                                            DataGenerator.generateCommentsForProducts(products);
+
+                                    insertData(database, products, comments);
+                                    // notify that the database was created and it's ready to be used
+                                    database.setDatabaseCreated();
+                                });
+                            }
+                        })
+                    .addMigrations(MIGRATION_1_2)
+                    .build();
+
+        4.创建Dao查询接口
+           @Dao
+           public interface CommentDao {
+               @Query("SELECT * FROM comments where productId = :productId")
+               LiveData<List<CommentEntity>> loadComments(int productId);
+
+               @Query("SELECT * FROM comments where productId = :productId")
+               List<CommentEntity> loadCommentsSync(int productId);
+
+               @Insert(onConflict = OnConflictStrategy.REPLACE)
+               void insertAll(List<CommentEntity> comments);
+           }
+
+           @Dao
+           public interface ProductDao {
+               @Query("SELECT * FROM products")
+               LiveData<List<ProductEntity>> loadAllProducts();
+
+               @Insert(onConflict = OnConflictStrategy.REPLACE)
+               void insertAll(List<ProductEntity> products);
+
+               @Query("select * from products where id = :productId")
+               LiveData<ProductEntity> loadProduct(int productId);
+
+               @Query("select * from products where id = :productId")
+               ProductEntity loadProductSync(int productId);
+
+               @Query("SELECT products.* FROM products JOIN productsFts ON (products.id = productsFts.rowid) "
+                   + "WHERE productsFts MATCH :query")
+               LiveData<List<ProductEntity>> searchAllProducts(String query);
+           }
+
+        5.创建数据库仓库实现接口，供用户使用
+           public class DataRepository {
+               private static DataRepository sInstance;
+               ...
+               public LiveData<List<ProductEntity>> getProducts() {
+                   return mObservableProducts;
+               }
+
+               public LiveData<ProductEntity> loadProduct(final int productId) {
+                   return mDatabase.productDao().loadProduct(productId);
+               }
+
+               public LiveData<List<CommentEntity>> loadComments(final int productId) {
+                   return mDatabase.commentDao().loadComments(productId);
+               }
+
+               public LiveData<List<ProductEntity>> searchProducts(String query) {
+                   return mDatabase.productDao().searchAllProducts(query);
+               }
+           }
+    5.Navigation
+        https://developer.android.google.cn/guide/navigation/navigation-getting-started
+        使用前添加依赖
+            dependencies {
+              def nav_version = "2.1.0"
+
+              // Java
+              implementation "androidx.navigation:navigation-fragment:$nav_version"
+              implementation "androidx.navigation:navigation-ui:$nav_version"
+
+              // Kotlin
+              implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+              implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+            }
+        1.Activity布局文件里面声明导航文件navigation.xml,navigation.xml在
+            <fragment
+                 android:id="@+id/my_nav_host_fragment"
+                 ...
+                 android:name="androidx.navigation.fragment.NavHostFragment"
+                 app:defaultNavHost="true"
+                 app:navGraph="@navigation/navigation"/>
+            注意点
+             1.name属性包含NavHost实现的类名称
+             2.navGraph属性将关联NavHostFragment导航图,导航图指定了NaviHostFragment用户可以导航到的所有目的地
+             3.defaultNavHost="true"确保NavHostFragment拦截系统的"后退"按钮
+        2.navigation.xml文件中定义各个Fragment,并通过其action标签确定跳转逻辑
+            1.每个Fragment通过id定义身份
+            2.根navigation通过startDestination确定第一个显示的Fragment
+            3.初始的Fragment在TitleScreen,定义一个id为action_title_screen_to_register的action
+                action中可以通过destination指定要跳转的目的地，同时设定跳转动画
+            4.在TitleScreen就可以通过代码跳转到id为Register的Fragment中了.具体跳转逻辑如下
+                java写法
+                    Navigation.findNavController(view).navigate(R.id.action_title_screen_to_register)
+                kotlin写法：(自定义NavDirections)
+                    view.findNavController().navigate(direction:NavDirections)
+
+               <navigation xmlns:android="http://schemas.android.com/apk/res/android"
+                           xmlns:app="http://schemas.android.com/apk/res-auto"
+                           xmlns:tools="http://schemas.android.com/tools"
+                           app:startDestination="@+id/title_screen">
+                   <fragment
+                           android:id="@+id/title_screen"
+                           android:name="com.example.android.navigationsample.TitleScreen"
+                           android:label="fragment_title_screen"
+                           tools:layout="@layout/fragment_title_screen">
+                       <action
+                               android:id="@+id/action_title_screen_to_register"
+                               app:destination="@id/register"
+                               app:popEnterAnim="@anim/slide_in_left"
+                               app:popExitAnim="@anim/slide_out_right"
+                               app:enterAnim="@anim/slide_in_right"
+                               app:exitAnim="@anim/slide_out_left"/>
+                   </fragment>
+              </navigation>
+
+
+    6.DataBinding
+        https://blog.csdn.net/LVXIANGAN/article/details/90176401
+        介绍
+            Databinding是谷歌官方发布的一种支持库，借助该库，可以使用声明式的语言(而非程序化的)
+        将布局中界面组件绑定到应用中的数据源
+            优点：避免写findViewById；界面动态绑定数据；自动判空
+            缺点:增加调试难度；编译出的apk文件会增加类数量和方法数量
+
+        1使用入门
+            要求4.0以上系统，AndroidStudio 1.5以上版本
+            1.AndroidStudio gradle脚本中声明
+                android{
+                    ...
+                    dataBinding{
+                        enabled = true
+                    }
+                }
+            1.在布局文件中用layout作为根标签
+                其中name定义的是要使用的变量名,type可以是绑定类的全路径，也可以导入包名
+                 如果存在import类名相同时，可以使用alias指定别名
+                 通过@{}或@={}的方式进行引用，其中@={}的方式表示双向绑定
+                 <data>
+                     <import type="leavesc.hello.databindingsamples.model.User" />
+                     <import
+                         alias="TempUser"
+                         type="leavesc.hello.databindingsamples.model2.User" />
+                     <variable
+                         name="user"
+                         type="User" />
+                     <variable
+                         name="tempUserInfo"
+                         type="TempUser" />
+                      //处理点击事件
+                     <variable name="task" type="com.android.example.Task" />
+                     <variable name="presenter" type="com.android.example.Presenter" />
+                     <TextView android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:text="@{user.firstName, default=my_default}"/>
+
+                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent">
+                         <Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+                         android:onClick="@{() -> presenter.onSaveClick(task)}" />
+                      </LinearLayout>
+                 </data>
+            2.Activity中通过DataBindingUtil设置布局文件，省略原先的setContent方法
+                其中ActivityMainBinding是根据布局文件名自动生成的，且会生成对应的方法；也可以通过以下方式自定义ViewDataBiding的实例名
+                java使用
+                    ActivityMainBinding binding = DataBinDing.setContentView(this,R.layout.activity_main)
+                    User user = new User("abcd","1234");
+                    bingding.setUserInfo(user);
+                    //处理点击事件
+                    public class Presenter {
+                        public void onSaveClick(Task task){}
+                    }
+                kotlin使用
+                    val binding = DataBindingUtil.setContentView<ActivityLivedataBinding>(this, R.layout.activity_livedata)
+                    val binding = setContentView<ActivityGardenBinding>(this, R.layout.activity_garden)
+
+             在Fragment或Adapter中可以这样用
+                ListItemBinding binding = ListItemBinding.inflate(layoutInflater, viewGroup, false);
+                // or
+                ListItemBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item, viewGroup, false);
+            3.绑定表达式
+                空合并运算符
+                    android:text="@{user.displayName ?? user.lastName}"
+                    android:text="@{user.displayName != null ? user.displayName : user.lastName}"
+                集合
+                    <data>
+                        <import type="android.util.SparseArray"/>
+                        <import type="java.util.Map"/>
+                        <import type="java.util.List"/>
+                        <variable name="list" type="List&lt;String>"/>
+                        <variable name="sparse" type="SparseArray&lt;String>"/>
+                        <variable name="map" type="Map&lt;String, String>"/>
+                        <variable name="index" type="int"/>
+                        <variable name="key" type="String"/>
+                    </data>
+                    android:text="@{list[index]}"
+                    android:text="@{sparse[index]}"
+                    android:text="@{map[key]}"
+              Databinding不支持include作为merge标签的直接子元素
+
+        2.使用可观察的数据对象(AS3.1以上版本允许使用LiveData通知UI)
+            Observable objects(BaseObservable)
+            Observable fields
+            Observable collections
+
+        3.绑定适配器
+            Binding Adapter负责调用合适的框架调用来设置值，例如通过setText设置属性值、通过setOnclickListener设置事件监听器等。
+            Databinging类库允许通过调用特定的方法设置值、允许自定义绑定逻辑、允许指定适配器的返回类型
+            @BindingMethods({
+               @BindingMethod(type = "android.widget.ImageView",
+                  attribute = "android:tint",
+                  method = "setImageTintList"),
+            })
+            参数类型很重要的。 第一个参数决定与这个属性相绑定的View类型，第二个参数决定了通过绑定表达式传入的数据参数类型
+        4.将布局视图绑定到架构组件(architecture中的LiveData和ViewModel)
+            Databinding和ViewModel可以无缝协作，ViewModel可以显示布局观察到的数据并对其更改做出反应
+            将ViewModel组件与数据绑定库一起使用，可以将UI逻辑移出布局并移入到组件中，这更易于测试
+            Databinding可以确保需要时将视图和数据源绑定和解除绑定，具体实现包含以下步骤
+                1.获取ViewModel组件
+                    UserModel userModel = ViewModelProviders.of(getActivity()).get(UserModel.class)
+                2.获取绑定类实例
+                    UserBinding binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+                3.将ViewModel实例作为一个属性分配给Databing实例
+                    bingding.viewmodel = userModel
+                4.在布局中，使用绑定表达式将ViewModel组件的属性和方法分配给相应的视图
+                    <CheckBox
+                        android:id="@+id/rememberMeCheckBox"
+                        android:checked="@{viewmodel.rememberMe}"
+                        android:onCheckedChanged="@{() -> viewmodel.rememberMeChanged()}" />
+
+
+            使用Observable ViewModel可以更好地控制绑定适配器，类似于使用LiveData,但这种方式允许我们自定义方法
+                /**
+                 * A ViewModel that is also an Observable,
+                 * to be used with the Data Binding Library.
+                 */
+                class ObservableViewModel extends ViewModel implements Observable {
+                    private PropertyChangeRegistry callbacks = new PropertyChangeRegistry();
+
+                    @Override
+                    protected void addOnPropertyChangedCallback(
+                            Observable.OnPropertyChangedCallback callback) {
+                        callbacks.add(callback);
+                    }
+
+                    @Override
+                    protected void removeOnPropertyChangedCallback(
+                            Observable.OnPropertyChangedCallback callback) {
+                        callbacks.remove(callback);
+                    }
+
+                    /**
+                     * Notifies observers that all properties of this instance have changed.
+                     */
+                    void notifyChange() {
+                        callbacks.notifyCallbacks(this, 0, null);
+                    }
+
+                    /**
+                     * Notifies observers that a specific property has changed. The getter for the
+                     * property that changes should be marked with the @Bindable annotation to
+                     * generate a field in the BR class to be used as the fieldId parameter.
+                     *
+                     * @param fieldId The generated BR id for the Bindable field.
+                     */
+                    void notifyPropertyChanged(int fieldId) {
+                        callbacks.notifyCallbacks(this, fieldId, null);
+                    }
+                }
+        5.双向数据绑定
+            1.布局文件绑定数据时使用@={""}
+        6.Databinding踩坑
+            1.布局文件中使用了srcCompact标签，在Activity要添加以下注解，便于它将属性与ImageView中的setImageDrawable联系起来
+                @BindingMethods({
+                        @BindingMethod(type = android.widget.ImageView.class,
+                                attribute = "app:srcCompat",
+                                method = "setImageDrawable") })
+    7.WorkManager
+二.基础组件
+三.行为组件
+四.界面组件

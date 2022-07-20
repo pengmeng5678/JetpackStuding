@@ -44,6 +44,20 @@ public class SimpleRequest{
         为什么静态内部类能保证类延迟加载和线程安全
             1.延迟加载是因为第一次初始化外部类的时候，静态内部类不会被初始化,只有当调用getInstance方法时才会初始化静态内部类
             2.线程安全的原因是JVM在初始化一个类的时候是同步的，会保证多个线程下只有一个线程能初始化此类，其他线程会阻塞
+
+      饿汉式
+        private static final IdGeneratorSingletonHungry instance = new IdGeneratorSingletonHungry();
+        public static IdGeneratorSingletonHungry getInstance() {
+            return instance;
+        }
+      懒汉式
+         private static IdGeneratorSingletonLazy instance;
+        //直接对该方法加锁
+        public static synchronized IdGeneratorSingletonLazy getInstance() {
+            if (instance == null) {
+                instance = new IdGeneratorSingletonLazy();
+            }
+
       2.双重检查形式
         public static SpeechManager getInstance1(){
             private static valotile SpeechManager mInstance = null;

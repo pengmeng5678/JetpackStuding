@@ -1,4 +1,4 @@
-一、AOT/JIT &dexopt与dex2oat(热修复相关)
+一、AOT/JIT &dexopt与dex2oat
     JIT:just in time:
         即时编译，运行时编译，边运行边编译，比如java虚拟机是在运行时，将解释执行的语言（比如字节码）编译成机器指令，以提高运行速度
         优点：可以对执行频繁的dex/odex进行编译和优化，提升编译器性能
@@ -25,13 +25,11 @@
                混合模式简要说明：在 ART 的时候，先把 dex 解释成中间态的，不编译成机器码。在运行的时候，或者充电的时候，只编译“热代码”
 
         JVM:java virtual machine
-            基于栈架构指令集，执行速度慢，基于堆栈的机器需要更多指令(内存)
             不同的java平台使用JVM加载字节码文件(.class),java编译成的字节码文件与硬件和操作系统无关，这是跨平台基础
             每个类或者接口单独占据一个class文件，每个类单独处理，没有交叉
             弊端：内存占用大，不适合于移动端；堆栈的加载模式导致加载速度慢；文件IO操作多，查询慢
 
         DVM:dalvik virtual machine
-            基于寄存器，相比JVM执行速度更快。CPU>寄存器>内存>外存
             AndroidSDK中有个dx工具将java字节码转换成Dalvik字节码dex
             使用JIT即时编译，只对编译执行次数较多的dex转换成机器码
             每次启动App都要JIT编译，启动速度慢
@@ -67,241 +65,17 @@
 
         2.怎么将外部的dex插入到ClassLoader中
 
-二、热修复原理(热修复相关)
-    1.Android热修复
-        作用：主要用于替换类、资源、so的过程
-        替换方案：
-            资源文件方案：AssertManager
-            类：底层替换和类加载方案
-    2.源码类到机器执行的文件过程
-        主要过程：java -(dex,class)-opt/oat-odex
-        Davlik虚拟机：java-dex-opt-D类型的odex   ,优化后的odex还是需要翻译，JIT
-        ART虚拟机:java-dex-oat-A类型的odex(机器码类型文件),AOT
-        混合模式：java-dex-oat-(D类型的odex,base.art:热缓存,image),高级JIT+全时段AOT
-
+二、热修复原理
+    1.源码类到机器执行的过程
+        主要过程：java-class/dex-opt/oat-odex
+        DVM:java-dex-opt-D类型的odex，还需要通过JIT翻译
+        ART:java-dex-oat-A类型的odex(机器码类型文件),使用AOT，在应用安装的时候进行编译
+        混合模式：java-dex-oat-(D类型的odex,base.art:热缓存,image)JIT;AOT全时段编译
+    2.补丁包
+        补丁包主要有class,资源文件，so的改动
+        1.资源文件:替换AssertManager-加载resources.arsc
+        2.类:底层替换和类加载器方案
+        3.so,暂未方案
     3.类补丁生效原理
-        1.底层替换方案：阿里的AndFix
-        2.类加载方案：腾讯的QFix,Tinker,Soaphix
-
-       双亲委派模型：
-          工作过程：
-                类加载器收到了加载请求，首先不会尝试自己去加载这个类，而是把这个请求委派给父类加载器去完成，
-                只有当父类加载器反馈无法加载这个类时，子类加载器才会尝试自己去加载这个类
-          作用：
-                使得java类随着它的类加载器一起具备了一种带有优先级的层次
-                保障java环境稳定性
-                避免重复加载，如果已经加载过一次Class，就不需要再次加载，而是先从缓存获取
-    4.tinker热修复集成
-        https://www.jianshu.com/p/ed17f00a3d23
-        打包步骤
-            1.生成签名的apk，这是基础的oldApk
-            2.修改代码、更新res文件、更新so等
-            3.将oldApk按gradle中的参数规则，重命名为指定名字，放到指定目录下
-                //old apk地址
-                tinkerOldApkPath = "${bakPath}/app-release-0708-21-59-49.apk"
-                //old apk 混淆文件地址
-                tinkerApplyMappingPath = "${bakPath}/app-release-0708-21-59-49-mapping.txt"
-                //old apk R 文件地址
-                tinkerApplyResourcePath = "${bakPath}/app-release-0708-21-59-49-R.txt"
-            4.调用tinkerPathchDebug生成补丁包于/build/outputs/tinkerPatch目录，默认是patch_signed_7zip.apk
-            5.将补丁包复制到SD卡目录下，在程序中调用打补丁方法，重启App即可实现热修复。
-
-三、插件化框架设计(插件化相关)
-    1.Class文件与Dex文件的结构解读
-        Class文件
-            定义：是Java虚拟机定义并被其所识别的文件格式，通俗的说，每个类或者接口都对应一个Class文件
-            格式：
-                1.Class 文件是一组以 8 位字节为基础单位的的二进制流。
-                2.各数据项目之间没有任何分隔符
-                3.Class 文件格式采用的结构只有两种数据结构：无符号数和表。
-                4.无符号数：以 u1,u2 等表示 1，2 个字节的无符号数，无符号数可用于描述数
-                字、索引引用、数量值、字符串值。
-                5.表：以多个无符号数或者表组成，通常以_info 结尾，整个 Class 文件就是一张
-                表
-        Dex文件
-            定义：是Android平台上(Davilk和Art虚拟机)的可执行文件，每个Apk压缩包都包含一个或者多个dex文件，文件中包含了app的所有源码
-            结构：
-                1.Dex 文件是一组以 8 位字节为基础单位的的二进制流。
-                2.Dex 文件的各数据项目之间也没有任何分隔符
-                3.Dex 文件由文件头，索引区，数据区三个部分组成
-    2.Android资源加载机制详解
-        1.定义资源
-            Android 使用 XML 文件描述各种资源，包括字符串、颜色、尺寸、主题、布局、甚至是图片（selector，layer-list）。
-            资源可分为两部分，一部分是属性，另一部分是值。对于 android:text="hello，world" ， text 就是属性， hello，world 就是值
-            属性的定义
-                在 APK 程序中，属性定义在 res/values/attrs.xml 中，在系统中属性位于
-                framework/base/core/res/res/values/attrs.xml 文件中
-                    对于 <declare-styleable name="Window"> ，Window 相当于属性集合的名称。
-                    对于 <attr name="windowBackground"> ，windowBackground 相当于属性的名称；
-                    属性名称在应用程序范围内必须唯一，既无论定义几个资源文件，无论定义几个styleable，windowBackground 必须唯一
-            值的定义
-                值的类型大致分为两类，一类是基本类型，一类是引用类型；
-                对于 int，boolean等类型在声明属性时使用如下方式：
-                <attr name="width" format="integer"/>
-                <attr name="text" format="string" />
-                <attr name="centerInParent"="boolean"/>
-                对于 Drawable，layout 等类型在声明属性时：
-                <attr name="background" format="reference"/>
-
-        2.解析资源
-            资源解析主要涉及到两个类，一个是 AttributeSet，另一个是 TypedArray
-            AttributeSet 对象，该对象包含了解析元素的所有属性及属性值(如下例子所示：属性是id,属性值是@+id/tv)
-                如：android:id="@+id/tv"，通过AttributeSet的getIdAttribute方法，获取id属性对应的字符串，此处返回”@+id/tv”
-            TypedArray 可以将某个 AttributeSet 作为参数构造 TypedArray 对象，并提供更方便的方法直接获取该 dimen 的值
-                如：andorid:layout_width="@dimen/width",TypedArray a = context.obtainStyledAttributes(attrs,com.android.internal.R.styleable.XXX,defStyle,0);
-        3.加载资源
-            在使用资源时首先要把资源加载到内存。Resources 的作用主要就是加载资源，
-            应用程序需要的所有资源（包括系统资源）都是通过此对象获取。一般情况下每个应用都会仅有一个 Resources 对象。
-            要访问资源首先要获取 Resources 对象。
-            获取 Resources 对象有两种方法，一种是通过 Context，一种是通过 PackageManager
-
-四、四大组件调用原理(插件化相关)
-        1.开发插件Activity的大致流程
-            插件Activity-Replugin.startActivity-解析出插件Activity对应的pluginName-挑选坑位Activity替换
-            -调用系统startActivity方法-AMS回调执行坑位Activity类加载-加载并初始化目标插件资源、上下文、类加载器(首次)
-            -Hook掉ClassLoader的类加载器恢复为插件Activity-插件Activity启动,并拥有完整生命周期
-
-五、Android系统服务实现原理(插件化相关)
-    WifiManager wifimanager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-    1、创建相关的 AIDL 文件 IWifiManager.aidl，并定义相关功能方法。
-    2、创建 WifiServiceImpl.java 并实现 IWifiManager.Stub，并在 Contex 中定义服务的唯一标识字符串。
-    3、创建创建 WifiManager.java 内部维护了通过 ServiceManager 获取到的WifiServiceImpl 实例。
-    4、在 SystemServiceRegistry.java 的静态太代码块中通过 registerService()方法创建 WifiManager 实例，
-    并保存到 SYSTEM_SERVICE_FETCHERS 这个 map 中，这里要强调一点的是，由于 WifiManager 是在静态代码块中被创建，所以是单例的。
-    5、在 SystemServer.java 中通过 SystemServiceManager 创建 WifiService 实例，并调用其 onStart()方法。
-    6、在 WifiService 的构造方法中创建 WifiServiceImpl 实例。
-    7、最终通过SystemService 的 publishBinderService()方法调用ServiceManager.addService(name, service, allowIsolated);将 WifiServiceImpl 注册到 ServiceManager 中
-
-六、ARouter原理分析
-    作用：阿里开源的一个路由框架，主要用于组件与组件之间的数据传递和页面路由跳转
-    功能：
-        支持直接解析URL进行跳转、参数按类型解析到Bundle，支持Java基本类型(*)
-        支持应用内的标准页面跳转，API接近Android原生接口
-        支持多模块工程中使用，允许分别打包，包结构符合Android包规范即可(*)
-        支持跳转过程中插入自定义拦截逻辑，自定义拦截顺序(*)
-        支持服务托管，通过ByName,ByType两种方式获取服务实例，方便面向接口开发与跨模块调用解耦(*)
-        映射关系按组分类、多级管理，按需初始化，减少内存占用提高查询效率(*)
-        支持用户指定全局降级策略
-        支持获取单次跳转结果
-        丰富的API和可定制性
-        被ARouter管理的页面、拦截器、服务均无需主动注册到ARouter，被动发现
-        支持Android N推出的Jack编译链
-    优点：
-        1.集中式的URL管理
-        2.可配置性强
-        3.页面跳转过程中可插手
-        4.跨模块通信解耦
-    分类：ARouter把路由一共分为以下几类(主要用到的就ACTIVITY,PROVIDER,FRAGMENT)
-        ACTIVITY(0, “android.app.Activity”)
-        SERVICE(1, “android.app.Service”)
-        PROVIDER(2, “com.alibaba.android.arouter.facade.template.IProvider”)
-        CONTENT_PROVIDER(-1, “android.app.ContentProvider”), BOARDCAST(-1, “”),
-        METHOD(-1, “”), FRAGMENT(-1, “android.app.Fragment”), UNKNOWN(-1, “Unknown route type”);
-    使用：
-        1.添加依赖
-        2.定义路由路径常量,在需要用到的类上面定义注解@Route(“/group/name”),其中group是分组，name是类名
-            如语音String LIB_SPEECH =  "/speechlibrary/lib";
-        3.对ARouter进行初始化
-            ARouter.init(mApplication)
-        4.编译后会生成对应的类，而注解相关的信息会保存到两个Map中,key是路径,value是class对象
-            (1)如果ARouter分类是PROVIDER,就在路由组件(serviceManagerLib组件)定义接口实现IProvider，并在接口的实现类(speechLib组件)上面定义注解
-                serviceManagerLib：
-                    public interface ISpeechManagerProvider extends IProvider{void startSpeak(String txt);}
-                speechLib:
-                    @Route(path = ARouterConstants.LIB_SPEECH)
-                    public class SpeechProviderImpl implements ISpeechManagerProvider
-                编译后：
-                    public class ARouter$$Group$$speechlibrary implements IRouteGroup {
-                      @Override
-                      public void loadInto(Map<String, RouteMeta> atlas) {
-                        atlas.put("/speechlibrary/lib", RouteMeta.build(RouteType.PROVIDER, SpeechProviderImpl.class, "/speechlibrary/lib", "speechlibrary", null, -1, -2147483648));
-                      }
-                    }
-                    public class ARouter$$Providers$$libraryspeechlibrary implements IProviderGroup {
-                      @Override
-                      public void loadInto(Map<String, RouteMeta> providers) {
-                        providers.put("com.limpoxe.support.servicemanager.provider.speech.ISpeechManagerProvider", RouteMeta.build(RouteType.PROVIDER, SpeechProviderImpl.class, "/speechlibrary/lib", "speechlibrary", null, -1, -2147483648));
-                      }
-                    }
-                发起路由操作：
-                    SpeechProviderImpl provider = (SpeechProviderImpl) ARouter.getInstance().build(ARouterConstants.LIB_SPEECH).navigation();
-                    provider.startSpeak("hello");
-            (2)如果ARouter分类是ACTIVITY或者FRAGMENT,就直接在类名上面定义注解
-                定义注解
-                    @Route(path = "/test/1")
-                    public class YourActivity extend Activity{...}
-                发起路由操作：
-                    ARouter.getInstance().build("/test/1")
-                                 .withLong("key1", 666L)
-                                 .withString("key3", "888")
-                                 .navigation();
-
-    实现原理：
-          反射和注解实现Demo:https://www.jianshu.com/p/c0d989533f99
-          基于注解和反射实现跨模块频繁的数据传递和页面跳转
-          注解：跨模块路径的定义
-          反射：根据注解编译后信息，反射出对应的实例类
-
-七、APT编译时期自动生成代码&动态类加载
-    1.apt编译时期自动生成代码
-        1.新建一个Android项目
-        2.新建一个java的Module(inject_annotation),注意是javalib，这个lib用来专门写注解就好
-            @Retention(RetentionPolicy.CLASS)@Target(ElementType.TYPE)
-            public @interface TestAnno {}
-        3.再新建一个java的Module(inject_comiler)
-            处理自动生成代码的逻辑
-        4.在Android项目里面配置和引用自己定义的注解库
-            compile project(':inject_annotation')
-            apt project(':inject_comiler')
-            注意这里是通过apt依赖inject_comiler的
-            因为注解处理器是javalib来完成的,javalib不能再引用androidlib
-
-    2.Android动态加载技术之类加载(ClassLoader)
-        1.虚拟机类加载机制
-            类加载过程是指虚拟机将描述类的数据从Class加载到内存，并对数据进行校验，转换解析和初始化，
-            最终形成可以被虚拟机直接使用的java类型的过程
-
-        2.类加载的过程(运行期)
-            虚拟机类加载的过程分为七个阶段：
-                1.加载：
-                    以下四种情况虚拟机会开始进行类的加载
-                        a、使用new关键字实例化对象,读取或设置类的静态变量(final修饰除外)和静态方法的时候
-                        b、对类进行反射调用的时候
-                        c、当初始化一个类时，如果其父类没有被加载，则先对其父类进行加载
-                        d、当虚拟机启动的时候，用户指定的类(包含main方法)会被加载
-                    类的加载阶段，虚拟机会完成以下三件事情
-                        a、通过一个类的全限定名获取定义类的二进制字节流
-                        b、将这个字节流所代表的静态存储结构转化成方法区的运行时数据结构
-                        c、在java堆里面生成一个代表这个类的Class对象,作为方法区这些数据的访问入口
-                2.验证
-                    为了确保class文件的字节流包含的信息符合当前虚拟机的要求,且不会危害虚拟机自身的安全
-                    主要包括：文件格式验证、元数据验证、字节码验证、符合引用验证
-                3.准备
-                    为类变量分配内存并设置类变量初始值的阶段，这些内存将在方法区中进行分配
-                    这个阶段中进行内存分配的变量只包括被static修饰的变量，而普通变量的赋值是在初始化阶段
-                4.解析
-                    将虚拟机常量池的符号引用替换为直接引用的过程
-                5.初始化
-                    执行类构造器<cinit>()方法的过程,父类的<cinit>()方法会先于子类执行
-                6.使用
-
-                7.卸载
-        3.类加载器
-            1.启动类加载器Bootstrap ClassLoader
-                主要负责加载存放在%JAVAHOME%/lib 目录中的，或者被-Xbootclasspath 指定的类库到虚拟机内存中，Bootstrap ClassLoader 无法被 java 程序直接引用
-            2.扩展类加载器Extension ClassLoader
-                主要负责加载%JAVAHOME%/lib/ext 目录中的，或者被 java.ext.dirs 系统变量指定路径的所有类
-            3.应用程序类加载器Application ClassLoader
-                因 为 其 实getSystemClassLoader 的返回对象），主要负责加载用户类路径（ClassPath）下的类库
-            4.自定义类加载器User ClassLoader
-
-八、AOP&IOC
-    1.AOP
-        定义：
-            面向切面编程：Aspect Oriented Program
-
-        作用：
-            是一种支持在运行时(或者编译期和类加载期)，动态的将代码切入到类的指定方法、指定位置的编程思想
-            一般，我们把切入到指定类、指定方法的代码片段成为切面，而切入到哪些类/哪些方法成为切入点
-            OOP(面向对象编程:object Oriented program)是从横向区分一个个类
-            AOP(面向切面编程:Aspect Oriented Program)是从纵向上向对象加入特定的代码
+        1.底层替换方案AndFix
+        2.类加载器方案QFix,tinker,Sophix

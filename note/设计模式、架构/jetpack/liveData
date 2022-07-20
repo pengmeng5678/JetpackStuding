@@ -1,0 +1,175 @@
+http://liuwangshu.cn/tags/Android-Jetpack/
+https://juejin.cn/post/6844903889574051848
+一、liveData基本介绍
+        简介：LiveData是一个可观察的数据持有者，它是具有组件生命周期感知的
+        优点:
+            自动更新UI、无内存泄露、无需手动处理生命周期、共享数据(LiveData单例)
+            LiveData和Rxjava不同点在于，LiveData不会对所有观察者发送通知，而只会对Actvie(OnStarted和OnResumed)状态的组件进行通知
+
+        使用场景：Room、ViewModel
+        数据变换：map(LiveData<A>发送数据后将A变更成,接收到B)、SwitchMap(发送数据前根据条件决定是发送LiveData<A>还是LiveData<B>)
+
+        1.在Activity中监听LiveData的变化后，会回调onChange方法
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {//1
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:"+s);
+                }
+            });
+        2.一般在ViewModel层更新数据
+            mutableLiveData.postValue("Android进阶三部曲");//setValue只能在主线程中使用
+        3.更改LiveData的数据,Transformations
+            如果我们想在LiveData对象分发给观察者之前对其中存储的值进行更改，可以使用Transformations.map和Transformations.switchMap()
+            MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+            mutableLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged1:"+s);
+                }
+            });
+            LiveData transformedLiveData =Transformations.map(mutableLiveData, new Function<String, Object>() {
+                @Override
+                public Object apply(String name) {
+                   return name + "+Android进阶解密";
+                }
+            });
+            transformedLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged2:"+s);
+                }
+            });
+            mutableLiveData.postValue("Android进阶之光");
+            打印结果：
+                onChanged1:Android进阶之光
+                onChanged2:Android进阶之光+Android进阶解密
+        4.监听某个数据的变化，且能随时切换监听，可以使用Transformations.switchMap()
+            LiveData transformedLiveData= Transformations.switchMap(liveDataSwitch, new Function<Boolean, LiveData<String>>() {
+                @Override
+                public LiveData<String> apply(Boolean input) {
+                    if (input) {
+                        return mutableLiveData1;
+                    } else {
+                        return mutableLiveData2;
+                   }
+                }
+            });
+
+            transformedLiveData.observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable final String s) {
+                    Log.d(TAG, "onChanged:" + s);
+                }
+            });
+            liveDataSwitch.postValue(false);//2
+            mutableLiveData1.postValue("Android进阶之光");
+            mutableLiveData2.postValue("Android进阶解密");
+            输出的结果是Android进阶解密
+
+        5.合并多个MutableLiveData,使用MediatorLiveData.addSource，将多个MutableLiveData合并到一起，
+        这样当任何一个MutableLiveData数据发生变化时,MediatorLiveData都能感知到
+            public class MainActivity extends AppCompatActivity {
+               private static final String TAG="MainActivity";
+                @Override
+                protected void onCreate(Bundle savedInstanceState) {
+                    super.onCreate(savedInstanceState);
+                    setContentView(R.layout.activity_main);
+                    MutableLiveData<String> mutableLiveData1  = new MutableLiveData<>();
+                    MutableLiveData<String> mutableLiveData2  = new MutableLiveData<>();
+                    MediatorLiveData liveDataMerger = new MediatorLiveData<String>();
+                    liveDataMerger.addSource(mutableLiveData1, new Observer() {
+                        @Override
+                        public void onChanged(@Nullable Object o) {
+                            Log.d(TAG, "onChanged1:"+o.toString());
+                        }
+                    });
+
+                    liveDataMerger.addSource(mutableLiveData2, new Observer() {
+                        @Override
+                        public void onChanged(@Nullable Object o) {
+                            Log.d(TAG, "onChanged2:"+o.toString());
+                        }
+                    });
+                    liveDataMerger.observe(this, new Observer() {
+                        @Override
+                        public void onChanged(@Nullable Object o) {
+                            Log.d(TAG, "onChanged:"+o.toString());
+                        }
+                    });
+                    mutableLiveData1.postValue("Android进阶之光");
+                }
+            }
+            输出结果为Android进阶之光
+
+二、liveData使用原理
+       我们知道LiveData是可观察的数据持有者，它是具有组件生命周期感知的，那么他是如何感知组件生命周期的？
+       LiveData和Rxjava不同点在于，LiveData不会对所有观察者发送通知，而只会对Actvie(OnStarted和OnResumed)状态的组件进行通知
+
+       其实就是LiveData在observe方法中传入了两个参数，一个是LifecycleOwner，一个是Observer
+       LifecycleBoundObserver类是Obeserver类的内部类，当组件生命周期变化时，会回调LifecycleBoundObserver的onStateChange方法
+       当onStateChanged回调的Event状态时ONDESTROY时，会移除observer观察者，并更新组件状态activeStateChanged(shouldBeActive())
+
+       1.我们知道基本使用
+        MutableLiveData<String> mutableLiveData  = new MutableLiveData<>();
+        mutableLiveData.observe(this, new Observer<String>() {//1
+           @Override
+           public void onChanged(@Nullable final String s) {
+               Log.d(TAG, "onChanged:"+s);
+           }
+        });
+
+         @MainThread
+         public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
+           assertMainThread("observe");
+           //如果被观察者的当前的状态是DESTROYED，就return
+           if (owner.getLifecycle().getCurrentState() == DESTROYED) {//1
+               return;
+           }
+           LifecycleBoundObserver wrapper = new LifecycleBoundObserver(owner, observer);//2
+           ObserverWrapper existing = mObservers.putIfAbsent(observer, wrapper);//3
+           if (existing != null && !existing.isAttachedTo(owner)) {
+               throw new IllegalArgumentException("Cannot add the same observer"
+                       + " with different lifecycles");
+           }
+           if (existing != null) {
+               return;
+           }
+           owner.getLifecycle().addObserver(wrapper);//4
+        }
+
+        2.LifecycleBoundObserver类是Obeserver类的内部类
+        class LifecycleBoundObserver extends ObserverWrapper implements GenericLifecycleObserver {
+               @NonNull final LifecycleOwner mOwner;
+
+               LifecycleBoundObserver(@NonNull LifecycleOwner owner, Observer<? super T> observer) {
+                   super(observer);
+                   mOwner = owner;
+               }
+
+               @Override
+               boolean shouldBeActive() {
+                   return mOwner.getLifecycle().getCurrentState().isAtLeast(STARTED);
+               }
+
+               @Override
+               public void onStateChanged(LifecycleOwner source, Lifecycle.Event event) {
+                   if (mOwner.getLifecycle().getCurrentState() == DESTROYED) {
+                       removeObserver(mObserver);//1
+                       return;
+                   }
+                   activeStateChanged(shouldBeActive());//2
+               }
+
+               @Override
+               boolean isAttachedTo(LifecycleOwner owner) {
+                   return mOwner == owner;
+               }
+
+               @Override
+               void detachObserver() {
+                   mOwner.getLifecycle().removeObserver(this);
+               }
+           }
+
+
