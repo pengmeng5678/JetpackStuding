@@ -62,13 +62,131 @@ https://juejin.cn/post/6854573211418361864
 
 三、流Flow
     Flow的使用和Rxjava非常相似
-    1.基础
-        lifecycleScope.lauch{
-            createFlow()
-                .collect{num->
+    1.Flow基础
+        特点：
+            1.冷流：有点类似Kotlin懒加载，只有当collect方法执行的时候，数据才开始发射
+            2.有序:每个数据都是经过 emit、filter 、map和 collect 这一套完整的处理流程后，下个数据才会开始处理，而不是所有的数据都先统一 emit，完了再统一 filter，接着 map，最后再 collect
+            3.协作取消：Flow 采用和协程一样的协作取消，也就是说，Flow 的 collect 只能在可取消的挂起函数中挂起的时候取消，否则不能取消。
+        基本使用：
+            lifecycleScope.lauch{
+                createFlow()
+                    .collect{num->
 
+                    }
+            }
+            Flow中的数据源Flow<T>相当于Rxjava的Observable<T>
+            Flow中的订阅collect相当于Rxjava的subscribe
+
+        创建Flow对象
+            fun createFlow():Flow<Int> = flow{
+                for (i in 1..10)
+                    emit(i)
+            }
+
+            一直调用emit不方便，Flow提供了和Rxjava.just类似的方法
+            flowof(vararg elements: T)：帮助可变数组生成 Flow 实例
+            扩展函数 .asFlow()：面向数组、列表等集合
+
+        消费数据
+            collect方法和Rxjava中的subscribe方法一样，都是用来消费的
+            collect方法是一个suspend方法，所以它必须发生在协程或者带有suspend方法里面
+
+    2.Flow线程切换
+        协程切换线程
+           lifecycleScope.launch {
+               // 创建一个协程 Flow<T>
+               createFlow()
+                   // 将数据发射的操作放到 IO 线程中的协程
+                   .flowOn(Dispatchers.IO)
+                   .collect { num ->
+                       // 具体的消费处理
+                       // ...
+                   }
+               }
+           }
+        改变数据发射的线程：Flow的flowOn方法类似Rxjava的subscribeOn
+        改变数据消费的线程：Flow消费数据的线程在启动协程时就已经通过调度器(Dispatcher)确定好了
+
+    3.Flow异常和完成
+        异常捕获
+            Flow通过catch捕获异常，Rxjava通过onError捕获异常
+                lifecycleScope.launch {
+                    flow {
+                        //...
+                    }.catch {e->
+
+                    }.collect()
                 }
-        }
-        Flow中的数据源Flow<T>相当于Rxjava的Observable<T>
-        Flow中的订阅collect相当于Rxjava的subscribe
+        完成
+            lifecycleScope.launch {
+                createFlow()
+                    .onCompletion {
+                        // 处理完成操作
+                    }
+                    .collect {
 
+                    }
+            }
+
+    4.操作符对比
+        普通操作符：
+            map:转换操作符，将A变成B
+            take:后面跟Int类型的参数，表示接收多少个emit的值
+            filter过滤操作符
+        特殊操作符(发送数据是并发的)
+            buffer:数据发射并发,collect不并发
+
+
+
+四、通道
+    Channel是一个面向多协程之间数据传输的BlockQueue，使用如下
+        lifecycleScope.launch {
+            // 1. 生成一个 Channel
+            val channel = Channel<Int>()
+
+            // 2. Channel 发送数据
+            launch {
+                for(i in 1..5){
+                    delay(200)
+                    channel.send(i * i)
+                }
+                channel.close()
+            }
+
+            // 3. Channel 接收数据
+            launch {
+                for( y in channel)
+                    Log.e(TAG, "get $y")
+            }
+        }
+    1.创建Channel
+        方式一：直接创建Channel对象
+        方式二：通过produce函数
+            lifecycleScope.launch {
+                // 1. 生成一个 Channel
+                val channel = produce<Int> {
+                    for(i in 1..5){
+                        delay(200)
+                        send(i * i)
+                    }
+                    close()
+                }
+
+                // 2. 接收数据
+                // ... 省略 跟之前代码一致
+            }
+    2.发送数据
+        Channel#send()方法，当数据发送完毕后，可以用Channel#close方法表明通道已经结束数据的发送
+    3.接收数据
+        获取一次数据
+            Channel#receive()
+        获取指定次数的数据
+            repeate(4){
+                Log.e(TAG, "get ${channel.receive()}")
+            }
+        获取未知数量的数据，需要迭代Channel
+            for( y in channel)
+                Log.e(TAG, "get $y")
+
+五、多协程数据处理
+    多协程处理并发数据的时候，原子性同样也得不到保证，协程中出了一种叫 Mutex 的锁，区别是它的 lock 操作是挂起的，非阻塞的
