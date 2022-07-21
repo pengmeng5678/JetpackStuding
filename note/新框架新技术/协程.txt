@@ -1,7 +1,14 @@
-https://juejin.cn/post/6854573211418361864
+协程：
+    https://juejin.cn/post/6854573211418361864
+协程、LiveData、Flow:
+    https://mp.weixin.qq.com/s/p5H51RC6QfyyoAcQ1aGRLg
 一、基本介绍
     定义：轻量级的线程
-    优点：可以通过阻塞的方式写出非阻塞的代码，解决常见的回调地狱，还可以结合jetpack相关组件一起使用
+    优点：
+        1.可以通过阻塞的方式写出非阻塞的代码，解决常见的回调地狱问题
+        2.很容易离开主线程
+        3.样板代码最少：活用了Kotlin语言的能力，包括suspend方法
+        4.结构并发性：当一个操作不再需要被执行时，协程会自动取消它
 
 二、基本使用
     GlobalScope.launch(Dispatchers.IO){//}
@@ -11,7 +18,8 @@ https://juejin.cn/post/6854573211418361864
             runblocking:顶层函数，它会阻塞当前线程来等待，所以在业务中不适用
             GlobalScope:全局协程作用域，可以在整个应用的生命周期中操作，且不能取消，所以在业务中不适用
             自定义作用域：自定义的协程作用域，不会造成内存泄露
-
+                lifecycleScope
+                viewModelScope
         2.协程调度器：
             Dispatchers.Main:执行的线程是主线程
             Dispatchers.IO：执行的线程是IO线程
@@ -54,12 +62,15 @@ https://juejin.cn/post/6854573211418361864
                         delay(5000)
                         return num*num
                     }
-        5.协程结合Android jetpack
-            lifecycleScope.lauch{
-                whenResumed{//代码}
-            }
-            viewModelScope.lauch{//代码}
-
+        5.协程的取消
+            绝大部分情况，协程的取消是自动的，即通过协程作用域
+            所有 kotlin.coroutines 的 suspend 方法都是可取消的
+                suspend fun printPrimes() {
+                    while(true) {
+                        //delay也是一个suspend方法，每一次delay都会检查协程是否处于有效状态,一旦发现协程被取消，循环的操作也会被取消
+                        delay(1000)
+                    }
+                }
 三、流Flow
     Flow的使用和Rxjava非常相似
     1.Flow基础
@@ -136,7 +147,8 @@ https://juejin.cn/post/6854573211418361864
         特殊操作符(发送数据是并发的)
             buffer:数据发射并发,collect不并发
 
-
+    5.Flow结合Retrofit
+        https://mp.weixin.qq.com/s/pxNSXRkS0zIBoR0L02O1vQ
 
 四、通道
     Channel是一个面向多协程之间数据传输的BlockQueue，使用如下
@@ -190,3 +202,85 @@ https://juejin.cn/post/6854573211418361864
 
 五、多协程数据处理
     多协程处理并发数据的时候，原子性同样也得不到保证，协程中出了一种叫 Mutex 的锁，区别是它的 lock 操作是挂起的，非阻塞的
+
+六、协程与jetpack结合使用
+    1.在ViewModel中启动协程
+        class MyViewModel : ViewModel {
+            private val _result = MutableLiveData<String>()
+            val result: LiveData<String> = _result
+
+            init {
+                viewModelScope.launch {
+                    val computationResult = doComputation()
+                    _result.value = computationResult
+                  }
+              }
+        }
+        以上代码做了三件事
+            1、准备一个 ViewModel 私有的 MutableLiveData (MLD)
+            2、暴露一个不可变的 LiveData
+            3、启动协程，然后将其操作结果赋给 MLD
+
+        LiveData的协程构造方法：在lifecycle2.2.0,同样的操作可以用更精简的方法实现
+            class MyViewModel{
+                val result = liveData{
+                    emit(doComputation)
+                }
+            }
+
+    2.协程与LiveData结合使用
+        比如当用户在 UI 中选中一些元素，然后将这些选中的内容显示出来。
+        一个常见的做法是，把被选中的项目的 ID 保存在一个 MutableLiveData 里，
+        然后运行 switchMap。现在在 switchMap 里，您也可以使用协程构造方法
+
+        private val itemId = MutableLiveData<String>()
+        val result = itemId.switchMap {
+            liveData { emit(fetchItem(it)) }
+        }
+
+        使用emitSource方法从另一个LiveData获取更新的结果
+            liveData(Dispatchers.IO) {
+                emit(LOADING_STRING)
+                emitSource(dataSource.fetchWeather())
+            }
+
+    3.one-shot操作获取单一数据
+        数据分层：View -> ViewModel -> Repository -> DataSource
+
+        通过LiveData连接View和ViewModel,然后使用LiveData协程构造方法打通livedata和协程，然后respository和DataSource就是调用suspend方法
+            class MyViewModel{
+                val result = liveData{
+                    emit(respository.fetchData)
+                }
+            }
+    4.observers操作监听多个数据(如当前天气显示)
+        方式一：将ViewModel以外(即respository)也使用LiveData
+            val currentWeather: LiveData<String> =
+                dataSource.fetchWeather()
+
+        方式二：respository和DataSource发射Flow数据,并使用LiveData协程构造函数
+            val currentWeatherFlow:LiveData<String> = liveData{
+                dataSource.fetWeatherFlow().collect{
+                    emit(it)
+                }
+            }
+            更简单的写法
+                val currentWeatherFlow: LiveData<String> =
+                    dataSource.fetchWeatherFlow().asLiveData()
+
+    5.先发送一个一次性的结果，然后再持续发送多个数值
+        1.LiveData方式
+            val currentWeather: LiveData<String> = liveData {
+                emit(LOADING_STRING)
+                emitSource(dataSource.fetchWeather())
+            }
+        2.Flow方式一
+            val currentWeather: LiveData<String> = liveData {
+                emit(LOADING_STRING)
+                emitSource(dataSource.fetchWeatherFlow().asLiveData)
+            }
+        2.Flow方式二
+            val currentWeather: LiveData<String> =
+                dataSource.fetchWeatherFlow()
+                    .onStart{emit(LOADING_STRING)}
+                    .asLiveData()
