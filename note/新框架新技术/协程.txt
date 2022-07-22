@@ -204,6 +204,7 @@
     多协程处理并发数据的时候，原子性同样也得不到保证，协程中出了一种叫 Mutex 的锁，区别是它的 lock 操作是挂起的，非阻塞的
 
 六、协程与jetpack结合使用
+    一、ViewModel模式：
     1.在ViewModel中启动协程
         class MyViewModel : ViewModel {
             private val _result = MutableLiveData<String>()
@@ -279,8 +280,78 @@
                 emit(LOADING_STRING)
                 emitSource(dataSource.fetchWeatherFlow().asLiveData)
             }
-        2.Flow方式二
+        3.Flow方式二
             val currentWeather: LiveData<String> =
                 dataSource.fetchWeatherFlow()
                     .onStart{emit(LOADING_STRING)}
                     .asLiveData()
+
+    6.接收的数据需要做转换
+        1.使用liveData
+            使用switchMap，从而通过liveData协程构造方法获得一个LiveData
+            而且switchMap方法会在每次数据源LiveData更新时调用，heavyTransformation 函数进行数据转换，并发送其结果给 liveData 协程构造方法
+            val currentWeatherLiveData: LiveData<String> =
+                dataSource.fetchWeather().switchMap {
+                    liveData { emit(heavyTransformation(it)) }
+            }
+
+        2.使用Flow
+            直接从dataSource获取数据，然后调用Flow的map方法，再转换为liveData
+                val currentWeatherFlow:LiveData<String> =
+                    dataSource.fetchWeatherFlow()
+                        .map{heavyTransformation(it)}
+                        .asLiveData()
+
+     7.repository模式：一般用于进行复杂的数据转换和处理，现在通过 Flow 就可以完成各种复杂的操作
+            val currentWeatherFlow: Flow<String> =
+                dataSource.fetchWeatherFlow()
+                    .map { ... }
+                    .filter { ... }
+                    .dropWhile { ... }
+                    .combine { ... }
+                    .flowOn(Dispatchers.IO)
+                    .onCompletion { ... }
+
+六、协程与Retrofit、Room协作
+    Retrofit 从 2.6.0 开始支持 suspend 方法，Room 从 2.1.0 开始支持 suspend 方法。
+    1.单次操作
+        如果使用Retrofit从远程数据源获取数值，直接将方法标记为suspend方法即可
+            suspend fun doOneShot(param:String):String =
+                retrofitClient.doSomething(param)
+
+    2.回调机制
+        如果数据源不支持协程，且使用回调机制，可以使用suspendCancellabeCoroutine协程构造方法
+        这个方法是协程和回调之间的适配器，会在内部提供一个 continuation 供开发者使用
+            suspend fun doOneShot(param: String) : Result<String> =
+                suspendCancellableCoroutine { continuation ->
+                    api.addOnCompleteListener { result ->
+                        continuation.resume(result)
+                    }.addOnFailureListener { error ->
+                        continuation.resumeWithException(error)
+                    }
+              }
+
+    3.监听操作
+        数据源持续发送数值，如每隔两秒发送一个天气值
+            override fun fetchWeatherFlow():Flow<String> = Flow{
+                counter++
+                delay(200)
+                emit(weatherString)
+            }
+
+        如果使用的是不支持Flow而是使用的回调的代码库，可以使用callbackFlow
+            fun flowFrom(api:CallbackBaseApi):Flow<T> = callbackFlow{
+                val callback = object :Callback{
+                    override fun onNextValue(value: T) {
+                        //通过offer方法将数据源发送给Flow
+                        offer(value)
+                    }
+                    override fun onApiError(cause: Throwable) {
+                        close(cause)
+                    }
+                    override fun onCompleted() = close()
+                }
+                api.register(callback)
+                //如果API不会再有更新，则使用awaitClose彻底关闭这条数据通道
+                awaitClose{api.unregister(callback)}
+            }
