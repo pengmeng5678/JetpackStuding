@@ -16,15 +16,6 @@
 
 package android.app;
 
-import static android.app.servertransaction.ActivityLifecycleItem.ON_CREATE;
-import static android.app.servertransaction.ActivityLifecycleItem.ON_DESTROY;
-import static android.app.servertransaction.ActivityLifecycleItem.ON_PAUSE;
-import static android.app.servertransaction.ActivityLifecycleItem.ON_RESUME;
-import static android.app.servertransaction.ActivityLifecycleItem.ON_START;
-import static android.app.servertransaction.ActivityLifecycleItem.ON_STOP;
-import static android.app.servertransaction.ActivityLifecycleItem.PRE_ON_CREATE;
-import static android.view.Display.INVALID_DISPLAY;
-
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.app.assist.AssistContent;
@@ -152,16 +143,6 @@ import com.android.org.conscrypt.OpenSSLSocketImpl;
 import com.android.org.conscrypt.TrustedCertificateStore;
 import com.android.server.am.MemInfoDumpProto;
 
-import dalvik.system.BaseDexClassLoader;
-import dalvik.system.CloseGuard;
-import dalvik.system.VMDebug;
-import dalvik.system.VMRuntime;
-
-import libcore.io.DropBox;
-import libcore.io.EventLogger;
-import libcore.io.IoUtils;
-import libcore.net.event.NetworkEventDispatcher;
-
 import org.apache.harmony.dalvik.ddmc.DdmVmInternal;
 
 import java.io.File;
@@ -182,6 +163,24 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.Executor;
+
+import dalvik.system.BaseDexClassLoader;
+import dalvik.system.CloseGuard;
+import dalvik.system.VMDebug;
+import dalvik.system.VMRuntime;
+import libcore.io.DropBox;
+import libcore.io.EventLogger;
+import libcore.io.IoUtils;
+import libcore.net.event.NetworkEventDispatcher;
+
+import static android.app.servertransaction.ActivityLifecycleItem.ON_CREATE;
+import static android.app.servertransaction.ActivityLifecycleItem.ON_DESTROY;
+import static android.app.servertransaction.ActivityLifecycleItem.ON_PAUSE;
+import static android.app.servertransaction.ActivityLifecycleItem.ON_RESUME;
+import static android.app.servertransaction.ActivityLifecycleItem.ON_START;
+import static android.app.servertransaction.ActivityLifecycleItem.ON_STOP;
+import static android.app.servertransaction.ActivityLifecycleItem.PRE_ON_CREATE;
+import static android.view.Display.INVALID_DISPLAY;
 
 final class RemoteServiceException extends AndroidRuntimeException {
     public RemoteServiceException(String msg) {

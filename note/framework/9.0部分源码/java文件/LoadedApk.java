@@ -55,8 +55,6 @@ import android.view.DisplayAdjustments;
 
 import com.android.internal.util.ArrayUtils;
 
-import dalvik.system.VMRuntime;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,6 +69,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
+
+import dalvik.system.VMRuntime;
 
 final class IntentReceiverLeaked extends AndroidRuntimeException {
     public IntentReceiverLeaked(String msg) {

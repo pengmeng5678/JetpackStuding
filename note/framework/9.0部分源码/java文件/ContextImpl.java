@@ -80,8 +80,6 @@ import android.view.autofill.AutofillManager.AutofillClient;
 import com.android.internal.annotations.GuardedBy;
 import com.android.internal.util.Preconditions;
 
-import libcore.io.Memory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -95,6 +93,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Executor;
+
+import libcore.io.Memory;
 
 class ReceiverRestrictedContext extends ContextWrapper {
     ReceiverRestrictedContext(Context base) {

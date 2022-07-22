@@ -99,6 +99,14 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         3.等待唤醒机制与synchronized
             所谓等待唤醒机制这里主要指wait、notify、notifyAll方法,使用这三个方法时必须处于synchronized方法或代码块中
         否则就会抛出IllegalMonitorStateException。这是因为调用这几个方法必须拿到当前对象的监视器monitor对象
+
+        4.使用场景
+            synchronize(this)
+            synchronize(object)
+            synchronize(A.class)
+            synchronize修饰函数
+            synchronize修饰静态函数
+
     4.Volatile和Synchronize区别
         1.Volatile只修饰一个变量，而Synchronize可以通过锁修饰一个方法或者一个代码块
         2.Volatile保证可见性和有序性,而Synchronize保证原子性、可见性和有序性
@@ -169,6 +177,43 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             HandlerThread thread = new HandlerThread("aa");
             thread.start();
             Handler handler = new Handler(thread.getLooper());
+
+        源码：
+            public class HandlerThread extends Thread {
+                private Looper mLooper;
+
+                public HandlerThread(String name) {
+                    super(name);
+                }
+
+                @Override
+                public void run() {
+                    Looper.prepare();//加载Looper对象到当前线程
+                    //synchronized锁住HandlerThread保证获取getLooper前，Looper已经初始化完成
+                    synchronized (this) {
+                        mLooper = Looper.myLooper();
+                        notifyAll();//尝试唤醒getLooper()，使其他等待锁的线程进入进入就绪状态
+                    }
+                    Looper.loop();
+                }
+
+                 public Looper getLooper() {
+                    if (!isAlive()) {
+                        return null;
+                    }
+                    // If the thread has been started, wait until the looper has been created.
+                    synchronized (this) {
+                        while (isAlive() && mLooper == null) {
+                            try {
+                                wait();
+                            } catch (InterruptedException e) {
+                            }
+                        }
+                    }
+                    return mLooper;
+                }
+            }
+
     intentService
         介绍
             是一个封装了HandlerThread的Service,提交任务后会存放到工作队列中,并回调onHandIntent方法执行任务,当队列中的所有任务串行执行完成后，该Service会杀死自己
