@@ -1,0 +1,251 @@
+谷歌实验室：https://developer.android.com/codelabs/android-room-with-a-view-kotlin#0
+room介绍：https://www.jianshu.com/p/815c7db24b6d
+sqlite教程：https://www.runoob.com/sqlite/sqlite-tutorial.html
+
+一、基本介绍
+    定义：room是一个基于SQLite的强大数据库框架
+    优点：
+        1.编译时注解：能够对@Query和@Entity里面的SQL语句等进行验证
+        2.与SQL语句使用更加贴近，降低学习成本
+        3.对Rxjava2和LiveData/协程/Flow的支持
+        4.@Embedded能够减少表的创建
+    特点：
+        1.不能在主线程中操作数据库
+        2.一些不支持的类可以使用类型转换TypeConverters
+二、使用：
+    建立三张表，用户表、鞋表、收藏记录表，用户表和鞋表是多对多的关系
+    基于Room 2.1.0版本
+    1.添加依赖
+        apply plugin: 'kotlin-kapt'
+        dependencies {
+            // room
+            implementation "androidx.room:room-runtime:$rootProject.roomVersion"
+            implementation "androidx.room:room-ktx:$rootProject.roomVersion"
+            kapt "androidx.room:room-compiler:$rootProject.roomVersion"
+            androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
+        }
+        build.gradle添加
+        ext {
+           roomVersion = '2.1.0-alpha06'
+           //... 省略无关
+        }
+    2.创建表
+        注解说明：
+            @Entity: 声明这是一个表(实体)，主要参数tableName表名、foreignKeys外键、indices索引
+            @ColumnInfo:主要用来修改在数据库中的字段名
+            @PrimaryKey:声明该字段主键并可以声明是否可以自动创建
+            @Ignore:声明某个字段只是临时用，不会存储在数据库中
+            @Embedded:用于嵌套，里面的字段同样会存储在数据库中
+
+            其中Embedded应用场景：如用户表中有个变量是address,它是一个类
+                data class Address(
+                    val street:String,val state:String,val city:String,val postCode:String
+                )
+            通常这种情况下，我们想这些字段存储在数据库中有两种方法
+                1.重新创建表进行一对一关联，但是多创建一个表显得麻烦
+                2.在用户表中增加字段，可是使用第二种方法映射出来的对象又显得不面向对象
+            所以Embedded解决了第二种方式中的问题
+
+        用户表：
+            @Entity(tableName = "user")
+            data class User(
+                @ColumInfo(name = "user_account") val account:String //账号
+                ,@ColumInfo(name = "user_pwd") val pwd:String //密码
+                ,@ColumInfo(name = "user_name") val name:String //账号
+                ,@Embedded val address:Address //地址
+                ,@Ignore val State:Int //状态是临时用，不存储到数据库
+            ){
+                @PrimaryKey(autoGenerate = true)
+                @ColumInfo(name = "id")
+                var id:Long = 0
+            }
+        收藏记录表
+            @Entity(
+                tableName = "fav_shoe"
+                ,foreignKeys = [ForeignKey(entity = Shoe::class,parentColums = ["id"],childColums=["shoe_id"])
+                               ,ForeignKey(entity = User::class,parentColums = ["id"],childColums=["user_id"])]
+                ,indices = [Index("shoe_id")]
+            )
+            data class FavouriteShoe(
+                @ColumnInfo(name = "shoe_id") val shoeId:Long //外键，鞋子的id
+                ,@ColumnInfo(name = "user_id") val userId:Long //外键，用户的id
+                ,@ColumnInfo(name = "fav_date") val date:Date //外键，创建日期
+            ){
+                @PrimaryKey(autoGenerate = true)
+                @ColumnInfo(name = "id")
+                var id:Long = 0
+            }
+        鞋表：
+            @Entity(tableName = "shoe")
+            data class Shoe(
+                @ColumnInfo(name = "shoe_name") val name: String // 鞋名
+                , @ColumnInfo(name = "shoe_description") val description: String// 描述
+                , @ColumnInfo(name = "shoe_price") val price: Float // 价格
+                , @ColumnInfo(name = "shoe_brand") val brand: String // 品牌
+                , @ColumnInfo(name = "shoe_imgUrl") val imageUrl: String // 图片地址
+            ) {
+                @PrimaryKey(autoGenerate = true)
+                @ColumnInfo(name = "id")
+                var id: Long = 0
+            }
+    3.创建DAO
+        如果想声明一个Dao,只需要在抽象类或者接口加一个@Dao注解就行
+        增
+            @Dao
+            interface ShoeDao{
+                @Insert(onConflict = OnConflictStrategy.REPLACE)
+                fun insertShoe(shoe:Shoe)
+
+                // 增加多双鞋子,除了List之外，也可以使用数组
+                @Insert(onConflict = OnConflictStrategy.REPLACE)
+                fun insertShoes(shoes: List<Shoe>)
+            }
+        删
+            Dao
+            interface ShoeDao {
+                // 删除一双鞋子
+                @Delete
+                fun deleteShoe(shoe: Shoe)
+            }
+        改
+            @Dao
+            interface ShoeDao {
+                // 省略...
+                // 更新一双鞋
+                @Update
+                fun updateShoe(shoe:Shoe)
+            }
+        查
+            查相比增删改比较复杂，Room的查询很解决原生SQLite语句
+            @Query注解不仅可以声明这是一个查询语句，也可以用来删除和修改，不可以新增
+
+            @Dao
+            interface ShoeDao {
+                // 查询一个
+                @Query("SELECT * FROM shoe WHERE id=:id")
+                fun findShoeById(id: Long): Shoe?
+
+                // 查询多个 通过品牌查询多款鞋
+                @Query("SELECT * FROM shoe WHERE shoe_brand=:brand")
+                fun findShoesByBrand(brand: String): List<Shoe>
+
+                // 模糊查询 排序 同名鞋名查询鞋
+                @Query("SELECT * FROM shoe WHERE shoe_name LIKE :name ORDER BY shoe_brand ASC")
+                fun findShoesByName(name:String):List<Shoe>
+
+                // 配合LiveData 返回所有的鞋子
+                @Query("SELECT * FROM shoe")
+                fun getAllShoesLD(): LiveData<List<Shoe>>
+
+                // 配合LiveData 通过Id查询单款鞋子
+                @Query("SELECT * FROM shoe WHERE id=:id")
+                fun findShoeByIdLD(id: Long): LiveData<Shoe>
+
+                // 配合RxJava 通过Id查询单款鞋子
+                @Query("SELECT * FROM shoe WHERE id=:id")
+                fun findShoeByIdRx(id: Long): Flowable<Shoe>
+
+                // 省略...
+            }
+
+        复合查询：
+            @Dao
+            interface ShoeDao {
+                // 根据收藏结合 查询用户喜欢的鞋的集合 内联查询
+                @Query(
+                    "SELECT shoe.id,shoe.shoe_name,shoe.shoe_description,shoe.shoe_price,shoe.shoe_brand,shoe.shoe_imgUrl " +
+                            "FROM shoe " +
+                            "INNER JOIN fav_shoe ON fav_shoe.shoe_id = shoe.id " +
+                            "WHERE fav_shoe.user_id = :userId"
+                )
+                fun findShoesByUserId(userId: Long): LiveData<List<Shoe>>
+            }
+    4.创建数据库
+        @Database注解声明当前是一个数据库文件，注解中entities变量声明数据库中的表(实体)
+        以及其他的变量，如版本号。同时，获取Dao也必须在数据库类中，编译后，系统会自动创建AppDataBase和xxxDao的实现类
+
+        @Database(entities = [User::class,Shoe::class,FavouriteShoe::class],version = 1,exportSchema = false)
+        abstract class AppDataBase:RoomDatabase() {
+            // 得到UserDao
+            abstract fun userDao():UserDao
+            // 得到ShoeDao
+            abstract fun shoeDao():ShoeDao
+            // 得到FavouriteShoeDao
+            abstract fun favouriteShoeDao():FavouriteShoeDao
+
+            companion object{
+                @Volatile
+                private var instance:AppDataBase? = null
+
+                fun getInstance(context:Context):AppDataBase{
+                    return instance?: synchronized(this){
+                        instance?:buildDataBase(context)
+                            .also {
+                                instance = it
+                            }
+                    }
+                }
+
+                private fun buildDataBase(context: Context):AppDataBase{
+                    return Room
+                        .databaseBuilder(context,AppDataBase::class.java,"jetPackDemo-database")
+                        .addCallback(object :RoomDatabase.Callback(){
+                            override fun onCreate(db: SupportSQLiteDatabase) {
+                                super.onCreate(db)
+
+                                // 读取鞋的集合
+                                val request = OneTimeWorkRequestBuilder<ShoeWorker>().build()
+                                WorkManager.getInstance(context).enqueue(request)
+                            }
+                        })
+                        .build()
+                }
+            }
+        }
+
+    5.封装
+        /**
+         * 用户处理仓库
+         */
+        class UserRepository private constructor(private val userDao: UserDao) {
+            //...
+
+            /**
+             * 登录用户 本地数据库的查询
+             */
+            fun login(account: String, pwd: String):LiveData<User?>
+                    = userDao.login(account,pwd)
+
+            /**
+             * 注册一个用户 本地数据库的新增
+             */
+            suspend fun register(email: String, account: String, pwd: String):Long {
+                return withContext(IO) {
+                     userDao.insertUser(User(account, pwd, email))
+                }
+            }
+
+            companion object {
+                @Volatile
+                private var instance: UserRepository? = null
+                fun getInstance(userDao: UserDao): UserRepository =
+                    // ...
+            }
+        }
+
+三、更多
+    SQLite支持的类型有：NULL、INTEGER、REAL、TEXT、BLOB
+    对于Data类，SQLite还可以将其转化为TEXT、REAL或者INTEGER，如果是Calendar类呢
+    Room还提供了解决方法，使用@TypeConverter注解
+        class Converters {
+            @TypeConverter fun calendarToDatestamp(calendar: Calendar): Long = calendar.timeInMillis
+
+            @TypeConverter fun datestampToCalendar(value: Long): Calendar =
+                    Calendar.getInstance().apply { timeInMillis = value }
+        }
+        然后在数据库声明的时候，加上@TypeConverters::class就行了
+            @Database(...)
+            @TypeConverters(Converters::class)
+            abstract class AppDatabase : RoomDatabase() {
+                //...
+            }

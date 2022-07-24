@@ -1,0 +1,149 @@
+Room关系：https://mp.weixin.qq.com/s?__biz=MzAwODY4OTk2Mg==&mid=2652052515&idx=1&sn=f10b5a01d889214a760b721cd195489f&chksm=808cbc66b7fb3570376ecb0702c67288418cf159b727f51cdbac5ca0e00b6ee9aff5f62c327c&scene=178&cur_album_id=1355322955810799617#rd
+本文基于Room2.2及以上版本，通过数据库表明狗狗和主人的关系
+一、一对一的关系
+   狗狗表
+   @Entiry
+   data class Dog{
+        @PrimaryKey val dogId:Long,
+        val dogOwnerId:Long,
+        val name:String,
+        @ColumInfo(defaultValue = 10)   //列中可以定义默认属性
+        val cuteness:Int,
+        val barkVolume:Int,
+        val breed:String
+   }
+   /**
+    注2.2版本以前我们可以使用foreinKeys
+        @Entiry(foreinKeys = [
+           ForeinKey(
+                entity = Owner::class,
+                parentColumns = ["owenerId"],
+                childColums = ["dogId"]
+           )
+        ])
+       data class Dog{
+            @PrimaryKey val dogId:Long,
+            val dogOwnerId:Long,
+            val name:String,
+            val cuteness:Int,
+            val barkVolume:Int,
+            val breed:String
+       }
+   */
+   @Entity
+   data class DogAndOwner{
+        val owner:Owner,
+        val dog:Dog
+   }
+   为了在SQLite中进行查询，我们需要运行两个查询
+        SELECT * FROM Owner
+        SELECT * FROM Dog WHERE dogOwnerId In(ownerId1,ownerId2,...)
+   要在Room中获取一个List<DogAndOwner>，我们不需要自己去实现上面说的查询和映射
+   只需要使用@Relation注解
+    data class DogAndOwner{
+        @embedded val owner:Owner,
+        @Relation(
+            parentColum = "ownerId",
+            entityColumn = "dogOwnerId"
+        )
+        val dog:Dog
+    }
+    由于Dog有了owner的信息，我们给dog变量增加@Relation注解，指定父级(Owner)上的ownerId列对应dogOwnerId
+    Dao类可被简化成
+        @Trasaction
+        @Query("SELECT * FROM Owner")
+        fun getDogAndOwners():List<DogAndOwner>
+    因为Room会帮我们运行两个表查询请求，因此需要增加@Trasaction注解，表明这两个行为是原子性的
+
+二、一对多的关系
+    假设一个主人可以养多只狗狗，我们创建一个新的类来建模
+    data class OwnerWithDogs{
+        @Embedded val owner :Owner,
+        @relation(
+            parentColumn = "ownerId",
+            entityColumn = "dogOwnerId"
+        )
+        val dogs:List<Dog>
+    }
+    Dao类变成这样
+        @Trasaction
+        @Query("SELECT * FROM Owner")
+        fun getDogAndOwners():List<OwnerWithDogs>
+
+三、对对多的关系
+    假设一个人可以拥有多只狗，而一个狗狗也可以属于多个人
+    要对这个关系进行映射，我们需要建议一个连接表，associative表，这个表用于存储(dogId,OwnerId)的数据对
+    @Entity(primaryKeys = ["dogId","ownerId"])
+    data class DogOwnerCrossRef(
+        val dogId : Long,
+        val ownerId:Long
+    )
+    现在我们想要获取到所有的狗狗和主人的数据,也就是List<OwnerWithDogs>，
+    需要两个SQLite查询，一个查询所有的主人数据，另一个获取Dog和DogOwnerCrossRef表的连接数据
+        SELECT * FROM Owner
+        SELECT
+             Dog.dogId AS dogId,
+             Dog.dogOwnerId AS dogOwnerId,
+             Dog.name AS name,
+             _junction.ownerId
+        FROM
+             DogOwnerCrossRef AS _junction
+        INNER JOIN Dog ON (_junction.dogId = Dog.dogId)
+
+        WHERE _junction.ownerId IN (ownerId1, ownerId2, …)
+    要通过Room来实现这个功能，我们需要更新OwnerWithDogs数据类，
+    并告诉Room我们要使用DogOwnerCrossRef表来获取Dogs数据，我们使用Junction来引用这张表
+    data class OwnerWithDogs(
+        @Embedded val owner:Owner,
+        @Relation(
+            parentColumn = "ownerId",
+            entityColumn = "dogId",
+            associateBy = Junction(DogOwnerCrossRef:class)
+        )
+        val dogs : List<Dog>
+    )
+    Dao类变成这样
+        @Trasaction
+        @Query("SELECT * FROM Owner")
+        fun getDogAndOwners():List<OwnerWithDogs>
+
+四、查询不属于数据库实体的类
+    当使用 @Relation 注解时，Room 会默认从所修饰的属性类型推断出要使用的数据库实体。
+    例如，到目前为止我们用 @Relation 修饰了 Dog (或者是 List<Dog>)，Room 就会知道如何去对该类进行建模，以及知道要查询的到底是哪一行数据
+    如果我们想让该查询返回一个不同的类型，比如Pup这样不是一个数据库实体，但是包含了一些字段的对象，我们可以在 @Relation 注解中指定要使用的数据库实体:
+
+        data class Pup(
+             val name: String,
+             val cuteness: Int = 11
+        )
+        data class OwnerWithPups(
+             @Embedded val owner: Owner,
+             @Relation(
+                  parentColumn = "ownerId",
+                  entity = Dog::class,
+                  entityColumn = "dogOwnerId"
+             )
+             val dogs: List<Pup>
+        )
+
+五、查询数据实体中特定列的数据
+    如果我们只想从数据库实体中返回特定的列，您需要通过在 @Relation 中的 projection 属性中定义要返回哪些列。
+    例如，假如我们只想获取 OwnerWithDogs 数据类中所有狗的名字，
+    由于我们需要用到 List<String>，Room 不能推断出这些字符串是对应于狗的品种呢还是狗的名字，因此我们需要在 projection 属性中指名
+    data class OwnerWithDogs(
+         @Embedded val owner: Owner,
+         @Relation(
+               parentColumn = "ownerId",
+               entity = Dog::class,
+               entityColumn = "dogOwnerId",
+               projection = ["name"]
+         )
+         val dogNames: List<String>
+    )
+
+六、Room2.2新增功能
+    1.支持从文件或者配置中创建数据库
+        Room.databaseBuilder(appContext,TestDatabase.class,"Sample.db")
+            .createFromFile(File("mypath"))
+            //.createFromAsset("database/myapp.db")
+            .build
