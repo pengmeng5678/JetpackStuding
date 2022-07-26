@@ -64,7 +64,7 @@ dependencies {
 
     // Architecture components
     implementation deps.lifecycle.runtime
-    implementation 'androidx.room:room-common:2.3.0'
+    implementation 'androidx.room:room-common:2.2.0'
     annotationProcessor deps.lifecycle.compiler
     implementation deps.room.runtime
     annotationProcessor deps.room.compiler

@@ -312,7 +312,7 @@
                     .flowOn(Dispatchers.IO)
                     .onCompletion { ... }
 
-六、协程与Retrofit、Room协作
+六、协程与结合不同类型的数据源协作
     Retrofit 从 2.6.0 开始支持 suspend 方法，Room 从 2.1.0 开始支持 suspend 方法。
     1.单次操作
         如果使用Retrofit从远程数据源获取数值，直接将方法标记为suspend方法即可
@@ -355,3 +355,8 @@
                 //如果API不会再有更新，则使用awaitClose彻底关闭这条数据通道
                 awaitClose{api.unregister(callback)}
             }
+
+七、协程与Room协作
+    https://mp.weixin.qq.com/s?__biz=MzAwODY4OTk2Mg==&mid=2652058452&idx=2&sn=2ba868c5bc443d2ad185fed8c39ade41&chksm=808c9311b7fb1a07ba59ef3cf21c7ee137eeea20ec2542529a007cb97b0daf56145fe9cb5c31&scene=178&cur_album_id=1355322955810799617#rd
+    Room2.1版本支持对协程的支持
+    Room2.2我们通过 Flow 为读操作加入了可观察性，当数据库中的数据有变化时它可以使您收到通知

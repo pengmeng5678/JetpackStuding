@@ -6,9 +6,20 @@
     面试问答: https://juejin.im/post/5b8f15e26fb9a01a031b12d9
     面试准备: https://www.jianshu.com/p/a1a68a15ddde
 
-一、Java面试题
-    1.GC机制
+一、Java基础
+    1.HashMap
+        1.简述：
+        2.hash冲突和扩容
+        3.put流程：
+        4.和hashTable区别
 
-二、网络面试题
-三、Android面试题
-四、源码分析
+    2.Java内存模型
+        1.volatile
+
+二、Android基础
+
+三、网络面试题
+
+四、开源框架源码分析
+
+五、性能优化/jetpack/Kotlin协程/组件化/插件化
