@@ -1,0 +1,131 @@
+一.泛型
+    1.作用与定义
+        定义：JDK1.5，推出泛型
+        作用：
+            1.可以写出更加灵活通用的代码
+            2.将安全性检查由运行期提前到编译期，解决类型容器安全问题
+    2.通配符与嵌套
+    3.泛型上下边界
+        https://blog.csdn.net/hhllf61/article/details/108443398?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1.pc_relevant_default&spm=1001.2101.3001.4242.2&utm_relevant_index=4
+        1) 常用的 T，E，K，V等泛型字母为有类型，类型参数赋予具体的值
+
+        2) 无界通配符?未知类型  类型参数赋予不确定值，任意类型
+            ?是通配符（占位符），可以表示任意一个，T只是一种替代，只能表示其中一个
+            假设有A，B，C三个类
+            <?>可以是A，B，C任意一个,每一个<?>之间没有关联
+            <T>如果确定了是A那之后的都是A，每一个<T>代表的是相同的
+        3) 上界通配符 < ? extends E>
+            能够接收E类或者E类的子类,上边界通配符直接使用add()方法受限，但是可以用来获取各种数据类型的数据
+        4) 下界通配符 < ? super E>
+            下边界通配符使用get()方法受限（不使用强转），但是可以添加特定类型的值
+    4.Rxjava深入理解泛型
+        泛型分为:
+        1.自定义泛型接口 interface Observer<T>
+        2.泛型类 class ImplObserver<T> implements Observer<T>
+        3.泛型方法 <T> Observer<T> call(T t)
+        说一下泛型的作用域:
+            如果将泛型声明放在泛型接口,泛型类上,则该泛型在该类中就是确定的了,如果将泛型声
+        明放在了泛型方法上,则该泛型只在该方法中有效,如果泛型方法上声明的泛型类型和类或
+        接口中声明的泛型一致,则会在该方法中隐藏类或接口上的泛型
+
+        //创建被观察者
+        public class ImplObservable<T> implements Observable<T>{
+            T t;
+            private ImplObservable(T t){
+                this.t = t;
+            }
+            public static <T> Observable<T> create(T t) {
+                return new ImplObservable<T>(t);
+            }
+        }
+        Observable<Student> create = ImplObservable.create(new Student());
+        //转换方法T转R
+        public interface Func1<T,R> {
+            R call(T t);
+        }
+        创建map方法
+        public <R> Observable<R> map(Func1<T, R> fun1) {
+            Observable<R> ob = ImplObservable.create(fun1.call(t));
+            return ob;
+        }
+        //
+        public Observable<T> next(Action<T> action) {
+            action.callAction(t);
+            return this;
+        }
+
+二、注解
+    1.注解
+        定义：ANNOTATIONS,注解将元信息与定义相关联
+        作用：1.注解确保编码的正确性；2.影响代码生成的注释@inline；3.java注解依赖特定的name-value对来初始化他们的元素
+            //定义注解
+            @interface Source{
+                public String URL();
+                public String mail();
+            }
+            //使用方式
+            @Source(URL = "http://coders.com/"
+
+    2.元注解
+        定义：用于定义注解的注解
+        作用：定义注解的作用范围，使用在什么元素上
+        种类：四种
+            @Retation:保留的范围，默认值为CLASS,可选值有三种：SOURCE,只在源码中可用；CLASS，在源码和字节码中可用；RUNTIME,在源码、字节码、运行时都可用
+            @Target:用于修饰哪些程序元素，如TYPE,METHOD,CONSTRUCTURE,FIELD,PARAMETER,未标注表示可以修饰所有
+            @Inherited:是否可以被继承，默认为false
+            @Documented:是否会保存到Javadoc文档中
+
+    3.自定义注解
+        @Retention(RetentionPolicy.RUNTIME)@Target(ElementType.FIELD)
+        public @interface TestAnnotation {
+            String value();
+            String[] value2() default "value2";
+        }
+
+    4.APT
+        定义：Anotation Processing Tool，编译时注解处理器，Javac的一个工具，核心类是AbstractProcessor类
+        作用：APT可以用来在编译时扫描和处理注解，
+             通过 APT 可以获取到注解和被注解对象的相关信息，在拿到这些信息后我们可以根据需求来自动的生成一些代码，省去了手动编写
+        使用场景：ButterKnife,EventBus,Dagger2,ARouter等开源框架
+        如何构建APT项目：
+            1.至少需要两个Java Library模块组成：
+                一个Annotation模块
+                一个Compiler模块(Compiler模块依赖Annotation模块),
+                    且App模块和其他业务模块都需要依赖 Annotation 模块
+                    同时需要通过 annotationProcessor 依赖 Compiler 模块
+                    app 模块的 gradle 中依赖关系如下
+                        implementation project(':annotation')
+                        annotationProcessor project(':factory-compiler')
+
+    5.插桩
+        定义：将一段代码插入或者替换原本的代码
+        作用:利用注解标记需要插桩的方法，结合编译后的字节码帮助我们自动插入，这种AOP思想让我们只需要关注插桩代码本身
+        字节码插桩：在我们编写的源码编译成字节码(class)后，在Android下生成dex之前修改Class文件，修改或者增强原有代码逻辑的操作
+        应用场景：QQ空间《热修复解决方案》中利用 Javaassist 库实现向类的构造函数中插入一段代码解决 CLASS_ISPREVERIFIED 问题
+        字节码操作框架：ASM,Javaassist。(根据Class字节码的规则格式，通过字节码操作框架对字节码进行修改)
+        AS插件：ASM Bytecode Viewer
+
+    6.反射
+        https://www.jianshu.com/p/f67182a482eb
+        定义：反射是一种机制，利用该机制可以在程序运行过程中对类进行解剖并操作类中的方法、属性、构造方法等成员
+        实现步骤：
+            1.获取Class字节码对象
+            2.获取你要操作对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
+            如果操作是private类型，就提前设置允许暴力操作，setAccessible(true)
+            public class Person {
+                private String name;
+                private int age;
+                private String msg="hello wrold";
+                public Person() {}
+                public void fun(String name,int age) {
+                    System.out.println("我叫"+name+",今年"+age+"岁");
+              }
+            }
+
+            Class c = Class.forName("com.tengj.reflect.Person");
+            Object o = c.newInstance();
+            Method method = c.getMethod("fun", String.class, int.class);
+            method.invoke(o, "tengj", 10);
+
+三、并发编程
+    1.

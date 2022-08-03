@@ -61,4 +61,24 @@ http://liuwangshu.cn/tags/ClassLoader/
 
 6.自定义类加载器
     对于静态字段,只有直接定义这个字段的类才会被初始化,因此通过其子类来引用父类中定义的静态字段,只会触发父类的初始化而不会触发子类的初始化
+
 7.Android ClassLoader
+
+    1、JVM ClassLoader和Android ClassLoader区别：
+        JVM ClassLoader主要加载jar和class文件
+        Android ClassLoader主要加载dex文件
+
+    2、Android ClassLoader分类
+        BootClassLoader：和java的BootClassLoader不一样，它并不是由C/C++实现，而是由java实现的
+        DexClassLoader：可以加载dex及包含dex的压缩文件(apk和jar)
+        PathClassLoader:主要加载系统类和应用程序的类
+
+8.类加载器启动的时机
+    类加载器不需要某个类"首次主动使用"时再加载它，JVM规范运行类加载器在预料某个类要被使用时就预先加载它
+
+9.从哪些地方启动类加载器
+    1.本地磁盘
+    2.网上加载.class文件，Applet
+    3.从数据库中
+    4.压缩文件中，ZAR,JAR
+    5.从其他文件生成的，JSP应用

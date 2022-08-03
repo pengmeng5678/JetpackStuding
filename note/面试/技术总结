@@ -14,9 +14,59 @@
         4.和hashTable区别
 
     2.Java内存模型
-        1.volatile
+        1.定义
+        2.解决什么问题：屏蔽掉各种硬件和操作系统的内存访问差异
+        3.三大性质
+        4.volatile和sychrounize
+
+    3.JVM
+        1.Dalvik和ART虚拟机的区别
+        2.JVM类加载机制(双亲委派、java JVM、Android JVM、类加载流程)
+        3.JVM垃圾回收
+            检测垃圾
+                GcRoots引用链
+                java运行时数据区域
+                软引用、弱引用、虚引用区别
+                对象死亡宣告
+                方法区的回收
+            回收垃圾
+                垃圾回收算法及对应的特点(标记清除、复制、标记整理、分代收集)
+                分代手机算法的工作流程(新生代、老年代、永久代)
+                垃圾回收器的分类
+                GC触发的时机(minor GC，Major Gc两种GC)
+
+    4.泛型、反射、注解
+        泛型：
+        反射：
+          1、定义：
+          2、作用：
+          3、相关类：Class、Field、Method、Construct
+        注解：
+
+    5.多线程和线程池
+
+    6.HTTP、HTTPS、TCP/IP、Socket
+
+    7.设计模式
+        面向对象六大设计原则
+        26种设计模式
 
 二、Android基础
+    1.Handler机制
+        定义、作用、工作原理、ThreadLocal、HandlerThread、IntentService
+
+    2.自定义View
+        流程
+        事件分发机制
+        动画
+        绘制原理
+
+    3.性能优化
+        卡顿优化
+        内存优化(内存泄露、内存溢出)
+        网络优化(https)
+
+    4.MVC/MVP/MVVM
 
 三、网络面试题
 
