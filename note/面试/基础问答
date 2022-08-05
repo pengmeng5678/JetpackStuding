@@ -113,5 +113,11 @@
             给a重新赋值，并不是原来"A"对象发生了改变，而是重新创建了一个对象"B",令a引用新的对象
 
     finally:
-        通常与try-catch配合使用，一般情况下,不管是否抛出异常finally最终都会被执行，但是以下几种情况是特例：
-            1.
+        通常与try-catch配合使用，一般情况下,不管是否抛出异常finally最终都会被执行(即使try或者catch代码块中有return语句)，但是以下几种情况是特例：
+            1.try-catch执行之前进程终止了，如System.exit(0)
+            2.try或者catch代码块中，进程终止了，如System.exit(0)
+
+
+    finalize:
+        是object类中的方法，当重写了finalize方法，在垃圾回收之前会回调一次，如果finalize方法中类对象与GcRoots节点建立了引用链的关系，这个类就不会被回收
+        通常使用场景是在finalize方法中对象回收前释放一些资源
