@@ -14,6 +14,7 @@
             getY获取当前点击点的Y坐标到距离控件顶边的距离,即视图坐标
             getRawX获取点击事件距离整个屏幕左边的距离,即绝对坐标
             getRawY获取点击事件距离整个屏幕顶边的距离,即绝对坐标
+
     2.Activity、Window和View的关系(Activity的构成)
            Activity的setContentView会调用getWindow().setContentView(),其中getVindow会返回一个Window的实现类对象PhoneWindow
         PhoneWindow的setContentView会创建一个DecorView(通过installDecor方法会调用generateDecor方法)，DecorView是PhoneWindow的内部类,继承了FrameLayout
