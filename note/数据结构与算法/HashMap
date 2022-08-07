@@ -1,6 +1,7 @@
 http://www.importnew.com/7099.html
 https://juejin.im/post/5dee6f54f265da33ba5a79c8
 1.简单介绍一下hashMap工作原理
+    基于MAP接口实现的一种键值对的存储结构
     特点：底层使用数组+链表实现，采用键值对方式存储，key必须唯一，value允许重复，存取无序,key和value可以传入null
 
     hashMap基于hashing原理,我们通过put和get方法储存和获取对象。
