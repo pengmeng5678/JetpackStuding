@@ -1,5 +1,10 @@
 http://www.importnew.com/7099.html
 https://juejin.im/post/5dee6f54f265da33ba5a79c8
+hashMap组成元素
+    size:hashMap元素的个数
+    loadFactor:负载因子，默认0.75
+    threshold:下一次扩容时的阈值 threshold = 容器容量capacity * 负载银子loadFactor
+    Node<K,V>[] table:底层数组，充当哈希表的作用，总长度时2的N次幂
 1.简单介绍一下hashMap工作原理
     基于MAP接口实现的一种键值对的存储结构
     特点：底层使用数组+链表实现，采用键值对方式存储，key必须唯一，value允许重复，存取无序,key和value可以传入null
@@ -133,7 +138,7 @@ https://juejin.im/post/5dee6f54f265da33ba5a79c8
       1.hash碰撞时，通过拉链法解决碰撞冲突，通过Entry内部的next变量我们知道使用的是链表。
           当多个线程put数据，有两个或以上的key发生hash碰撞时，获取到了同一个链表的结点,那么addEntry必然会发生数据丢失
       2.hashMap扩容时会调用非同步的resize方法，扩容时会生成一个新容量的数组，
-          然后对原数组的键值对重新进行计算并写入到新的数组中，之后指向新的数据。
+          然后对原数组的键值对重新进行计算索引并写入到新的数组中，之后指向新的数据。
           当多个线程同时put数据时，某个时刻发生扩容resize，那么最终只有一个线程生成的新数组赋值给了table变量，其他线程的数据都会丢失。
 
 5.HashMap的容量为什么是2的n次方

@@ -45,8 +45,41 @@ https://www.jianshu.com/p/cf57726e77f2
         synchronize具备有序性，因为锁在同一个时刻只能有一个线程进行获取，其他线程只能等待,因此synchronize语义要求线程访问共享变量时只能串行执行
         volatile包含禁止指令重排序的语义，具有有序性
 
-4.synchrounized实现原理和优化项
+4.volatile的语义
+    1.保证可见性：保证不同线程对该变量操作内存的可见性，但是不等同于volatile变量并发操作的安全性
+        线程写volatile变量的过程
+            1.改变线程工作内存中volatile变量副本的值
+            2.将改变后的副本的值从工作内存刷新到主内存
+        线程读volatile变量的过程
+            1.从主内存中读取volatile的最新值拷贝到线程中工作内存
+            2.从工作内存中读取volatile变量的副本
 
+        注意：多个线程把更新后的变量值同时刷新到主内存，可能导致不是预期结果，如
+            定义volatile int count = 0,2个线程分别执行count++，各执行500次，最终的执行结果小于1000
+            因为执行一次count++的结果需要经历如下步骤：
+                1.线程从主内存读取到最新的count值
+                2.执行引擎把count值加1，并赋值给工作内存
+                3.线程工作内存把count值刷新给主内存
+
+                有可能某一个时刻，两个线程执行步骤1时，读取到的值都是100，那两个线程执行count++后，刷新到主内存的值都是101
+
+    2.禁止指令重排序
+        举例
+        volatile boolean initialized = false ;
+        // 下面代码线程 A 中执行读取配置信息，当读取完成后将 initialized 设置为 true 以通知其他线程配置可用
+        doSomethingReadConfg();
+        initialized = true ;
+
+        如果定义 initialized 变量时没有使用 volatile 修饰，就有可能会由于指令重排序的优化，
+        导致线程 A 中最后一句代码 "initialized = true" 在 “doSomethingReadConfg()” 之前被执行
+
+        volatile实现禁止指令重排序的实现原理是通过内存屏障实现的：
+        volatile使用场景，一次写入，多处读取
+
+5.synchrounized实现原理和优化项
+    使用synchrounized包裹的代码块有如下规则
+        1.读数据：当线程进入到该区域读取最新变量信息时，对数据的读取只能从主内存中读取，保证读到的时最新值
+        2.写数据：在同步代码块对变量的写操作，在离开同步代码块后，会将工作内存的数据刷新到主内存中，保证更新的数据对其他线程的可见性
     总结
         synchronized具有原子性、可见性、有序性
         volatile具有可见性和有序性
