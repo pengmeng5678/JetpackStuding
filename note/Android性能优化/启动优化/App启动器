@@ -1,0 +1,11 @@
+https://github.com/NoEndToLF/AppStartFaster.git
+https://github.com/idisfkj/android-startup/blob/master/README-ch.md
+一、你是如何处理Android的启动优化的
+二、什么是有向无环图、拓扑排序
+    1.DAG定义：顶点、边、入度、出度
+    2.拓扑排序算法原理
+    3.countlatch
+三、App启动器解决了哪些问题
+    1.任务依赖
+    2.线程管理
+    3.阻塞问题

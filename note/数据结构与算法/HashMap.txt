@@ -149,7 +149,7 @@ hashMap组成元素
 6.hashMap和hashTable区别
     1.线程安全与容器整体结构
         hashMap非线程安全,可以存储null键和值
-        hashTable线程安全,不可以存储null键和值
+        hashTable线程安全(核心方法有sychrounize修饰),不可以存储null键和值
     2.容器设定和扩容机制
         hashMap初始化容量是16，以2的整数倍进行扩容
         hashTable初始化容量是11，以2的整数倍+1进行扩容
@@ -158,10 +158,17 @@ hashMap组成元素
         hashTable是除留余数法计算存储位置的(容量不是2的n次方，不能用位运算替代模运算)，
         int index = (hash & 0x7FFFFFFF) % tab.length
 
-7.hashMap中的key支持/适合用什么数据
+7.hashTable和concurrentHashMap区别
+    hashTable通过给每个方法加上sychrounize关键字保证了线程安全，避免多线程环境下get方法死锁
+    但是这个锁的是hashTable实例，导致效率下降
+
+    concurrentHashMap不会对每个方法加锁，只对链表或者红黑树结点加锁，可以提高效率的同时也避免了死锁
+
+
+8.hashMap中的key支持/适合用什么数据
     key是用于计算hash值的(一个int值，int范围是[0-table.length))
 
-8.HashMap为什么引入红黑树
+9.HashMap为什么引入红黑树
     两个原因：
         1.数组扩容时死锁
             当两个线程同时执行扩容操作时，可能造成A和B两个节点互相指向；
@@ -171,7 +178,7 @@ hashMap组成元素
             红黑树的时间复杂度O(log n)，红黑树根节点的左边节点值一定小于右边节点值
 
 
-9.hashMap小结
+10.hashMap小结
     HashMap是基于哈希表实现的，用Entry[]来存储数据，而Entry中封装了key、value、hash以及Entry类型的next
     HashMap存储数据是无序的
     hash冲突是通过拉链法解决的
