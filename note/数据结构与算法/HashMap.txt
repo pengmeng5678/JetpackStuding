@@ -6,6 +6,7 @@ hashMap组成元素
     threshold:下一次扩容时的阈值 threshold = 容器容量capacity * 负载银子loadFactor
     Node<K,V>[] table:底层数组，充当哈希表的作用，总长度时2的N次幂
 1.简单介绍一下hashMap工作原理
+    基于MAP接口实现的一种键值对的存储结构
     特点：底层使用数组+链表实现，采用键值对方式存储，key必须唯一，value允许重复，存取无序,key和value可以传入null
 
     hashMap基于hashing原理,我们通过put和get方法储存和获取对象。
@@ -49,7 +50,7 @@ hashMap组成元素
 
 3.hashMap的Put原理
     HashMap使用hashMapEntry<K,V>对象的数组来存放数据。put数据时有以下几个步骤
-        1.判断key是否为空值，如果为空值就放在table[0]
+        1.如果tabel为空或者length为0，就resize方法初始化table;判断key是否为空值，如果为空值就放在table[0]
         2.通过哈希算法计算key的hash值，通过hash值获取数组存放位置的索引
         3.遍历原数组，如果数组中存在相同的key并且hash值也一样,就返回一个旧值,并且替换旧值
         4.如果不是同一个key,并且hash值没有碰撞,那么就直接存入数组;
@@ -157,7 +158,20 @@ hashMap组成元素
         hashTable是除留余数法计算存储位置的(容量不是2的n次方，不能用位运算替代模运算)，
         int index = (hash & 0x7FFFFFFF) % tab.length
 
-7.hashMap小结
+7.hashMap中的key支持/适合用什么数据
+    key是用于计算hash值的(一个int值，int范围是[0-table.length))
+
+8.HashMap为什么引入红黑树
+    两个原因：
+        1.数组扩容时死锁
+            当两个线程同时执行扩容操作时，可能造成A和B两个节点互相指向；
+            然后get节点时，有个for循环只要节点不为空，且AB节点互相指向，就会在链表中一直执行遍历操作，无法退出循环，造成死锁
+        2.hash冲突过多，链表太长导致get效率变低
+            链表的时间复杂度O(n)
+            红黑树的时间复杂度O(log n)，红黑树根节点的左边节点值一定小于右边节点值
+
+
+9.hashMap小结
     HashMap是基于哈希表实现的，用Entry[]来存储数据，而Entry中封装了key、value、hash以及Entry类型的next
     HashMap存储数据是无序的
     hash冲突是通过拉链法解决的
