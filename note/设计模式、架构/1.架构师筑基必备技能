@@ -75,6 +75,12 @@
             @Inherited:是否可以被继承，默认为false
             @Documented:是否会保存到Javadoc文档中
 
+        应用场景：
+            根据注解的保留级别不一样，注解作用于源码、字节码、运行时三种场景，具体的应用技术如下：
+                1.源码场景：应用技术：APT,在编译期能够获取注解与注解声明的类，包括类中所有成员信息，一般用于生成额外的辅助类
+                2.字节码场景，应用技术：字节码增强，在编译出Class后，通过修改Class数据以实现修改代码逻辑目的。对于是否需要修改的区分或者修改为不同逻辑的判断可以使用注解。
+                3.运行时，应用技术：反射，在程序运行过程中，通过反射技术动态获取注解与其元素，从而完成不同的逻辑判定
+
     3.自定义注解
         @Retention(RetentionPolicy.RUNTIME)@Target(ElementType.FIELD)
         public @interface TestAnnotation {
