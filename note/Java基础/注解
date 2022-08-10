@@ -1,4 +1,9 @@
 https://blog.csdn.net/gdutxiaoxu/article/details/70822023
-https://blog.csdn.net/lmj623565791/article/details/43452969k
-
+一、注解
+    定义：ANNOTATIONS,注解将元信息与定义相关联
+    作用：
+        1.注解确保编码的正确性
+        2.影响代码生成的注释@inline
+二、元注解
+三、自定义注解
 
