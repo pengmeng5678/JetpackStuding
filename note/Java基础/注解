@@ -1,9 +1,130 @@
 https://blog.csdn.net/gdutxiaoxu/article/details/70822023
 一、注解
-    定义：ANNOTATIONS,注解将元信息与定义相关联
-    作用：
-        1.注解确保编码的正确性
-        2.影响代码生成的注释@inline
-二、元注解
-三、自定义注解
+    定义：java注解又称Annotation,是JDK5.0引入的一种注释机制。
+         注解是元数据的一种形式，提供有关于程序但是不属于程序本身的数据，注解对他们注解的代码的操作没有直接影响
 
+    声明：java中所有的注解，默认实现Annotation接口
+            package java.lang.annotation
+            public interface Annotation{
+                boolean equals(Object obj);
+                int hashCode();
+                String toString();
+                Class<? extends Annotation> annotationType();
+            }
+
+        与声明一个Class不同的是，注解的声明使用@interface关键字
+            public @interface Lance{
+
+            }
+二、元注解
+    定义：用于定义注解的注解
+    作用：定义注解使用在什么元素上，及注解的使用范围，
+    种类：
+        @Target:注解标记另一个注解，以限制可以应用注解的java元素类型，目标注解指定以下元素类型之一作为其值：
+             ElementType.ANNOTATION_TYPE 可以应用于注解类型
+             ElementType.CONSTRUCTURE 可以应用于构造函数
+             ElementType.FIELD 可以应用于字段或者属性
+             ElementType.METHOD 可以应用于方法级注解
+             ElementType.PACKAGE 可以应用于包声明
+             ElementType.LOCAL_VARIABLE 可以应用于局部变量
+             ElementType.PARAMETER 可以应用于参数的注解(可以替换枚举节省内存)
+             ElementType.TYPE 可以应用于类的任何元素
+
+        @Retention:用于标记注解的存储方式(使用的范围)
+            RetentionPolicy.SOURCE,标记的注解只保留在源码中级别中，并被编译器忽略；
+            RetentionPolicy.CLASS，会保留在class文件中，但是会被虚拟机忽略(即无法在运行期反射获取注解),在源码和字节码中可用；
+            RetentionPolicy.RUNTIME,标记的注解由JVM保留，在源码、字节码、运行时都可以使用它
+
+        @Inherited:是否可以被继承，默认为false
+        @Documented:是否会保存到Javadoc文档中
+
+三、自定义注解示例
+      1.尝试自定义注解
+        @Target(ElementType.FIELD)              //只能在属性上标记该注解
+        @Retention(RetentionPolicy.SOURCE)      //标记的注解只保留在源码中级别中
+        public @interface Lance {
+            String value();         //无默认值
+            int age() default 1;    //有默认值
+        }
+
+        注：在使用注解时，如果定义的注解中的元素类型无默认值，则必须进行传值
+        @Lance("帅") //如果只存在value元素需要传值的情况，则可以省略：元素名
+        @Lance(value = "帅",age = 2)
+        int i;
+
+      2.Android开发中，support-annotations与androidx.annotations均有提供IntDef等注解
+        @Retention(RetentionPolicy.SOURCE)                //标记的注解只保留在源码中级别中
+        @Target(ElementType.ANNOTATION_TYPE)              //只能在注解上标记该注解
+        public @interface IntDef {
+            int[] value() default {};
+            boolean flag() default false;
+            boolean open() default false;
+        }
+
+四、注解的应用场景
+       根据@Retation元注解的保留级别不一样，注解作用于源码(SOURCE)、字节码(CLASS)、运行时(RUNTIME)三种场景，具体的应用技术如下：
+           1.源码场景：
+                IDE语法检查：
+                    如通过注解取代枚举，实现方法入参限制。
+                    java中的枚举实质时特殊单例的静态成员变量，在运行期所有枚举类作为单例加载到内存，比常量多5-10倍内存占用
+                    示例：我们定义方法test，方法接受teacher参数，需要在LANCE、ALVIN二选一，我们使用IntDef自定义注解
+                    public static final int LANCE = 1;
+                    public static final int ALVIN = 2;
+
+                    @IntDef(value={LANCE,ALVIN})
+                    @Retention(RetentionPolicy.SOURCE)
+                    @Target(ElementType.PAREMETER)
+                    public @interface Teacher(){
+
+                    }
+                    //定义方法,此时我们限定传参只能是IntDef限定的LANCE或ALVIN，否则就会编译报错
+                    public void test(@Teacher int teacher){
+
+                    }
+
+                APT：
+                    定义：Anotation Processing Tool，编译时注解处理器，Javac的一个工具，核心类是AbstractProcessor类
+                    作用：APT可以用来在编译时扫描和处理注解，
+                         通过 APT 可以获取到注解和被注解对象的相关信息，在拿到这些信息后我们可以根据需求来自动的生成一些代码，省去了手动编写
+                    使用场景：ButterKnife,EventBus,Dagger2,ARouter等开源框架
+                    如何构建APT项目：
+                        1.至少需要两个Java Library模块组成：
+                            一个Annotation模块
+                            一个Compiler模块(Compiler模块依赖Annotation模块),
+                                且App模块和其他业务模块都需要依赖 Annotation 模块
+                                同时需要通过 annotationProcessor 依赖 Compiler 模块
+                                app 模块的 gradle 中依赖关系如下
+                                    implementation project(':annotation')
+                                    annotationProcessor project(':factory-compiler')
+           2.字节码场景：
+                Retention定义为CLASS的注解，会保留在class文件中，但是会被虚拟机忽略(即无法在运行期通过反射获取注解)
+                字节码增强/AspectJ/热修复Roubust，在编译出Class后，通过修改Class数据以实现修改代码逻辑目的。
+
+                示例：如果我们所有的方法需要判断是否登录，那可以通过AOP面向切面编程的方式，对需要切面的方法进行注解
+                然后在编译后的字节码中获取方法注解，在操作字节码时，根据注解执行不同的逻辑，避免对所有方法执行if-else操作
+                    @Target(ElementType.METHOD)
+                    @Retention(RetentionPolicy.CLASS)
+                    public @interface Login{
+
+                    }
+
+                    @Login
+                    public void jumpA(){
+                        startActivity(new Intent(this,AActivity.class))
+                    }
+                    public void jumpB(){
+                        startActivity(new Intent(this,BActivity.class))
+                    }
+
+                    //Class字节码操作
+                    @Login
+                    public void jumpA(){
+                        if(this.isLogin){
+                            startActivity(new Intent(this,LoginActivity.class))
+                        }else{
+                            startActivity(new Intent(this,AActivity.class))
+                        }
+                    }
+
+           3.运行时场景：
+                反射，在程序运行过程中，通过反射技术动态获取注解与其元素，从而完成不同的逻辑判定
