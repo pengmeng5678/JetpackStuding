@@ -14,10 +14,30 @@ https://www.jianshu.com/p/f67182a482eb
         一个类(不是一个对象)在JVM虚拟机中只会有一个实例
         获得Class对象的方式：
             1.通过类名获取   ：类名.class
+                Class<?> kclass = int.class;
+                Class<?> classInt = Integer.TYPE;
             2.通过对象获取   ：对象.getClass()
+                StringBuilder str = new StringBuilder("123")
+                Class<?> kclass = str.getClass();
             3.通过全类名获取  ：Class.forName(全类名)，ClassLoader.loadClass(全类名)
-    2.获取对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
+
+    2.获取对象中的构造方法(Constructor)、创建实例、获取普通方法(Method)、获取属性字段(Field)
+        创建实例的方式：
+            1.使用Class对象的newInstance方法创建class对象对应类的实例
+                Class<?> c = String.class;
+                Object str = c.newInstance();
+            2.先通过Class对象获取指定的Constructor对象，再调用Constructor对象的newInstances创建实例
+                Class<?> c = String.class;
+                Constructor constructor = c.getConstructor(String.class)
+                Object obj = constructor.newInstance("3333")
+                System.out.println(obj)
+
+        获取构造器信息：
+        获取类成员变量信息：
+        获取类方法信息：
+
     3.调用或者修改对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
+        public Object invoke(Object obj,Object...args)
 
 4.应用场景
 
