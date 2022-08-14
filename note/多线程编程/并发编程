@@ -177,7 +177,8 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             HandlerThread thread = new HandlerThread("aa");
             thread.start();
             Handler handler = new Handler(thread.getLooper());
-
+        作用：
+            1.封装了子线程的handler,解决Handler在子线程使用的安全问题
         源码：
             public class HandlerThread extends Thread {
                 private Looper mLooper;
