@@ -1,12 +1,16 @@
 https://www.jianshu.com/p/f67182a482eb
 1.定义
-    反射是一种机制，利用该机制可以在程序运行过程中对类进行解剖并操作类中的方法、属性、构造方法等成员
-    反射是java语言被视为动态语言的关键。
+    Java反射机制是指在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；
+    对于任意一个对象，都能够调用它的任意一个方法和属性；
+    这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。
+    用一句话总结就是反射可以实现在运行时可以知道任意一个类的属性和方法。
 
-2.作用或者功能
-    在运行时构造任意一个类的对象
-    在运行时获取或者修改一个类所具备的的任意方法和属性
-    在运行时调用任意一个对象的方法和属性
+2.反射的优缺点
+    静态编译：在编译时确定类型，绑定对象，即通过
+    动态编译：运行时确定类型，绑定对象。动态编译最大限度发挥了java的灵活性，体现了多态的应用，降低程序耦合度
+
+    优点：可以在运行时动态的创建对象和编译，体现出java语言的灵活性
+    缺点：对性能有影响
 
 3.使用步骤
     1.获取Class字节码对象
@@ -20,6 +24,8 @@ https://www.jianshu.com/p/f67182a482eb
                 StringBuilder str = new StringBuilder("123")
                 Class<?> kclass = str.getClass();
             3.通过全类名获取  ：Class.forName(全类名)，ClassLoader.loadClass(全类名)
+                Class class3 = Class.forName("com.tengj.reflect.ReflectDemo");
+                System.out.println(class3.getName());
 
     2.获取对象中的构造方法(Constructor)、创建实例、获取普通方法(Method)、获取属性字段(Field)
         创建实例的方式：
@@ -32,13 +38,77 @@ https://www.jianshu.com/p/f67182a482eb
                 Object obj = constructor.newInstance("3333")
                 System.out.println(obj)
 
+        获取成员方法信息：
+            // 得到该类所有的方法，不包括父类的
+            public Method getDeclaredMethod(String name, Class<?>... parameterTypes)
+            // 得到该类所有的public方法，包括父类的
+            public Method getMethod(String name, Class<?>... parameterTypes)
+
         获取构造器信息：
+            //  获得该类所有的构造器，不包括其父类的构造器
+            public Constructor<T> getDeclaredConstructor(Class<?>... parameterTypes)
+            // 获得该类所以public构造器，包括父类
+            public Constructor<T> getConstructor(Class<?>... parameterTypes)
+
+            示例：
+                public A(String a,int b){}
+                Constructor constructor = a.getDeclaredConstructor(String.class, int.class);
+
         获取类成员变量信息：
-        获取类方法信息：
+            // 获得该类自身声明的所有变量，不包括其父类的变量
+            public Field getDeclaredField(String name)
+            // 获得该类自所有的public成员变量，包括其父类变量
+            public Field getField(String name)
 
     3.调用或者修改对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
         public Object invoke(Object obj,Object...args)
 
-4.应用场景
+    示例：反射调用Person类的fun方法和msg属性
+        public void fun(String name,int age) {
+            System.out.println("我叫"+name+",今年"+age+"岁");
+        }
 
-5.反射的缺点
+         //先生成class
+        Class c = Class.forName("com.tengj.reflect.Person");
+         //newInstance可以初始化一个实例
+        Object o = c.newInstance();
+        //获取方法
+        Method method = c.getMethod("fun", String.class, int.class);
+        //通过invoke调用该方法，参数第一个为实例对象，后面为具体参数值
+        method.invoke(o, "tengj", 10);
+
+        //获取成员变量
+        //因为msg变量是private的，所以不能用getField方法
+        Field field = c.getDeclaredField("msg");
+        Object o = c.newInstance();
+        //设置是否允许访问，因为该变量是private的，所以要手动设置允许访问，如果msg是public的就不需要这行了。
+        field.setAccessible(true);
+        Object msg = field.get(o);
+        System.out.println(msg);
+
+4.利用反射创建数组
+    可以通过Array.newInstance()创建数组对象
+
+5.练习：利用反射、注解、动态代理实现OnClick与OnLongClick事件的自动注入
+    1.需要定义Onclick和OnLongclick的注解
+        Target是作用于Method
+        Retention是作用于运行时
+
+    2.需要定义个InjectUtils来解析自定义的注解，并实现运行时自动调用注解修饰的方法
+        1.InjectUtils中要传入Activity
+        2.获取这个activity中所有的注解
+        理论上到这一步我们可以通过判断注解+反射获取的方法名来调用这个方法了
+
+    3.为了保障注解使用的扩展性
+        1.我们定义一个新的注解EventType
+            Target是作用于Annotation的，即用于注解OnClick和OnLongClick
+        2.EventType注解要包含两个参数
+            Class对象、注解修饰的方法名称
+            @EventType(listenerType = View.OnClickListener.class, listenerSetter = "setOnClickListener")
+
+    4.优化InjectUtils的解析
+        这样我们通过InjectUtils对注解进行解析的时候
+        1.通过EventType注解进行反射获取注入的点击事件的class和方法名称，而不需要写死方法名称了
+        2.再对EventType注解的OnClick和OnLongClick进行反射获取viewIds
+        3.遍历viewIds,对每个viewId进行反射获取方法
+        4.通过动态代理调用每个注入的方法
