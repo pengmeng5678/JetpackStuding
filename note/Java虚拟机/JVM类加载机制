@@ -7,17 +7,35 @@ http://liuwangshu.cn/tags/ClassLoader/
     类加载器除了用于加载类外,还可以用于确定类在java虚拟机中的唯一性
     即便是同样的字节码,被不同的类加载器加载之后所得到的类,也是不同的(类的Class对象的equals方法,isAssignableFrom,isInstance,instanceOf方法为false)
     通俗的说,要判断两个类是否相同,前提是这两个类必须被同一个类加载器加载,否则这两个类不相同
+
 3.JVM类加载器(ClassLoader)种类
     启动类加载器，Bootstrap ClassLoader,加载jre\lib中的jar文件,或者被-Xbootclasspath参数限定的类
     扩展类加载器,Extensions ClassLoader,加载jre\lib\ext中的jar文件,或者被java.ext.dirs系统变量指定的类
     应用程序类加载器,Application ClassLoader,它负责加载系统类路径java -classpath或者-D java.class.path指定路径下的类库，通过ClassLoader.getSystemClassLoader可以获取到类加载器
     自定义类加载器,通过继承ClassLoader实现,一般是加载我们的自定义类
 
-4.双亲委派模型
+4.Android ClassLoader
+
+    1、JVM ClassLoader和Android ClassLoader区别：
+        JVM ClassLoader主要加载jar和class文件
+        Android ClassLoader主要加载dex文件
+
+    2、Android ClassLoader分类
+        BootClassLoader：主要负责加载Framework层的class文件(如Activity.class),和java的BootClassLoader不一样，它并不是由C/C++实现，而是由java实现的
+        PathClassLoader:用于Android应用程序类加载器(如MainActivity.class)，可以加载指定的dex,以及jar、zip、apk中的classes.dex
+        DexClassLoader：可以加载dex及包含dex的压缩文件(apk和jar)
+
+    3、各种ClassLoader之间的关系
+        ClassLoader抽象类
+        BaseDexClassLoader继承自ClassLoader
+        DexClassLoader和PathClassLoader 都继承自BaseDexClassLoader
+
+5.双亲委派模型
     类加载器Java类如同其它的java类一样,也是要由类加载器来加载的,除了启动类加载器,每个类都有其父类加载器(父子关系由组合类实现,不是继承关系)
     所谓双亲委派是指每次收到类加载请求时,先将请求委派给父类加载器完成(所有的加载最终都会委派到Bootstrap['bʊt'stræp] Classloader)
     如果父类加载器无法完成这个加载(该加载器的搜索范围中没有找到对应的类),子类尝试自己加载
-5.类加载过程
+
+6.JVM类加载过程
     类加载过程分为三个步骤：加载、连接、初始化，其中连接分为验证、准备、解析三个步骤
     一个类从加载到卸载的全过程：加载、验证、准备、解析、初始化、使用、卸载七个步骤
 
@@ -59,19 +77,8 @@ http://liuwangshu.cn/tags/ClassLoader/
             5.初始化一个类的派生类(java虚拟机规范明确要求初始化一个类时,它的超类必须提前完成初始化操作,接口例外)
             6.JVM启动包含main方法的启动类时
 
-6.自定义类加载器
+7.自定义类加载器
     对于静态字段,只有直接定义这个字段的类才会被初始化,因此通过其子类来引用父类中定义的静态字段,只会触发父类的初始化而不会触发子类的初始化
-
-7.Android ClassLoader
-
-    1、JVM ClassLoader和Android ClassLoader区别：
-        JVM ClassLoader主要加载jar和class文件
-        Android ClassLoader主要加载dex文件
-
-    2、Android ClassLoader分类
-        BootClassLoader：和java的BootClassLoader不一样，它并不是由C/C++实现，而是由java实现的
-        DexClassLoader：可以加载dex及包含dex的压缩文件(apk和jar)
-        PathClassLoader:主要加载系统类和应用程序的类
 
 8.类加载器启动的时机
     类加载器不需要某个类"首次主动使用"时再加载它，JVM规范运行类加载器在预料某个类要被使用时就预先加载它

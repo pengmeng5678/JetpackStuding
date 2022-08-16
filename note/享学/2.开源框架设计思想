@@ -1,4 +1,3 @@
-一、AOT/JIT &dexopt与dex2oat(热修复相关)
 一、AOT/JIT &dexopt与dex2oat
     JIT:just in time:
         即时编译，运行时编译，边运行边编译，比如java虚拟机是在运行时，将解释执行的语言（比如字节码）编译成机器指令，以提高运行速度
@@ -39,7 +38,7 @@
 
         ART:Android runtime
             AndroidSDK中有个dx工具将java字节码转换成Dalvik字节码dex
-            Android4.4推出ART，Android5.5全面切换成ART(AOT编译),Android7.0使用AOT+JIT结合的方式
+            Android4.4推出ART，Android5.0全面切换成ART(AOT编译),Android7.0使用AOT+JIT结合的方式
             应用第一次安装时，字节码就会优先编译成机器码，启动速度快，但安装速度慢，且占用内存空间大(10%-20%)
 
     热修复设计之CLASS_ISPREVERIFIED
@@ -68,19 +67,12 @@
 
         2.怎么将外部的dex插入到ClassLoader中
 
-二、热修复原理(热修复相关)
-    1.Android热修复
-        作用：主要用于替换类、资源、so的过程
-        替换方案：
-            资源文件方案：AssertManager
-            类：底层替换和类加载方案
-    2.源码类到机器执行的文件过程
-        主要过程：java -(dex,class)-opt/oat-odex
-        Davlik虚拟机：java-dex-opt-D类型的odex   ,优化后的odex还是需要翻译，JIT
-        ART虚拟机:java-dex-oat-A类型的odex(机器码类型文件),AOT
-        混合模式：java-dex-oat-(D类型的odex,base.art:热缓存,image),高级JIT+全时段AOT
-
 二、热修复原理
+        Android热修复
+            作用：主要用于替换类、资源、so的过程
+            替换方案：
+                资源文件方案：AssertManager
+                类：底层替换和类加载方案
     1.源码类到机器执行的过程
         主要过程：java-class/dex-opt/oat-odex
         DVM:java-dex-opt-D类型的odex，还需要通过JIT翻译
@@ -296,10 +288,11 @@
                 5.初始化
                     执行类构造器<cinit>()方法的过程,父类的<cinit>()方法会先于子类执行
                 6.使用
+                7.卸载
         1.底层替换方案AndFix
         2.类加载器方案QFix,tinker,Sophix
 
-                7.卸载
+
         3.类加载器
             1.启动类加载器Bootstrap ClassLoader
                 主要负责加载存放在%JAVAHOME%/lib 目录中的，或者被-Xbootclasspath 指定的类库到虚拟机内存中，Bootstrap ClassLoader 无法被 java 程序直接引用

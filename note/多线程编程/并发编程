@@ -28,11 +28,26 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
 
      并发：多个事物在同一个时间段内一起执行
      并行：多个事件在同一个时刻同时执行
-2.进程和线程的状态
-    1.介绍
+
+2.线程基本介绍
+    1.线程的状态
         E:\AndroidProject\Studing\AndroidStudingProject\note\多线程编程\线程状态图.jpg
         初始状态、可运行状态、运行状态、阻塞状态、死亡状态
-    2.线程的阻塞
+    2.线程的启动与终止
+        线程启动：
+            1.继承Thread然后start;
+            2.实现runnable然后交给Thread执行
+        Thread和Runnable的区别：
+            Thread是对线程的抽象，Runnable是对任务的抽象，Thread可以接受任意一个Runnable的实例并执行
+        线程终止：
+            自然终止：Runnable方法执行完成
+            stop:暂停、恢复、停止操作分别对应suspend、resume、stop方法，但这些方法由于无法释放锁等副作用，已经废弃
+            中断：线程的interrupt方法(死锁时无法中断)
+                中断好比告诉一个线程A要中断了，但是线程A不会立即停止自己的工作，线程A完全可以不理会这种中断请求
+                因为Java的线程是协作式的，不是抢占式的，线程根据检测自己的中断标志位是否为true来进行响应
+                如线程处于阻塞状态(sleep、join、wait)下,如果判断中断标志位为true就抛出interruptException，然后将中断标志位设置为false
+
+    3.线程的阻塞
         sleep:使得线程在指定时间内进入阻塞状态,不释放锁
         yield:使得线程放弃当前分得的CPU时间,但是不使线程阻塞,即线程仍处于可运行状态,随时可能再次分得CPU时间
         wait/notify:两个方法配套使用,
@@ -44,7 +59,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
               而sleep可在任何位置使用
             4.sleep要捕获异常,而wait不需要
 
-    3.线程的上下文切换
+    4.线程的上下文切换
         多线程编程中,多线程共用资源,计算机对多个线程进行进行调度,因此会在不同的线程中进行切换
         线程就需要保存状态，以便在切换后需要回复到上一个状态运行，这就是线程的上下文切换
         线程上下文切换会消耗资源,造成性能损失。所以我们要尽量避免减少上下文切换，提高程序运行性能
@@ -111,6 +126,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         1.Volatile只修饰一个变量，而Synchronize可以通过锁修饰一个方法或者一个代码块
         2.Volatile保证可见性和有序性,而Synchronize保证原子性、可见性和有序性
         3.Volatile不会造成线程的阻塞,而Synchronize可能会造成线程阻塞
+
 4.Java内存模型和Java内存区域
     具体说明见E:\AndroidProject\Studing\AndroidStudingProject\note\Java虚拟机\Java内存模型
     java内存模型(Java Memory Model,JMM)就是一种符合内存模型规范的,屏蔽了各种硬件和操作系统访问差异,
@@ -127,12 +143,12 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
     原子性：指一个操作是不可中断的,即使是在多线程环境下,一个操作一旦开始就不会被其他线程影响
     可见性: 指一个线程修改了一个共享变量的值之后,其他线程是否能够马上知道这个修改的值
     有序性: 指在单线程的执行代码,我们总是认为代码的执行是按顺序依次执行的。但对于多线程环境,可能是乱序执行的,因为代码编译成机器指令后可能会出现指令重排现象。
+
 6.java的ThreadLocal
     1.简介
         ThreadLocal顾名思义就是线程本地变量。也就是说定义一个ThreadLocal变量,每个线程往这个ThreadLocal变量里面读写的值都是线程隔离,互相之间是不会影响的
         ThreadLocal实例通常来说都是private static类型,用于关联线程
 
-        Thread类中持有ThreadLocal.ThreadLocalMap变量
         Threadlocal类中有个静态内部类Threadlocal.ThreadLocalMap
     2.作用
         ThreadLocal的作用是提供线程内的局部变量,在本地线程内随时随地可取,隔离其他线程。这种局部变量仅仅在线程的生命周期内起作用。
@@ -178,7 +194,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             thread.start();
             Handler handler = new Handler(thread.getLooper());
         作用：
-            1.封装了子线程的handler,解决Handler在子线程使用的安全问题
+            1.封装了子线程的handler,解决Handler在子线程使用的安全问题(synchronized内置锁)
         源码：
             public class HandlerThread extends Thread {
                 private Looper mLooper;
@@ -249,6 +265,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
     生产者和消费者模型保证的是当缓冲区满了的时候，生产者不再生产数据；当缓冲区空的时候,消费者不再消费数据;
     实现机制就是：当缓冲区满时,生产者进入等待状态，当缓冲区空时，让消费者进入等待状态；当生产后数据后,唤醒消费者，当消费数据后，唤醒生产者
     三种实现方式:wait和notify,await和signal(Reentrantlock,Reentrantlock.newCondition),BlockQueue(put,take)
+
 9.Java线程死锁
 10.volatile
     一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。程序运行中的数据都存放在主存中，这样会有一个问题，由于 CPU 的执行速度是要远高于主存的读写速度，所以直接从主存中读写数据会降低 CPU 的效率。为了解决这个问题，就有了高速缓存的概念，在每个 CPU 中都有高速缓存，它会事先从主存中读取数据，在 CPU 运算之后在合适的时候刷新到主存中。
