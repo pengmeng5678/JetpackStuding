@@ -159,4 +159,89 @@ https://blog.csdn.net/qian520ao/article/details/78262289
                     }
                 }
             }
-    7.什么是内存屏障
+
+8.Handler的消息延时是怎么实现的
+    1.消息延时是做了什么特殊处理吗
+        消息队列按消息触发时间排序,越早触发的消息越排在队列的前面
+    2.是发送延时了还是消息处理延时了,如何保证在延时时间点触发消息呢?
+        消息处理延时了,设置epoll_wait的超时时间,使其在特定时间唤醒
+    3.延时的精度怎么样
+        精度不高,因为依赖epoll_wait的超时时间，且上一个消息处理时间不确定,会影响取下一条消息
+
+9.说说idleHandler的原理
+    public static interface idleHandler{
+        boolean queueIdle()
+    }
+    1.idleHandler的作用及调用方式
+        IdleHandler是MessageQueue类中的一个接口
+        当messageQueue中没有消息了，或者所有的消息都还未到触发时间(pending message),就会回调queueIdle
+        当我们在queueIdle中返回false后,那这个queueIdle后面就不会再回调了
+    2.idleHandler的使用场景
+        比如延迟初始化,检测到当handler空闲的时候再给某些模块初始化
+    3.idleHandler的实现原理
+        messageQueue的next方法中会判断当前队列是否空闲了,如果是就会回调queueIdle
+    4.dleHandler的基本使用
+        private MessageQueue.IdleHandler mIdleHandler = new MessageQueue.IdleHandler(){
+            public boolean queueIdel(){
+                return true
+            }
+        }
+10.主线程进入了loop循环了为什么没有ANR
+    1.了解ANR触发的原理
+        在AMS中的子线程中弹出了一个dialog提示用户,应用无响应
+        final void appNotResponding(ProcessRecord app,...){
+            Message msg = Message.obtain()
+            msg.what = SHOW_NOT_RESPONDING_MSG
+            mUiHandler.sendMessage(msg)//Dialog d = new AppNotRespondingDialog();d.show()
+        }
+        触发ANR的原因有以下几种
+            1.主线程耗时操作
+                serviceTimeout
+                broadcastTimeout
+                providerTimeout
+                inputDispatching Timeout
+            2.其他进程占用CPU太多导致当前进程无法获取到CPU时间片
+            3.主线程被其他线程锁死
+        如ServiceTimeout是在realStartServiceLocked中触发的
+        void realStartServiceLocked(ServiceRecord,ProcessRecord app,...){
+            bumpServiceExecutionLocked(r,execInFg,"create")//执行scheduleServiceTimeoutLocked(r.app)
+            app.thread.scheduleCreateService(r,r.serviceInfo)
+        }
+    2.了解应用大致启动流程
+    3.了解线程的消息循环机制
+    4.了解应用和系统的通信过程
+    5.Android中为什么主线程不会因为Looper.loop()里的死循环卡死？
+         Looper的loop函数在一个死循环中通过MessageQueue调用next函数(调用底层的nativePollOnce函数),这个next函数在没有消息时会阻塞休眠,但不会占用CPU资源
+         当有消息过来的时候便会唤醒这个handler处理消息。
+         这个机制就是Linux的epoll模型
+            当没有消息的时候会epoll.wait,等待句柄写的时候再唤醒,这个时候是阻塞的
+            所有的UI刷新都是通过handler发消息,如屏幕刷新就会有句柄写的操作,唤醒上文的wait操作,所以不会卡死
+         既然是死循环又如何去处理其他事务呢？
+            答案是通过创建新线程的方式,ActivityThread的main方法中的activityThread.attach方法就是绑定了Binder线程(ApplicationThread会接收AMS发送过来的Binder消息)
+            该Binder线程通过Handler将Message发送给主线程
+
+11.说说消息屏障
+    1.什么是消息屏障
+        插入一个消息屏障之后,会优先执行这个消息屏障,且后面的同步消息会被阻塞(不会阻塞异步消息),比如每次屏幕刷新信号vSync信号来的时候,就会插入一个消息屏障,待下一次Vsync信号来时优先执行屏幕绘制工作
+        private int postSyncBarrier(long when){
+            sychrounized(this){
+                final int token = mNextBarrierToken++;
+                final Message msg = Message.obtain()
+                msg.markInUse()
+                msg.when = when
+                msg.arg1 = token
+                //给这个msg按时间顺序插入到消息队列中
+                return token
+            }
+        }
+        插入屏障消息的特点
+            1.这个消息没有handler，不需要分发
+            2.这个消息带有时间戳,会影响后面消息的分发
+            3.消息队列是可以插入多个消息屏障的
+            4.没有唤醒线程
+            5.插入屏障消息会返回一个token,便于执行屏障消息后移除这个消息屏幕
+
+    2.什么场景下会使用消息屏障
+        scheduleTraversals方法中会插入一个消息屏障拦截所有同步消息的执行,优先等待执行屏幕刷新工作
+        当Vsync信号来了执行doTraversal方法时就会执行移除屏障消息
+    3.消息屏障实现原理是什么

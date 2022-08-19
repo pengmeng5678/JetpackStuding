@@ -218,7 +218,7 @@ MessageQueue.cpp
 
 6.说说消息屏障
     1.什么是消息屏障
-        插入一个消息屏障之后,会优先执行这个消息屏障,且后面的普通消息会被阻塞(不会阻塞异步消息),比如每次屏幕刷新信号vSync信号来的时候,就会插入一个消息屏障,待下一次Vsync信号来时优先执行屏幕绘制工作
+        插入一个消息屏障之后,会优先执行这个消息屏障,且后面的同步消息会被阻塞(不会阻塞异步消息),比如每次屏幕刷新信号vSync信号来的时候,就会插入一个消息屏障,待下一次Vsync信号来时优先执行屏幕绘制工作
         private int postSyncBarrier(long when){
             sychrounized(this){
                 final int token = mNextBarrierToken++;

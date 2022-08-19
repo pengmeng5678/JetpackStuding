@@ -23,7 +23,7 @@
                 mRemote.transact(START_ACTIVITY_TRANSACTION,data,reply,0)
             }
 
-2.说说TreadLocal的原理
+2.说说ThreadLocal的原理
     1.适用于什么场景
         适用于保存当前线程的局部变量(局部变量只在线程的生命周期内有效),在本地线程内随时随地可取,隔离其他线程。
         Looper的prepare函数,就将Looper对象存放到了当前线程的ThreadLocal中了

@@ -29,6 +29,19 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
      并发：多个事物在同一个时间段内一起执行
      并行：多个事件在同一个时刻同时执行
 
+    并发编程的好处：
+        1.充分利用CPU资源
+        2.提高响应用户的速度
+        2.提高程序的模块化、异步化、简单化(不同线程执行不同的任务)
+    并发编程的缺点
+        1.产生安全性的问题，需要进行加锁，使用不当会严重影响系统性能甚至死锁
+        2.增加内存：OS限制，linux线程数1000个，windows线程数2000个，
+            每个线程都需要分配栈空间(缺省值1M),创建1000个线程占用内存1G
+
+    CPU核心数与线程数的关系
+        一般情况下CPU核心数与线程数是1:1的关系，而intel引入超线程技术后，CPU核心数与线程数是1:2的关系
+        而我们可以创建很多线程的原因是利用了CPU的时间轮转机制
+
 2.线程基本介绍
     1.线程的状态
         E:\AndroidProject\Studing\AndroidStudingProject\note\多线程编程\线程状态图.jpg
@@ -47,7 +60,39 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
                 因为Java的线程是协作式的，不是抢占式的，线程根据检测自己的中断标志位是否为true来进行响应
                 如线程处于阻塞状态(sleep、join、wait)下,如果判断中断标志位为true就抛出interruptException，然后将中断标志位设置为false
 
-    3.线程的阻塞
+        Thread类中run和start方法的区别
+            run方法：运行在调用方法的线程中
+            start方法：运行在Thread线程中
+
+    3.如何安全的退出线程呢
+            1.在Thread类中建议用isInterrupt方法安全的退出线程
+            2.不建议采用判断标记位的方式,因为当线程while循环中如果调用了sleep、wait等阻塞方法时,是不会去检测这个标记位的，
+                而interrupt方法即使在阻塞状态也可以抛出interruptException异常退出线程
+            3.如果while循环中有用到阻塞方法(sleep、join、wait)且抛出了interruptException异常
+                应该在catch方法中释放锁资源之后，再次调用一次interrupt方法；
+                因为阻塞方法(sleep、join、wait)被调用之后会将中断标记为置为false(方便程序猿释放资源)
+
+                class MyTread extends Thread{
+                    public void run(){
+                        while(!Tread.isInterrupted()){...}         //判断中断标记位不为true就执行代码块逻辑，且将当前线程中断标记为记为false
+                        while(!isInterrupted()){                   //判断中断标记位不为true就执行代码块逻辑
+                            try{
+                                Thread.sleep(1000);              //这里被中断之后,会将当前线程中断标记为记为false,即不会自动退出while循环,应该在catch方法释放资源后手动退出循环
+                            }catch(interruptException e){
+                                //释放资源
+                                interrupt();
+                            }
+                        }
+                    }
+                }
+
+                public void main(){
+                    MyTread thread = new MyThread()
+                    thread.start();
+                    thread.sleep(1000);
+                    thread.interrupt() //将中断标志位记为true
+                }
+    4.线程的阻塞
         sleep:使得线程在指定时间内进入阻塞状态,不释放锁
         yield:使得线程放弃当前分得的CPU时间,但是不使线程阻塞,即线程仍处于可运行状态,随时可能再次分得CPU时间，不会释放锁
         wait/notify:两个方法配套使用,
@@ -57,7 +102,9 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             2.sleep属于Tread类，wait属于Object类
             3.wait/notify/notifyAll只能在同步方法/代码块中使用(因为会对锁标志进行操作,如果不同步,编译可通过但运行时会报错IllegalMonitorStateException),
               而sleep可在任何位置使用
-
+        join:
+            把指定的线程加入到当前线程，让交替执行的线程变成串行执行
+            如A线程执行了B线程对象的join方法，那会等B线程执行完成后，才会继续执行A线程
 
         wait和notify的标准范式
             等待：
@@ -72,7 +119,8 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
                     //业务逻辑,改变条件
                     对象.notifyAll() //这里不会释放锁，而是会等synchrounized代码块执行完后才释放锁
                 }
-    4.线程的上下文切换
+
+    5.线程的上下文切换
         多线程编程中,多线程共用资源,计算机对多个线程进行进行调度,因此会在不同的线程中进行切换
         线程就需要保存状态，以便在切换后需要回复到上一个状态运行，这就是线程的上下文切换
         线程上下文切换会消耗资源,造成性能损失。所以我们要尽量避免减少上下文切换，提高程序运行性能
@@ -82,36 +130,21 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             3.使用最少线程
             4.协程：在单线程里实现多任务调度
 
-3.线程的安全问题
-    诱因：1.存在共享数据(临界资源)；2.存在多条线程操作共享数据
-    解决方案:控制多个线程对某个共享数据(临界资源)的有序访问和修改,保证同一时刻只能有一个线程操作共享数据
+3.线程的共享与协作
+    线程安全问题
+        诱因：1.存在共享数据(临界资源)；2.存在多条线程操作共享数据
+        解决方案:控制多个线程对某个共享数据(临界资源)的有序访问和修改,保证同一时刻只能有一个线程操作共享数据
             其他线程必须等到该线程处理完数据后再进行。这种方式称为互斥锁
+
     1.实现线程安全的工具
         1.隐式锁synchrounized
         2.显示锁java.util.concurrent.lock
         3.volatile
         4.原子操作java.util.concurrent.atomic
-    2.synchronized的三种应用方式
-        1.修饰实例方法：作用于当前实例加锁,进入同步代码块前要先获取当前实例的锁
-            public synchronized void increase1(){//多个线程调用同一个实例对象的increase1时,安全
-                i++;
-            }
 
-        2.修饰静态方法:作用于当前类加锁,进入同步代码块前要先获取当前类对象的锁
-            public static synchronized void increase2(){//多个线程调用多个实例对象的increase2时，安全
-                i++;
-            }
-        3.修饰代码块:指定加锁对象,对给定对象加锁,进入同步代码块前,要先获取给定对象的锁
-            synchronized(lock){//指定加锁对象是lock实例
-                i++;
-            }
-            synchronized(this){//指定加锁对象是当前实例对象
-                i++;
-            }
-            synchronized(AccountingSync.class){//指定加锁对象是类对象
-                i++;
-            }
-    3.synchronized方法注意点
+    2.synchronized内置锁
+        java支持多个线程访问同一个共享数据,可以通过关键字synchrounized修饰方法和代码块，保障同一时刻只有一个线程操作共享数据，保障线程安全。
+
         1.synchronized的可重入性
             当一个线程试图操作一个由其他线程持有对象锁的共享数据时,将会处于阻塞状态
         但当一个线程再次请求自己持有对象锁的共享数据时,这种情况是允许的,且该线程也可以调用当前实例中的其他synchronized方法
@@ -128,19 +161,62 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             所谓等待唤醒机制这里主要指wait、notify、notifyAll方法,使用这三个方法时必须处于synchronized方法或代码块中
         否则就会抛出IllegalMonitorStateException。这是因为调用这几个方法必须拿到当前对象的监视器monitor对象
 
-        4.使用场景
-            synchronize(this)
-            synchronize(object)
-            synchronize(A.class)
-            synchronize修饰函数
-            synchronize修饰静态函数
+        4.synchronized使用场景
+            synchronize(this)           //对象锁，锁的是方法所属的对象
+            synchronize(object)         //对象锁，锁的是object对象
+            synchronize(A.class)        //类锁，锁的是所有的A类的实例对象，即A类锁
+            synchronize修饰函数          //对象锁，锁的是方法所属的对象
+            synchronize修饰静态函数      //类锁，锁的静态方法所属类的是所有实例对象，即类锁
+
+                1.修饰实例方法：作用于当前实例加锁,进入同步代码块前要先获取当前实例的锁
+                public synchronized void increase1(){//多个线程调用同一个实例对象的increase1时,安全
+                    i++;
+                }
+
+                2.修饰静态方法:作用于当前类加锁,进入同步代码块前要先获取当前类对象的锁
+                    public static synchronized void increase2(){//多个线程调用多个实例对象的increase2时，安全
+                        i++;
+                    }
+                3.修饰代码块:指定加锁对象,对给定对象加锁,进入同步代码块前,要先获取给定对象的锁
+                    synchronized(lock){//指定加锁对象是lock实例
+                        i++;
+                    }
+                    synchronized(this){//指定加锁对象是当前实例对象
+                        i++;
+                    }
+                    synchronized(AccountingSync.class){//指定加锁对象是类对象
+                        i++;
+                    }
+
+        5.sychrounized实现原理
+
+    3.volatile
+        一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。
+        程序运行中的数据都存放在主存中，这样会有一个问题，由于 CPU 的执行速度是要远高于主存的读写速度，所以直接从主存中读写数据会降低 CPU 的效率。
+        为了解决这个问题，就有了高速缓存的概念，在每个 CPU 中都有高速缓存，它会事先从主存中读取数据，在 CPU 运算之后在合适的时候刷新到主存中。
+        这样的运行模式在单线程中是没有任何问题的，但在多线程中，会导致缓存一致性的问题。
+
+        举个简单的例子：i=i+1 ,在两个线程中执行这句代码，假设i的初始值为0。我们期望两个线程运行后得到2，
+        那么有这样的一种情况，两个线程都从主存中读取i到各自的高速缓存中，这时候两个线程中的i都为0。
+        在线程1执行完毕得到i=1，将之刷新到主存后，线程2开始执行，由于线程2中的i是高速缓存中的0，所以在执行完线程2之后刷新到主存的i仍旧是1。
+
+        所以这就导致了对共享变量的缓存一致性的问题，那么为了解决这个问题，
+        提出了缓存一致性协议：当 CPU 在写数据时，如果发现操作的是共享变量，它会通知其他 CPU 将它们内部的这个共享变量置为无效状态，
+        当其他 CPU 读取缓存中的共享变量时，发现这个变量是无效的，它会从新从主存中读取最新的值。
+
+        volatile的原理是在生成的汇编代码中多了一个lock前缀指令，这个前缀指令相当于一个内存屏障，这个内存屏障有3个作用：
+            1.确保指令重排的时候不会把屏障后的指令排在屏障前，确保不会把屏障前的指令排在屏障后。
+            2.修改缓存中的共享变量后立即刷新到主存中。
+            3.当执行写操作时会导致其他CPU中的缓存无效。
 
     4.Volatile和Synchronize区别
         1.Volatile只修饰一个变量，而Synchronize可以通过锁修饰一个方法或者一个代码块
         2.Volatile保证可见性和有序性,而Synchronize保证原子性、可见性和有序性
         3.Volatile不会造成线程的阻塞,而Synchronize可能会造成线程阻塞
 
-4.java的ThreadLocal
+        volatile适合的场景：一个线程写，多个线程读
+
+4.ThreadLocal
     1.简介
         ThreadLocal顾名思义就是线程本地变量。也就是说定义一个ThreadLocal变量,每个线程往这个ThreadLocal变量里面读写的值都是线程隔离,互相之间是不会影响的
         ThreadLocal实例通常来说都是private static类型,用于关联线程
@@ -206,20 +282,62 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             使用场景：
                 数据库的事务机制(每个线程持有一个connection连接)
                 Handler中的Looper.prepare(通过ThreadLocal为当前线程绑定一个Looper)
-5.volatile
-    一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。程序运行中的数据都存放在主存中，这样会有一个问题，由于 CPU 的执行速度是要远高于主存的读写速度，所以直接从主存中读写数据会降低 CPU 的效率。为了解决这个问题，就有了高速缓存的概念，在每个 CPU 中都有高速缓存，它会事先从主存中读取数据，在 CPU 运算之后在合适的时候刷新到主存中。
-    这样的运行模式在单线程中是没有任何问题的，但在多线程中，会导致缓存一致性的问题。举个简单的例子：i=i+1 ,在两个线程中执行这句代码，假设i的初始值为0。我们期望两个线程运行后得到2，那么有这样的一种情况，两个线程都从主存中读取i到各自的高速缓存中，这时候两个线程中的i都为0。在线程1执行完毕得到i=1，将之刷新到主存后，线程2开始执行，由于线程2中的i是高速缓存中的0，所以在执行完线程2之后刷新到主存的i仍旧是1。
-    所以这就导致了对共享变量的缓存一致性的问题，那么为了解决这个问题，提出了缓存一致性协议：当 CPU 在写数据时，如果发现操作的是共享变量，它会通知其他 CPU 将它们内部的这个共享变量置为无效状态，当其他 CPU 读取缓存中的共享变量时，发现这个变量是无效的，它会从新从主存中读取最新的值。
 
-    volatile的原理是在生成的汇编代码中多了一个lock前缀指令，这个前缀指令相当于一个内存屏障，这个内存屏障有3个作用：
-        1.确保指令重排的时候不会把屏障后的指令排在屏障前，确保不会把屏障前的指令排在屏障后。
-        2.修改缓存中的共享变量后立即刷新到主存中。
-        3.当执行写操作时会导致其他CPU中的缓存无效。
-
-6.fork-join
-   1.基础概念
+5.线程的并发工具类
+    1.fork-join
         分而治之：将大问题，分割成无关联的小问题
         动态规划：将大问题，分割成有关联的小问题
+
+    2.CountDownLatch，闭锁
+        定义：
+        CountDownLatch这个类能够使一个线程等待其他线程完成各自的工作后再执行
+        CountDownLatch是通过一个计数器来实现的，创建对象时传入一个初始值
+        线程A:通过CountDownLatch.countDown减1,当CountDownLatch数量为0时；
+        线程B:在闭锁上等待CountDownLatch.await方法的其他线程就可以恢复执行
+
+        示例：
+        static CountDownLatch coutDownLatch= new CountDownLatch(6)
+        业务逻辑线程，调用coutDownLatch.await();会进入阻塞状态
+        初始化线程(假设有多个)，多个线程总共调用coutDownLatch.countDown()6次，直到计数器为0时，业务逻辑线程就会被唤醒执行
+
+        注意：
+        CountDownLatch是当前线程等待其他一组线程任务完成之后在继续往下执行；
+        CountDownLatch并不是用来保护共享资源同步访问的，而是用来控制并发线程等待的；
+        CountDownLatch只允许使用一次，一旦内部计数器等于0，再调用这个方法将不起作用，如果还有第二次并发等待，你还得创建一个新的CountDownLatch。
+        有一个任务A，它要等待其他4个任务执行完毕之后才能执行，此时就可以利用CountDownLatch来实现这种功能了
+
+    3.CyclicBarrier
+       应用场景：
+            N个线程，执行到内存屏障位置后(CyclicBarrier.await)，会开始阻塞，
+            直到N个线程都执行到CyclicBarrier.await位置，才会唤醒所有线程(CyclicBarrier.await后面的代码业务)
+            唤醒其他线程前，可以选择传入一个任务(如CollectionRunnable)汇总N个线程的数据
+            CyclicBarrier cyclicBarrier = new CyclicBarrier(4,new CollectionRunnable)
+
+       CyclicBarrier和CountDownLatch的区别
+            线程和计数器的数量：CyclicBarrier必须一致，CountDownLatch可以不一致
+            重复使用：CyclicBarrier可以重复使用，CountDownLatch可以不一致
+
+    4.callable、FutureTask
+        private static class UseCall implements Callable<Integer>{
+            int y = 0;
+            for(i = 100;i>0;i--){
+                Thread.sleep(1000);
+                if(Thread.currentThread().isInterrupted()){
+                    return -1;
+                }
+                y += i;
+            }
+            return y;
+        }
+        public static void main(String[] args){
+            UseCall useCall = new UseCall();
+            FutureTask<String> futureTask = new FutureTask<>(useCall);
+            new Thread(futureTask).start();
+
+            futureTask.cancel();//注意，这里调用cancel相当于是中断线程，应该在线程中主动判断中断标志再退出，否则不会自动退出线程
+            System.out.println(futureTask.get());
+        }
+
 
 7.HandlerThread和intentService
     handlerThread
