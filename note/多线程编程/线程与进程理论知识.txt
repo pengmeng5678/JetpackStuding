@@ -6,7 +6,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
 并发编码的两大核心：JMM抽象内存模型和happens-before规则。三天性质：原子性、有序性和可见性
 死锁：https://blog.csdn.net/hd12370/article/details/82814348
 进程、线程、协程：https://blog.csdn.net/daaikuaichuan/article/details/82951084
-1.基础概念
+1.进程、线程、协程
     进程：
         介绍：在现代操作系统中,进程是系统资源(CPU时间片、内存)分配的最小单位,而线程是CPU调度的基本单位,一个进程里面最小有一个线程,叫主线程
         特点：每个进程都有自己独立的内存空间、一组资源系统，其内部数据和状态都是完全独立的；但进程消耗的内存大，进程切换的代价高
@@ -26,76 +26,30 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         地址空间：线程是进程的一个执行单元；进程至少有一个线程；一个进程内的多线程共享该进程的地址空间；而进程自己有独立的地址空间
         资源有用:进程是资源分配的最小单位,同一个进程内的线程共享进程的资源；线程是处理器调度的基本单位,但进程不是
 
-    并发：多个事物在同一个时间段内一起执行(CPU轮转机制)
-    并行：多个事件在同一个时刻同时执行(多核CPU)
-
-    并发编程的好处：
-        1.充分利用CPU资源
-        2.提高响应用户的速度
-        2.提高程序的模块化、异步化、简单化(不同线程执行不同的任务)
-    并发编程的缺点
-        1.产生安全性的问题，需要进行加锁，使用不当会严重影响系统性能甚至死锁
-        2.增加内存：OS限制，linux线程数1000个，windows线程数2000个，
-            每个线程都需要分配栈空间(缺省值1M),创建1000个线程占用内存1G
-
-    CPU核心数与线程数的关系
-        一般情况下CPU核心数与线程数是1:1的关系，而intel引入超线程技术后，CPU核心数与线程数是1:2的关系
-        而我们可以创建很多线程的原因是利用了CPU的时间轮转机制
+     并发：多个事物在同一个时间段内一起执行
+     并行：多个事件在同一个时刻同时执行
 
 2.线程基本介绍
     1.线程的状态
         E:\AndroidProject\Studing\AndroidStudingProject\note\多线程编程\线程状态图.jpg
         初始状态、可运行状态、运行状态、阻塞状态、死亡状态
-
     2.线程的启动与终止
         线程启动：
             1.继承Thread然后start;
-            2.实现runnable然后通过构造方法传给Thread执行start
+            2.实现runnable然后交给Thread执行
         Thread和Runnable的区别：
             Thread是对线程的抽象，Runnable是对任务的抽象，Thread可以接受任意一个Runnable的实例并执行
         线程终止：
             自然终止：Runnable方法执行完成
-            stop:暂停、恢复、停止操作分别对应suspend、resume、stop方法，但这些方法由于线程锁占用的资源不会正常释放，已经废弃
+            stop:暂停、恢复、停止操作分别对应suspend、resume、stop方法，但这些方法由于无法释放锁等副作用，已经废弃
             中断：线程的interrupt方法(死锁时无法中断)
                 中断好比告诉一个线程A要中断了，但是线程A不会立即停止自己的工作，线程A完全可以不理会这种中断请求
-                因为Java的线程是协作式的，不是抢占式的，线程根据检测自己的中断标志位(isInterrupt)是否为true来进行响应(如while判断isInterrupt)
+                因为Java的线程是协作式的，不是抢占式的，线程根据检测自己的中断标志位是否为true来进行响应
                 如线程处于阻塞状态(sleep、join、wait)下,如果判断中断标志位为true就抛出interruptException，然后将中断标志位设置为false
 
-        Thread类中run和start方法的区别
-            run方法：运行在调用方法的线程中
-            start方法：运行在Thread线程中
-
-    3.如何安全的退出线程呢
-        1.在Thread类中建议用isInterrupt方法安全的退出线程
-        2.不建议采用判断标记位的方式,因为当线程while循环中如果调用了sleep、wait等阻塞方法时,是不会去检测这个标记位的，
-            而interrupt方法即使在阻塞状态也可以抛出interruptException异常退出线程
-        3.如果while循环中有用到阻塞方法(sleep、join、wait)且抛出了interruptException异常
-            应该在catch方法中释放锁资源之后，再次调用一次interrupt方法；
-            因为阻塞方法(sleep、join、wait)被调用之后会将中断标记为置为false(方便程序猿释放资源)
-
-            class MyTread extends Thread{
-                public void run(){
-                    while(!Tread.isInterrupted()){...}         //判断中断标记位不为true就执行代码块逻辑，且将当前线程中断标记为记为false
-                    while(!isInterrupted()){                   //判断中断标记位不为true就执行代码块逻辑
-                        try{
-                            Thread.sleep(1000);              //这里被中断之后,会将当前线程中断标记为记为false,即不会自动退出while循环,应该在catch方法释放资源后手动退出循环
-                        }catch(interruptException e){
-                            //释放资源
-                            interrupt();
-                        }
-                    }
-                }
-            }
-
-            public void main(){
-                MyTread thread = new MyThread()
-                thread.start();
-                thread.sleep(1000);
-                thread.interrupt() //将中断标志位记为true
-            }
-    4.线程的阻塞
+    3.线程的阻塞
         sleep:使得线程在指定时间内进入阻塞状态,不释放锁
-        yield:使得线程放弃当前分得的CPU时间,但是不使线程阻塞,即线程仍处于可运行状态,随时可能再次分得CPU时间
+        yield:使得线程放弃当前分得的CPU时间,但是不使线程阻塞,即线程仍处于可运行状态,随时可能再次分得CPU时间，不会释放锁
         wait/notify:两个方法配套使用,
             wait使用方式：1.允许以指定时间作为参数，超时就重新进入可执行状态；2.没有时间,必须以notify来唤醒
         sleep和wait的区别
@@ -103,12 +57,22 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             2.sleep属于Tread类，wait属于Object类
             3.wait/notify/notifyAll只能在同步方法/代码块中使用(因为会对锁标志进行操作,如果不同步,编译可通过但运行时会报错IllegalMonitorStateException),
               而sleep可在任何位置使用
-            4.sleep要捕获异常,而wait不需要
-        join:
-            把指定的线程加入到当前线程，让交替执行的线程变成串行执行
-            如A线程执行了B线程对象的join方法，那会等B线程执行完成后，才会继续执行A线程
 
-    5.线程的上下文切换
+
+        wait和notify的标准范式
+            等待：
+                synchrounized(对象){
+                    while(条件不满足){
+                        对象.wait()   //这里会释放锁
+                    }
+                    //业务逻辑
+                }
+            通知：
+                synchrounized(对象){
+                    //业务逻辑,改变条件
+                    对象.notifyAll() //这里不会释放锁，而是会等synchrounized代码块执行完后才释放锁
+                }
+    4.线程的上下文切换
         多线程编程中,多线程共用资源,计算机对多个线程进行进行调度,因此会在不同的线程中进行切换
         线程就需要保存状态，以便在切换后需要回复到上一个状态运行，这就是线程的上下文切换
         线程上下文切换会消耗资源,造成性能损失。所以我们要尽量避免减少上下文切换，提高程序运行性能
@@ -176,33 +140,13 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         2.Volatile保证可见性和有序性,而Synchronize保证原子性、可见性和有序性
         3.Volatile不会造成线程的阻塞,而Synchronize可能会造成线程阻塞
 
-        volatile适合的场景：一个线程写，多个线程读
-
-4.Java内存模型和Java内存区域
-    具体说明见E:\AndroidProject\Studing\AndroidStudingProject\note\Java虚拟机\Java内存模型
-    java内存模型(Java Memory Model,JMM)就是一种符合内存模型规范的,屏蔽了各种硬件和操作系统访问差异,
-  保证了Java程序在各种平台下对内存的访问都能保证效果一致的机制和规范
-
-    java的多线程之间是通过共享内存进行通信的,而由于采用共享内存进行通信,在通信过程中会存在一系列如可见性、原子性、有序性等问题
-  而JMM就是围绕这多线程通信以及与其相关的一系列特性而建立的模型。
-
-    Java内存模型规定了所有的变量都存储在主内存中,每条线程还有自己的工作内存,线程中的保存了该线程中用到的变量的主内存副本拷贝
-  线程对变量的操作都要在工作内存中进行, 而不能直接读写主内存；不同的线程也不能直接访问对方工作内存中的变量,
-  线程间变量的传递需要自己的工作内存先写入到主内存后再进行数据同步进行。
-
-5.原子性、可见性、有序性简介
-    原子性：指一个操作是不可中断的,即使是在多线程环境下,一个操作一旦开始就不会被其他线程影响
-    可见性: 指一个线程修改了一个共享变量的值之后,其他线程是否能够马上知道这个修改的值
-    有序性: 指在单线程的执行代码,我们总是认为代码的执行是按顺序依次执行的。但对于多线程环境,可能是乱序执行的,因为代码编译成机器指令后可能会出现指令重排现象。
-
-6.java的ThreadLocal
+4.java的ThreadLocal
     1.简介
         ThreadLocal顾名思义就是线程本地变量。也就是说定义一个ThreadLocal变量,每个线程往这个ThreadLocal变量里面读写的值都是线程隔离,互相之间是不会影响的
         ThreadLocal实例通常来说都是private static类型,用于关联线程
 
         Threadlocal类中有个静态内部类Threadlocal.ThreadLocalMap
         ThreadLocalMap的key是用户定义的Threadlocal对象
-
     2.作用
         ThreadLocal的作用是提供线程内的局部变量,在本地线程内随时随地可取,隔离其他线程。这种局部变量仅仅在线程的生命周期内起作用。
 
@@ -211,7 +155,19 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         可以简单的将它的key视为ThreadLocal(实际不是ThreadLocal本身,而是它的一个弱引用),value视为存入的值
         所以每个线程往ThreadLocal里面存的值,都是往自己类里面的ThreadLocalMap里面存,读也是从某个ThreadLocal为引用,在自己的map里面找对应的key,从而实现了线程隔离
 
-    4.java ThreadLocal的常用方法
+        创建ThreadLocal对象时，可以重写initiaValue值,即每个线程持有的ThreadLocal的初始化值都是一样的
+    3.java ThreadLocal的常用方法
+
+          //ThreadLoacalMap内部类
+          static class ThreadLocalMap{
+            static class Entry extends WeakReference<ThreadLocal<?>>{
+                Object value;
+                Entry(ThreadLocal<?> k,Object v){
+                    super(k);
+                    value = v;
+                }
+            }
+          }
           public void set(T value) {//设置当前线程的线程局部变量
               Thread t = Thread.currentThread();
               ThreadLocalMap map = getMap(t);//获取当前线程的ThreaLocalMap对象
@@ -230,21 +186,40 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
               }
               return setInitialValue();
           }
-    5.ThreadLocal的内存泄露
-        1.如何发生内存泄露
-            weakReferece
-        2.如何解决内存泄露
-            ThreadLocal.remove
+    4.ThreadLocal引发的内存泄露
+        threadLocalRef变量指向了ThreadLocal实例(是用weakReference包裹的)
+        threadRef变量指向了ThreadLoacalMap,ThreadLoacalMap持有Entry对象,Entry持有value
+        当发生GC时，ThreadLocal实例会被回收，而线程中的ThreadLoacalMap不会被回收
+        而这个ThreadLoacalMap只能通过ThreadLocal对象这个key进行访问，当key被回收，value访问不到，线程不退出，entry就无法被回收
 
+        解决ThreadLocal内存泄露
+            在操作ThreadLocal对象后，调用ThreadLocal对象的remove方法(调用expungeStaleEntry清除当key为null的value值)
+    5.ThreadLocal对象的线程不安全
+        虽然每个线程会持有一个ThreadLocal对象的拷贝副本
+        但当多个线程操作的是一个共享数据时(如Static变量),那每个线程修改的值都会生效到同一个变量上
     6.ThreadLocal总结
             ThreadLocal是解决线程安全的一个很好的思路，它通过为每个线程提供了一个独立的变量副本
-        解决了变量并发访问的冲突问题。
-            ThreadLocal和synchronized区别：
-                ThreadLocal：是用存储拷贝进行空间换时间
-                synchronized:用锁机制进行时间换空间。
-
+        解决了变量并发访问的冲突问题。ThreadLocal和synchronize用一句话就是一个用存储拷贝进行空间换时间
+        另一个用锁机制进行时间换空间。
             ThreadLocal不是用于解决共享变量的问题,不是为了协调线程同步而存在,
         而是为了方便每个线程处理自己的状态而引入的一个机制。
+            使用场景：
+                数据库的事务机制(每个线程持有一个connection连接)
+                Handler中的Looper.prepare(通过ThreadLocal为当前线程绑定一个Looper)
+5.volatile
+    一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。程序运行中的数据都存放在主存中，这样会有一个问题，由于 CPU 的执行速度是要远高于主存的读写速度，所以直接从主存中读写数据会降低 CPU 的效率。为了解决这个问题，就有了高速缓存的概念，在每个 CPU 中都有高速缓存，它会事先从主存中读取数据，在 CPU 运算之后在合适的时候刷新到主存中。
+    这样的运行模式在单线程中是没有任何问题的，但在多线程中，会导致缓存一致性的问题。举个简单的例子：i=i+1 ,在两个线程中执行这句代码，假设i的初始值为0。我们期望两个线程运行后得到2，那么有这样的一种情况，两个线程都从主存中读取i到各自的高速缓存中，这时候两个线程中的i都为0。在线程1执行完毕得到i=1，将之刷新到主存后，线程2开始执行，由于线程2中的i是高速缓存中的0，所以在执行完线程2之后刷新到主存的i仍旧是1。
+    所以这就导致了对共享变量的缓存一致性的问题，那么为了解决这个问题，提出了缓存一致性协议：当 CPU 在写数据时，如果发现操作的是共享变量，它会通知其他 CPU 将它们内部的这个共享变量置为无效状态，当其他 CPU 读取缓存中的共享变量时，发现这个变量是无效的，它会从新从主存中读取最新的值。
+
+    volatile的原理是在生成的汇编代码中多了一个lock前缀指令，这个前缀指令相当于一个内存屏障，这个内存屏障有3个作用：
+        1.确保指令重排的时候不会把屏障后的指令排在屏障前，确保不会把屏障前的指令排在屏障后。
+        2.修改缓存中的共享变量后立即刷新到主存中。
+        3.当执行写操作时会导致其他CPU中的缓存无效。
+
+6.fork-join
+   1.基础概念
+        分而治之：将大问题，分割成无关联的小问题
+        动态规划：将大问题，分割成有关联的小问题
 
 7.HandlerThread和intentService
     handlerThread
@@ -322,23 +297,3 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
                     stopSelf(msg.arg1);
                 }
             }
-8.生产者和消费者模型
-    生产者和消费者模型保证的是当缓冲区满了的时候，生产者不再生产数据；当缓冲区空的时候,消费者不再消费数据;
-    实现机制就是：当缓冲区满时,生产者进入等待状态，当缓冲区空时，让消费者进入等待状态；当生产后数据后,唤醒消费者，当消费数据后，唤醒生产者
-    三种实现方式:wait和notify,await和signal(Reentrantlock,Reentrantlock.newCondition),BlockQueue(put,take)
-
-9.Java线程死锁
-10.volatile
-    一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。程序运行中的数据都存放在主存中，这样会有一个问题，由于 CPU 的执行速度是要远高于主存的读写速度，所以直接从主存中读写数据会降低 CPU 的效率。为了解决这个问题，就有了高速缓存的概念，在每个 CPU 中都有高速缓存，它会事先从主存中读取数据，在 CPU 运算之后在合适的时候刷新到主存中。
-    这样的运行模式在单线程中是没有任何问题的，但在多线程中，会导致缓存一致性的问题。举个简单的例子：i=i+1 ,在两个线程中执行这句代码，假设i的初始值为0。我们期望两个线程运行后得到2，那么有这样的一种情况，两个线程都从主存中读取i到各自的高速缓存中，这时候两个线程中的i都为0。在线程1执行完毕得到i=1，将之刷新到主存后，线程2开始执行，由于线程2中的i是高速缓存中的0，所以在执行完线程2之后刷新到主存的i仍旧是1。
-    所以这就导致了对共享变量的缓存一致性的问题，那么为了解决这个问题，提出了缓存一致性协议：当 CPU 在写数据时，如果发现操作的是共享变量，它会通知其他 CPU 将它们内部的这个共享变量置为无效状态，当其他 CPU 读取缓存中的共享变量时，发现这个变量是无效的，它会从新从主存中读取最新的值。
-
-    volatile的原理是在生成的汇编代码中多了一个lock前缀指令，这个前缀指令相当于一个内存屏障，这个内存屏障有3个作用：
-        1.确保指令重排的时候不会把屏障后的指令排在屏障前，确保不会把屏障前的指令排在屏障后。
-        2.修改缓存中的共享变量后立即刷新到主存中。
-        3.当执行写操作时会导致其他CPU中的缓存无效。
-
-11.CAS
-    Compare And Swap
-
-12 countLatch
