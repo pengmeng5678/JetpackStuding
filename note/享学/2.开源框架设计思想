@@ -20,7 +20,7 @@
             Android2.2，Android虚拟机首次加入JIT编译器
             Android 4.0 之前是主要是的 Dalvik 虚拟机,使用JIT编译器
             Android4.4首次引入ART虚拟机和AOT编译器
-            Android5.5全面替换成ART虚拟机+AOT编译
+            Android5.0全面替换成ART虚拟机+AOT编译
             Android7开始引入了JIT和AOT的混合模式，用于解决7.0之前AOT编译器dex优化成 odex,系统和应用更新非常耗时
                混合模式简要说明：在 ART 的时候，先把 dex 解释成中间态的，不编译成机器码。在运行的时候，或者充电的时候，只编译“热代码”
 

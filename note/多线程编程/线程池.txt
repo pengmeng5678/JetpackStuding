@@ -1,9 +1,9 @@
 https://www.jianshu.com/p/87bff5cc8d8c
-1.作用
+1.线程池作用
     线程是稀缺资源，如果被无限制的创建和销毁，不仅会消耗系统资源，还会降低系统稳定性,合理使用线程池对线程进行统一分配、调优和监控，有以下好处
         1.降低系统资源销毁
         2.提高系统稳定性和可管理性
-2.使用
+2.线程池使用
     1.自定义线程池
     ThreadPoolExecutor executor = new ThreadPoolExecutor(mCorePoolSize, mMaximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
     executor.execute(task);//executor.submit(task)
@@ -28,7 +28,8 @@ https://www.jianshu.com/p/87bff5cc8d8c
         4.newScheduledThreadPool
             初始化的线程池可以在指定的时间内周期性的执行所提交的任务
             new ScheduledThreadPoolExcutor(corePoolSize)
-3.原理
+3.线程池原理
+    Executor[ɪɡˈzekjətə(r)]
     1.ThreadPoolExecutor构造函数参数说明
         1.corePoolSize:核心线程池
             提交任务时,线程池会创建新线程执行任务直到线程数等于corePoolSize;如果线程数等于corePoolSize时,新任务会被加入到阻塞队列中
@@ -51,30 +52,46 @@ https://www.jianshu.com/p/87bff5cc8d8c
             DiscardOldestPolicy:丢弃阻塞队列中最靠前的任务,并执行当前任务
             DiscardPolicy:直接丢弃任务
 
-4.任务执行
-    1.excute
-        任务必须实现Runnable接口,没有返回值,无法判断任务是否执行成功
-    2.submit
-        任务必须实现Callable接口,有返回值,返回值是Future类型
-        Future.get方法会导致线程阻塞,直到Callable任务执行完成
+    2.线程池的工作机制
+        1）如果当前运行的线程少于corePoolSize，则创建新线程来执行任务（注意，执行这一步骤需要获取全局锁）。
+        2）如果运行的线程等于或多于corePoolSize，则将任务加入BlockingQueue。
+        3）如果无法将任务加入BlockingQueue（队列已满），则创建新的线程来处理任务。
+        4）如果创建新线程将使当前运行的线程超出maximumPoolSize，任务将被拒绝，并调用RejectedExecutionHandler.rejectedExecution()方法。
+        一句话总结：任务存放顺序为：corePoolSize、BlockingQueue、maxmumPoolSize、RejectedExecutionHandler
 
+    3.如何设计线程池的参数
+        CPU密集型：maxnumPoolSize+1
+        IO密集型：maxnumPoolSize*2
+
+4.线程池任务执行和关闭
+    执行
+        1.excute
+            任务必须实现Runnable接口,没有返回值,无法判断任务是否执行成功
+        2.submit
+            任务必须实现Callable接口,有返回值,返回值是Future类型
+            Future.get方法会导致线程阻塞,直到Callable任务执行完成
+    关闭
+        1.shutDown：尝试关闭线程池
+        2.shutDownNow:中断当前任务(线程协议机制,不一定成功，看是否处理了中断标记位)，移除未执行的任务
 5.阻塞队列
     1.阻塞队列介绍
         阻塞队列常用于生产者消费者场景,具体如下。
             1.当队列中没有数据的时候，消费者所有线程全部挂起(阻塞),直到有数据放入队列
             2.当队列中的数据满的时候，生产者所有线程全部挂起(阻塞),直到队列中有空的位置后，线程被唤醒
 
-         插入数据
-            add：若队列已满，直接抛异常
-            offer:插入成功就返回ture,插入失败返回false,不阻塞线程;offer(e,time,unit)插入数据超时退出
-            put:如果队列已满,会一直阻塞，等待队列有空位置
+        BlockingQueue接口中的抽象方法
+             插入数据
+                add：若队列已满，直接抛异常
+                offer:插入成功就返回ture,插入失败返回false,不阻塞线程;offer(e,time,unit)插入数据超时退出
+                put:如果队列已满,会一直阻塞，等待队列有空位置
 
-         获取数据
-            remove：若队列为空,会抛异常
-            poll：若队列为null,会返回null,poll(time,unit)获取数据超时退出
-            take:若队列为null，会阻塞直到队列中有数据
+             获取数据
+                remove：若队列为空,会抛异常
+                poll：若队列为null,会返回null,poll(time,unit)获取数据超时退出
+                take:若队列为null，会阻塞直到队列中有数据
 
     2.阻塞队列种类
+        它们都实现自BlockingQueue接口，有界:规定了最大容量，无界：没有规定最大容量
         ArrayBlockingQueue,一个由数组结构组成的有界阻塞队列
         LinkedBlockingQueue,一个由链表结构组成的有界阻塞队列，默认长度为Integer.MAX_VALUE
         PriorityBlockingQueue,一个支持优先级排序的无界阻塞队列
@@ -152,4 +169,3 @@ https://www.jianshu.com/p/87bff5cc8d8c
         }
     }
 
-8.AQS

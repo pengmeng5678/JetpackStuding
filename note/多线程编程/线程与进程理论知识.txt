@@ -188,7 +188,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
                         i++;
                     }
 
-        5.sychrounized实现原理
+        5.synchrounized实现原理
 
     3.volatile
         一般提到 volatile，就不得不提到内存模型相关的概念。我们都知道，在程序运行中，每条指令都是由 CPU 执行的，而指令的执行过程中，势必涉及到数据的读取和写入。
@@ -232,7 +232,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
         所以每个线程往ThreadLocal里面存的值,都是往自己类里面的ThreadLocalMap里面存,读也是从某个ThreadLocal为引用,在自己的map里面找对应的key,从而实现了线程隔离
 
         创建ThreadLocal对象时，可以重写initiaValue值,即每个线程持有的ThreadLocal的初始化值都是一样的
-    3.java ThreadLocal的常用方法
+    4.java ThreadLocal的常用方法
 
           //ThreadLoacalMap内部类
           static class ThreadLocalMap{
@@ -273,7 +273,19 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
     5.ThreadLocal对象的线程不安全
         虽然每个线程会持有一个ThreadLocal对象的拷贝副本
         但当多个线程操作的是一个共享数据时(如Static变量),那每个线程修改的值都会生效到同一个变量上
-    6.ThreadLocal总结
+
+    6.线程与ThreadLocal的类成员关系
+        class Thread{
+            ThreadLocal.ThreadLocalMap  //Thread类持有ThreadLocalMap对象实例
+        }
+        class ThreadLocalMap{
+            Entry[]                     //ThreadLocalMap持有Entry数组
+        }
+        class Entry{
+            ThreadLocal key;            //Entry数组的key是ThreadLocal对象，value是Object对象
+            Object value;
+        }
+    7.ThreadLocal总结
             ThreadLocal是解决线程安全的一个很好的思路，它通过为每个线程提供了一个独立的变量副本
         解决了变量并发访问的冲突问题。ThreadLocal和synchronize用一句话就是一个用存储拷贝进行空间换时间
         另一个用锁机制进行时间换空间。

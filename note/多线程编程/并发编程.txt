@@ -65,29 +65,169 @@
 
                    Thread.sleep(10)                 //while循环下休眠一段时间,重复获取锁资源，但又不会变成活锁
                }
-3.线程安全问题
+3.锁种类
+    悲观锁
+        synchrounized:总有刁民想害朕，比较悲观，我先拿到锁再说
+    乐观锁
+        用CAS指令对应的AtomicInt,猜想与期望值一致，比较乐观
+    自旋锁
+        用CAS指令对应的AtomicInt,不断自旋重复，直到成功为止
+    内置锁
+        synchrounized，锁的开启和关闭是内置到JVM中的，不需要人为操作
+    公平锁
+        CLH中获取每个锁的线程队列，都是在当前结点自旋，等待前屈结点释放后才能获取锁
+        ReentrantLock中的公平锁，判断hasQueuedPredecessor方法，每个结点是否有前屈结点，需要等待前屈线程释放锁之后才能继续获取锁
+    非公平锁
+        ReentrantLock非公平锁就是，只要CAS设置同步状态成功，则表示当前线程获取了锁
+    可重入锁
+        synchrounized，一个线程可以多次访问持有锁的共享资源，且该线程也可以调用当前实例的其他synchrounized方法
+        线程A获取到锁之后，将AQS中的state状态由0变成1
+        线程A再次获取锁时，判断获取锁的线程是不是占据锁的线程，如果是，则再次成功获取，计数+1，获取N次
+        线程A释放锁的时候，如果计数器为N,则需要释放N次，直到同步状态为0
+
+    共享锁：读写锁
+    排他锁：synchrounized
 4.CAS
-5.Java内存模型和Java内存区域
+    定义：
+        Compare And Swap
+        原子操作：当执行一系列操作时，要么全部执行完成，要么不执行，这一系列执行被称为原子操作
+    原理：
+        每个CAS操作过程都包含三个运算符：一个操作地址V，一个期望值A，一个新值B
+        当从地址V中的值和期望值相等，就赋新值，否则不做操作，循环CAS就是不断重复这一过程直到成功(赋新值)为止。
+        示例:4个线程操作i = i++(初始值为0)
+            步骤1：4个线程从内存中读取到i的值，第一次值等于0
+            步骤2：4个线程都执行i++操作，并想把这个i值变成1并写入到内存中
+            步骤3：单个线程A将内存中的值和期望的值(别的线程没有修改这个值，默认应该为0)进行比较，值相等，等于0:Compare
+            步骤4：单个线程A就将i赋值为1并写入到内存：Swap
+            步骤5：其他三个线程执行步骤3时发现内存中的值变成了1，和期望中的0不相等，就不操作，重新从步骤1开始执行(此时内存中i的值变成1了)
+            此时，我们把步骤3和步骤4称为CAS操作
+    CAS产生的背景：
+        实现原子操作可以使用锁，且java中已经有了synchrounized关键字可以实现原子操作，为什么还要用CAS来实现呢
+        原因是性能：synchrounized会持有锁，造成其他线程阻塞，即要发生上下文切换，消耗CPU资源
+        所以在单个变量的原子操作时，会使用基于CAS规则下的原子操作类实现，比如AtomicInteger
+    CAS的问题
+        1.ABA问题：
+            线程1将变量A变成了B然后又变成了A；线程2进行CAS操作时进行compare时发现变量A和预期值相等，其实线程A是被改过了的
+            解决ABA问题，可以加上一个版本戳
+        2.开销问题：如果锁一直自旋无法成功，会造成严重的CPU消耗
+        3.只能保证一个共享变量的原子操作
+    CAS的种类
+        更新基本类型类：
+            AtomicInteger,AtomicLong,AtomicBoolean
+        更新数组类:
+            AtomicIntegerArray,AtomicLongArray,AtomicReferenceArray
+        更新引用类:
+            AtomicReference(如果想修改多个变量，可以将多个变量放到一个类中)
+            AtomicMarkableReference(解决ABA问题，关心版本戳是否被改过)
+            AtomicStampedReference(解决ABA问题，关心版本戳被动过几次)
+    CAS的种类
+        AtomicInteger at = AtomicInteger(10)
+        at.incrementAndGet()    //++i,11
+        at.getAndincrement()    //i++,10
+        at.addAndGet(10)        //20
+        at.getAndAdd(10)        //10
+
+5.AQS
+    java.util.concurrent.locks.AbstractQueuedSynchronizer
+    AbstractQueuedSynchronizer,队列同步器，简称同步器或者AQS
+    定义：
+        AbstractQueuedSynchronizer是一个抽象类，它被用来构建锁或者其他同步组件的基础框架,CountDownLatch、ReentrantLock均继承自它
+    原理：
+        AQS内部定义了一个int型的变量state来代表同步状态，并提供了3个final方法操作这个状态，并保证状态的改变是安全的
+            •getState()：获取当前同步状态。
+            •setState(int newState)：设置当前同步状态。
+            •compareAndSetState(int expect,int update)：使用CAS 设置当前状态，该方法能够保证状态设置的原子性。
+        AQS定义了很多模板方法用于自定义锁，如CountDownLatch、ReentrantLock均实现以下这些方法实现自定义的锁
+            tryAcquire
+            tryRelease
+            ...
+        CLH 队列锁
+            CLH 队列锁即Craig, Landin, and Hagersten (CLH) locks。
+            CLH 队列锁也是一种基于链表的可扩展、高性能、公平的自旋锁，申请线程仅仅在本地变量上自旋，它不断轮询前驱的状态，假设发现前驱释放了锁就结束自旋。
+            当一个线程A需要获取锁时，需要经历以下步骤
+                1.创建一个结点QNode，将其中的locked设置为true表示需要获取锁，myPred表示其前屈结点的引用
+                2.线程A对tail域调用getAndSet方法，使自己成为队列的尾部，同时获取一个指向前屈结点的引用myPred
+                3.线程A就在前屈结点的locked字段上自旋，直到前屈结点释放锁(locked=false)
+                4.当一个线程需要释放锁时，就将当前结点的locked设置为false,同时回收前屈结点
+            AQS是CLH队列锁的一种变体实现
+    作用：
+        AQS是实现锁的关键，它简化了锁的实现方式，屏蔽了同步状态管理、线程的排队、等待与唤醒等底层操作
+
+6.ReentrantLock可重入锁
+    线程可以重复进入任何一个它已经拥有的锁所同步着的代码块，Sychrounized和ReentrantLock都是可重入锁
+    ReentrantLock实现上就是，线程每次进入锁时，都会判断是否是当前持有锁的线程，如果是就会在计数器加1；每次释放锁计数器减1
+    当计数器的状态为0时，表示线程彻底释放锁。
+    ReentrantLock是基于JUC的AQS实现的
+
+    Sychrounized和ReentrantLock的区别
+        1.实现原理上，Sychrounized是通过moniterEnter和moniterExit指令实现的，而ReentrantLock是基于AQS实现的
+        2.锁的类型上，Sychrounized是内置锁，ReentrantLock是显示锁，并且实现了很多锁相关的方法，避免死锁
+
+7.CountDownLatch，闭锁
+        定义：
+        CountDownLatch这个类能够使一个线程等待其他线程完成各自的工作后再执行
+        CountDownLatch是通过一个计数器来实现的，创建对象时传入一个初始值
+        线程A:通过CountDownLatch.countDown减1,当CountDownLatch数量为0时；
+        线程B:在闭锁上等待CountDownLatch.await方法的其他线程就可以恢复执行
+
+        示例：
+        static CountDownLatch coutDownLatch= new CountDownLatch(6)
+        业务逻辑线程，调用coutDownLatch.await();会进入阻塞状态
+        初始化线程(假设有多个)，多个线程总共调用coutDownLatch.countDown()6次，直到计数器为0时，业务逻辑线程就会被唤醒执行
+
+        注意：
+        CountDownLatch是当前线程等待其他一组线程任务完成之后在继续往下执行；
+        CountDownLatch并不是用来保护共享资源同步访问的，而是用来控制并发线程等待的；
+        CountDownLatch只允许使用一次，一旦内部计数器等于0，再调用这个方法将不起作用，如果还有第二次并发等待，你还得创建一个新的CountDownLatch。
+        有一个任务A，它要等待其他4个任务执行完毕之后才能执行，此时就可以利用CountDownLatch来实现这种功能了
+
+8.Java内存模型
     具体说明见E:\AndroidProject\Studing\AndroidStudingProject\note\Java虚拟机\Java内存模型
-    java内存模型(Java Memory Model,JMM)就是一种符合内存模型规范的,屏蔽了各种硬件和操作系统访问差异,
-  保证了Java程序在各种平台下对内存的访问都能保证效果一致的机制和规范
+    Java Memory Model,JMM
+    java内存模型产生的背景
+        CPU操作工作内存(高速缓存、寄存器)的速度(纳秒级)远远超过访问主内存的速度(微秒级)
+        所以为了提高CPU的运行效率，JMM定义了工作内存和主内存的抽象关系
 
-    java的多线程之间是通过共享内存进行通信的,而由于采用共享内存进行通信,在通信过程中会存在一系列如可见性、原子性、有序性等问题
-  而JMM就是围绕这多线程通信以及与其相关的一系列特性而建立的模型。
-
-    Java内存模型规定了所有的变量都存储在主内存中,每条线程还有自己的工作内存,线程中的保存了该线程中用到的变量的主内存副本拷贝
+    Java内存模型原理：
+        规定了线程共享的变量都存储在主内存中,每条线程还有私有的工作内存,工作内存中的保存了该线程中用到的变量的主内存副本拷贝
   线程对变量的操作都要在工作内存中进行, 而不能直接读写主内存；不同的线程也不能直接访问对方工作内存中的变量,
   线程间变量的传递需要自己的工作内存先写入到主内存后再进行数据同步进行。
 
-6.原子性、可见性、有序性简介
+9.原子性、可见性、有序性简介
     原子性：指一个操作是不可中断的,即使是在多线程环境下,一个操作一旦开始就不会被其他线程影响
     可见性: 指一个线程修改了一个共享变量的值之后,其他线程是否能够马上知道这个修改的值
     有序性: 指在单线程的执行代码,我们总是认为代码的执行是按顺序依次执行的。但对于多线程环境,可能是乱序执行的,因为代码编译成机器指令后可能会出现指令重排现象。
-7.生产者和消费者模型
+10.生产者和消费者模型
     生产者和消费者模型保证的是当缓冲区满了的时候，生产者不再生产数据；当缓冲区空的时候,消费者不再消费数据;
     实现机制就是：当缓冲区满时,生产者进入等待状态，当缓冲区空时，让消费者进入等待状态；当生产后数据后,唤醒消费者，当消费数据后，唤醒生产者
     三种实现方式:wait和notify,await和signal(Reentrantlock,Reentrantlock.newCondition),BlockQueue(put,take)
 
 
-8.CAS
-    Compare And Swap
+11.volatile的实现原理
+    volatile修饰的共享变量，在进行写操作的时候会使用CPU提供的Lock指令
+        1.将当前处理器缓存的数据写回到主内存
+        2.这个写回内存的操作会使其他CPU缓存该内存地址的数据无效
+    即对于这个共享变量，在完成写操作后，其他线程的读操作都是从主内存读取的最新值
+
+12.sychrounized关键字的原理
+    反编译class文件查看相关指令：javap -v 类名.class
+
+        对同步块，MonitorEnter 指令插入在同步代码块的开始位置，而monitorExit
+    指令则插入在方法结束处和异常处，JVM 保证每个MonitorEnter 必须有对应的
+    MonitorExit。总的来说，当代码执行到该指令时，将会尝试获取该对象Monitor
+    的所有权，即尝试获得该对象的锁：
+        1、如果monitor 的进入数为0，则该线程进入monitor，然后将进入数设置
+    为1，该线程即为monitor 的所有者。
+        2、如果线程已经占有该monitor，只是重新进入，则进入monitor 的进入数
+    加1.
+        3.如果其他线程已经占用了monitor，则该线程进入阻塞状态，直到monitor
+    的进入数为0，再重新尝试获取monitor 的所有权。
+
+        对同步方法，从同步方法反编译的结果来看，方法的同步并没有通过指令
+    monitorenter 和monitorexit 来实现，相对于普通方法，其常量池中多了
+    ACC_SYNCHRONIZED 标示符。
+
+13.T1/T2/T3三个线程顺序执行
+    join方法
+    T3的run方法里面调用T2.join方法
+    T2的run方法里面调用T1.join方法
