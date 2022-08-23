@@ -19,7 +19,7 @@ https://blog.csdn.net/qian520ao/article/details/78262289
         消息分发:Looper将取出的消息发送给创建该消息的处理者(Handler),msg.target.dispatchMessage
     4.消息处理
         处理者(Handler)接收处理器Looper发送过来的消息
-        处理者根据Message执行UI操作
+        handleMessage方法被执行
 
 3. Looper、Handler、MessageQueue、Message作用和存在的意义
     Looper:
@@ -30,7 +30,7 @@ https://blog.csdn.net/qian520ao/article/details/78262289
     MessageQueue:
         多个线程往主线程的MessageQueue发消息时,用队列来保存消息和安排每个消息的处理顺序
     Message
-        消息的载体
+        消息的载体，链表的结点
 
 4.注意点
     1.一个线程只能绑定一个Looper,但可以有多个Handler
@@ -90,6 +90,22 @@ https://blog.csdn.net/qian520ao/article/details/78262289
                 msg.recycle();
             }
         }
+
+        public void dispatchMessage(Message msg) {
+                //handler.post-getPostMessage-sendMessageAtTime-enqueueMessage
+                    其中getPostMessage会生成一个Message，并将Runnable赋值给msg.callback
+                //handler.sendMessage-sendMessageAtTime-enqueueMessage
+                if (msg.callback != null) {
+                    handleCallback(msg);
+                } else {
+                    if (mCallback != null) {
+                        if (mCallback.handleMessage(msg)) {
+                            return;
+                        }
+                    }
+                    handleMessage(msg);
+                }
+            }
 
     3.用户创建Handler,执行Handler的构造方法
             public handler(){

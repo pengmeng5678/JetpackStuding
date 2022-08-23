@@ -350,7 +350,6 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
             System.out.println(futureTask.get());
         }
 
-
 7.HandlerThread和intentService
     handlerThread
         介绍
@@ -410,7 +409,7 @@ synchronized:   https://blog.csdn.net/javazejian/article/details/72828483
                mServiceLooper = thread.getLooper();
                mServiceHandler = new ServiceHandler(mServiceLooper);
             }
-            public void onStart(Intent intent, int startId) {
+            public void onStartCommand(Intent intent, int startId) {
                 Message msg = mServiceHandler.obtainMessage();
                 msg.arg1 = startId;
                 msg.obj = intent;

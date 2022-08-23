@@ -1,6 +1,32 @@
 1.Service启动方式
     1.startService
     2.bindService,带上BIND_AUTO_CREATE参数
+
+    service和activity交互
+        service端
+            1.创建一个内部类继承Binder,可以实现业务接口，这样客户端拿到binder代理之后可以调用IPlayer业务接口
+                internal inner class MusicBinder : Binder(), IPlayer {
+                    //业务方法
+                    void startPlay()
+                }
+            2.onBind方法返回IBinder的实例
+                override fun onBind(intent: Intent?): IBinder? {
+                    musicServiceInit()
+                    return MusicBinder()
+                }
+        client端
+            1.在Activity中bindService
+                Intent intent = new Intent(this,MusicService.class);
+                bindService(intent,conn,BIND_AUTO_CREATE)
+            2.创建ServiceConnection接口实例，实现onServiceConnected方法
+                private ServiceConnection conn = new ServiceConnection(){
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder binder) {
+                        TestService.MusicBinder myBinder = (MusicService.MusicBinder)binder;
+                        //获取到binder实例后，调用MusicBinder对象实现的方法
+                        myBinder.startPlay();
+                    }
+                }
 2.Service启动流程
     1.应用组件(如Activity)向AMS发起请求启动Service,如果service启动成功就回调onStartCommand方法
     2.如果service所在的进程不存在，AMS就发socket消息给Zygote进程启动service所在的进程
