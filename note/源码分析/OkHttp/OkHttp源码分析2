@@ -133,7 +133,7 @@
                 this.httpCodec = httpCodec;
                 this.index = index;
                 this.request = request;
-              }
+            }
         2.proceed方法
             @Override public Response proceed(Request request) throws IOException {
                 return proceed(request, streamAllocation, httpCodec, connection);

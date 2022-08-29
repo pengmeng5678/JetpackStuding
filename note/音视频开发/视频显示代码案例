@@ -1,9 +1,12 @@
 1.View、SurfaceView、TextureView、GlSurefaceView区别
     View:普通的View，与宿主窗口共享同一个绘图表面，UI在主线程中绘制，在有无硬件加速的情况下都能工作
-    SurfaceView:继承自View，绘制和显示的效率高，拥有独立的绘图表面，UI在一个独立的线程中绘制，不占用主线程的资源，因为采用双缓冲机制，适合频繁刷新
+    SurfaceView:继承自View，绘制和显示的效率高，拥有独立的绘图表面，UI在一个独立的线程中绘制，不占用主线程的资源，因为采用双缓冲机制，适合频繁刷新，7.0以前不能进行平移、缩放
     TextureView:继承自View,与SurfaceView相比，TextureView必须在开启硬件加速才能工作，他不会创建一个单独的绘图表面，他可以像一般的View进行变换、移动、动画操作
     GlSurfaceView:基于SurfaceView再次扩展的视图类，封装了EGL环境管理和render线程，用于3D游戏开发的视图，openGl专用
 
+    surfaceView为什么可以在子线程绘制
+        因为普通的View绘制都需要调用ViewRootImpl的performxxx方法，方法中会调用checkThread检查是否是在主线程
+        而surfaceView采用了独立的surface用于绘制，通过surfaceView控制surface的格式和尺寸，所以不需要考虑线程的问题
 2.打开系统相机显示与拍照
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//打开系统相机拍照
     fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image

@@ -1,1 +1,10 @@
 https://www.jianshu.com/p/e99b5e8bd67b
+一、ACTION_DOWN总结
+    见图片：EventDispatch_ACTION_DOWN.png
+二、ACTION_MOVE和ACTION_UP总结
+    1、ACTION_DOWN事件在哪个控件消费了（return true），
+    那么ACTION_MOVE和ACTION_UP就会从上往下（通过dispatchTouchEvent）做事件分发往下传，就只会传到这个控件，不会继续往下传，
+
+    2、如果ACTION_DOWN事件是在dispatchTouchEvent消费，那么事件到此为止停止传递
+
+    3、如果ACTION_DOWN事件是在onTouchEvent消费的，那么会把ACTION_MOVE或ACTION_UP事件传给该控件的onTouchEvent处理并结束传递。
