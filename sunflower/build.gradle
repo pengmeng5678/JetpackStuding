@@ -82,9 +82,9 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
 
     //用于查看源码
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2.0'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:2.2.0'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:2.2.0'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:2.9.1'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:2.9.1'
 
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.18'

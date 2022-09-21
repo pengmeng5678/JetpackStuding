@@ -1,11 +1,27 @@
 https://github.com/NoEndToLF/AppStartFaster.git
 https://github.com/idisfkj/android-startup/blob/master/README-ch.md
-一、你是如何处理Android的启动优化的
-二、什么是有向无环图、拓扑排序
-    1.DAG定义：顶点、边、入度、出度
-    2.拓扑排序算法原理
-    3.countlatch
-三、App启动器解决了哪些问题
-    1.任务依赖
-    2.线程管理
-    3.阻塞问题
+问题点：
+    一、你是如何处理Android的启动优化的
+    二、什么是有向无环图、拓扑排序
+        1.DAG定义：顶点、边、入度、出度
+        2.拓扑排序算法原理
+        3.countlatch
+    三、App启动器解决了哪些问题
+        1.任务依赖
+        2.线程管理
+        3.阻塞问题
+
+如何做启动优化
+一.熟悉App启动流程
+  第一阶段：点击launcher桌面App图标，launcher向zygote进程请求创建App进程
+        这个阶段由Framework工程师进行优化
+
+  第二阶段：App的application启动
+        ActivityThread的attach方法内部会调用attachBaseApplication方法(加固、热修复都可以在这里操作)
+        优化点1：
+            问题背景：App启动后会有黑白屏，是因为显示了activity持有的phoneWindow(黑白屏的显示是wm.addView)的默认样式Appstyle
+            解决方案：我们可以在application的设置自定义的主题theme样式，并添加以下标签自定义背景来优化黑白屏的问题
+                26以下用windowbackground(可以添加背景图片)
+                api26及以上用windowSplashScreenContent(可以添加背景动画)
+
+  第三阶段: App的Activity启动
