@@ -13,15 +13,25 @@ https://github.com/idisfkj/android-startup/blob/master/README-ch.md
 
 如何做启动优化
 一.熟悉App启动流程
+    总结我们优化的位置：Application的attachBaseApplication、onCreate方法;Activity的onCreate、onStart、onResume方法
   第一阶段：点击launcher桌面App图标，launcher向zygote进程请求创建App进程
         这个阶段由Framework工程师进行优化
 
   第二阶段：App的application启动
-        ActivityThread的attach方法内部会调用attachBaseApplication方法(加固、热修复都可以在这里操作)
+        ActivityThread的attach方法内部会调用attachBaseApplication方法(加固、热修复都可以在这里操作，这里要避免耗时操作)
         优化点1：
-            问题背景：App启动后会有黑白屏，是因为显示了activity持有的phoneWindow(黑白屏的显示是wm.addView)的默认样式Appstyle
+            问题背景：App启动后(Application的attachBaseApplication、onCreate方法)会有黑白屏，是因为显示了activity持有的phoneWindow(黑白屏的显示是wm.addView)的默认样式Appstyle
             解决方案：我们可以在application的设置自定义的主题theme样式，并添加以下标签自定义背景来优化黑白屏的问题
                 26以下用windowbackground(可以添加背景图片)
                 api26及以上用windowSplashScreenContent(可以添加背景动画)
+            疑问：当黑白屏显示完成后，什么时间会显示下一个画面呢
+                是在onResume方法之后(handleResumeActivity中会执行wm.addView将decorView添加到window)，最终是在onWindowFocusChanged方法执行完成后
 
-  第三阶段: App的Activity启动
+        优化点2：
+            问题背景：Application的onCreate方法会进行大量SDK的初始化，很耗时
+            解决方案：使用有向无环图，App启动器(阿里方案)
+
+  第三阶段: App的Activity启动,Activity的onCreate、onStart、onResume方法优化
+        onCreate:懒加载,idleHandler
+        onStart：懒加载,idleHandler
+        onResume：减少布局层级，constrainLayout

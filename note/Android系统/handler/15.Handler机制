@@ -182,6 +182,7 @@ MessageQueue.cpp
                 return true
             }
         }
+        Looper.myQueue().addIdelHandler(mIdleHandler)
 5.主线程进入了loop循环了为什么没有ANR
     1.了解ANR触发的原理
         在AMS中的子线程中弹出了一个dialog提示用户,应用无响应
