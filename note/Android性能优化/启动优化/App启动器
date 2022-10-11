@@ -1,5 +1,6 @@
 https://github.com/NoEndToLF/AppStartFaster.git
 https://github.com/idisfkj/android-startup/blob/master/README-ch.md
+https://juejin.cn/post/6871006041262260237
 问题点：
     一、你是如何处理Android的启动优化的
     二、什么是有向无环图、拓扑排序
@@ -35,3 +36,9 @@ https://github.com/idisfkj/android-startup/blob/master/README-ch.md
         onCreate:懒加载,idleHandler
         onStart：懒加载,idleHandler
         onResume：减少布局层级，constrainLayout
+
+二.Application和Activity架构和组件化思路进行优化
+    根据App的启动流程，可以从三个阶段可以对速度进行优化
+    而通过autoservice框架，可以对Application和Activity架构进行优化(解耦)
+    https://blog.csdn.net/qq_22090073/article/details/108223341
+    https://github.com/google/auto
