@@ -1,6 +1,8 @@
-https://www.jianshu.com/p/45d27f3e1196
-https://www.jianshu.com/p/65605622234b
-https://www.jianshu.com/p/116ebf3034d9
+计算机网络基础：https://www.jianshu.com/p/45d27f3e1196
+TCP协议： https://www.jianshu.com/p/65605622234b
+SOCKET:  https://www.jianshu.com/p/089fb79e308b
+HTTP协议：https://www.jianshu.com/p/116ebf3034d9
+
 1.计算机网络结构
     OSI体系结构：七层网络模型：应用层、表示层、会话层、传输层、网络层、链路层、物理层
     TCP/IP体系结构：应用层、运输层、网际层、网络接口层
@@ -82,3 +84,13 @@ https://www.jianshu.com/p/116ebf3034d9
 
         TCP       面向连接      可靠       字节流        慢         多         要求通信可靠  20-60
         UDP        无连接      不可靠     数据报文段      快        少          要求通信速度快  8
+
+    4.UDP、TCP、HTTP、MQTT、Socket
+        区别说明：https://blog.csdn.net/qq_41854291/article/details/115721493
+        socket说明：https://www.jianshu.com/p/089fb79e308b
+
+        UDP：无连接，不可靠，速度快
+        TCP：是底层通讯协议，定义的是数据传输和连接方式的规范；面向连接，可靠，点对点，全双工
+        HTTP：是应用层协议，定义的是传输数据的内容的规范；适合使用在性能好一些的终端上
+        MQTT：适合IoT开发；为大量计算能力有限且工作在低带宽、不可靠网络的远程传感器和控制设备通讯而设计的一种协议。
+        SOCKET:即套接字，是应用层 与 TCP/IP 协议族通信的中间软件抽象层，表现为一个封装了 TCP / IP协议族 的编程接口（API），解决的是数据如何在网络中传输的问题

@@ -1,0 +1,27 @@
+一、测温USB通信初始化
+    1、获取UsbManager
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+    2、获取所有的Usb设备
+        HashMap<String, UsbDevice> devices = usbManager.getDeviceList();
+
+    3、遍历所有的UsbDevice，找到每个UsbDevice的VID和PID
+        ArrayList<String> tempTypeList = new ArrayList<>();
+        for (UsbDevice device : list) {
+            String strHexVendorId = Integer.toHexString(device.getVendorId()).toUpperCase();
+            String strHexProductId = Integer.toHexString(device.getProductId()).toUpperCase();
+            MyLogUtils.Logd("InfoUtils", "strHexVendorId:" + strHexVendorId + "  strHexProductId:" + strHexProductId);
+
+            if (device.getVendorId() == 0x833c && device.getProductId() == 0x0001) {
+                tempTypeList.add(0,"巨哥");
+            } else if (device.getVendorId() == 0x2bdf && device.getProductId() == 0x0101) {
+                tempTypeList.add(0,"海康");
+
+            } else if (device.getVendorId() == 0x1a86 && (device.getProductId() == 0x5523 || device.getProductId() == 0x5512 || device.getProductId() == 0xe010 || device.getProductId() == 0x7523 || device.getProductId() == 0x5740)) {
+                tempTypeList.add("海曼(天下云)");
+            } else if (device.getVendorId() == 0x0483 && (device.getProductId() == 0x5523 || device.getProductId() == 0x5512 || device.getProductId() == 0xe010 || device.getProductId() == 0x7523 || device.getProductId() == 0x5740)) {
+                tempTypeList.add(0,"海曼(安智物联)");
+            }
+        }
+
+    4、根据UsbDevice的VID和PID确定当前设备用的是哪个厂商的硬件模块，再确认使用哪种方式去初始化
+        厂商的SDK
