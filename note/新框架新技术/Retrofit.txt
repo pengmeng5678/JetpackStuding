@@ -21,7 +21,7 @@ https://www.jianshu.com/p/345304325511
 	}
 	
 	3.创建访问API的请求
-	NewsService api = retrofit.create(NewsService.class);
+	NewsService service = retrofit.create(NewsService.class);
 	Call<News> call = service.getNews("123");
 	
 	4.调用
