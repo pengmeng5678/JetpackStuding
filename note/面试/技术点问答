@@ -31,9 +31,21 @@ https://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650827338&idx=1&sn=39a2e2
         Activity的创建
 
 15.http和https的区别，SSL的原理
+    Https：hyperText transfer protocol over secure socket layer，基于安全套接层的超文本传输协议
+    https是在http的基础多了SSL(SSL3.0之后是TLS(Transport Layer Security,传输层安全协议))
+    HTTP是直接和TCP通信，而HTTPS是HTTP先和SSL层通信，再由SSL和TCP通信
+    所以简单说HTTPS = HTTP+加密+认证+完整性保护
+    SSL主要有以下功能
+        1.内容加密，解决HTTP明文传输数据导致被抓包或者窃听的风险
+        2.身份认证，解决HTTP无法确认网站的真实性问题
+        3.数据完整性，解决HTTP无法确认数据是否遭到篡改的问题
 
 16.串口和socket粘包和拆包，CRC
+    https://zhuanlan.zhihu.com/p/77275039
+    http://t.zoukankan.com/caoweixiong-p-14666400.html
+
 17.Apk体积的优化
+
 18.底盘地图的文件格式和绘制细节
 
 

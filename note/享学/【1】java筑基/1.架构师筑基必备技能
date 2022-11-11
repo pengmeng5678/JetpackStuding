@@ -1,9 +1,15 @@
 一.泛型
     1.作用与定义
-        定义：JDK1.5，推出泛型
+        定义：JDK1.5之后推出泛型,泛型是指将类型作为参数输入，使得可以使用的类型多样化，从而实现解耦
         作用：
-            1.可以写出更加灵活通用的代码
+            1.可以写出更加灵活通用的代码，解耦
             2.将安全性检查由运行期提前到编译期，解决类型容器安全问题
+        原理：
+            使用擦除的方法实现泛型：
+                擦除是指一定程度上无视类型参数T，直接从T所在的类开始向上T的父类去擦除
+                如调用泛型方法，传入类型参数T进入方法内部，Java进行内部擦除，直接把T当做Object类处理，而不是传进来的T
+                即有泛型的任何类和方法内部，他都不知道自己的泛型参数，擦除和转型都是在边界上发生
+                即传进去的参数在进入类和方法时被擦除掉，但传出来时又被转成了我们设置的T
     2.通配符与嵌套
     3.泛型上下边界
         https://blog.csdn.net/hhllf61/article/details/108443398?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1.pc_relevant_default&spm=1001.2101.3001.4242.2&utm_relevant_index=4
@@ -18,6 +24,7 @@
             能够接收E类或者E类的子类,上边界通配符直接使用add()方法受限，但是可以用来获取各种数据类型的数据
         4) 下界通配符 < ? super E>
             下边界通配符使用get()方法受限（不使用强转），但是可以添加特定类型的值
+
     4.Rxjava深入理解泛型
         泛型分为:
         1.自定义泛型接口 interface Observer<T>
@@ -68,6 +75,7 @@
                     String toString();
                     Class<? extends Anotation> annotationType();
                 }
+
             与声明一个Class不同的是，注解的声明使用@interface关键字：
                 @interface Source{
                     public String URL();
@@ -135,11 +143,9 @@
 
 三、反射
         https://www.jianshu.com/p/f67182a482eb
-        定义：反射是一种机制，利用该机制可以在程序运行过程中对类进行解剖并操作类中的方法、属性、构造方法等成员
+        定义：在运行状态中，对于任意一个类，都能获取类的所有属性和方法，对于任意一个对象，都可以调用对象的属性和方法
+        这种动态获取信息及动态调用对象的机制成为java语言的反射机制
         实现步骤：
-            1.获取Class字节码对象
-            2.获取你要操作对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
-            如果操作是private类型，就提前设置允许暴力操作，setAccessible(true)
             public class Person {
                 private String name;
                 private int age;
@@ -150,9 +156,23 @@
               }
             }
 
+            1.获取类的Class对象实例
             Class c = Class.forName("com.tengj.reflect.Person");
+
+            2.根据Class对象实例，通过newIntance方法获取对象实例
             Object o = c.newInstance();
+
+            3.根据class对象获取你要操作对象中的构造方法(Constructor)、普通方法(Method)、属性字段(Field)
             Method method = c.getMethod("fun", String.class, int.class);
+
+            4.通过invoke调用对象的方法
             method.invoke(o, "tengj", 10);
 
+        如果操作是private类型，
         反射是可以修改final变量的，但是如果是基本数据类型或者String类型的时候，无法通过对象获取修改后的值，因为JVM对其进行了内联优化
+
+        获取方法getMethods、getDeclaredMethods
+        获取属性getFields、getDeclaredMethods
+
+        包含Declared表示可以获取到私有的属性和方法，
+        如果要实际调用私有方法和属性，还要提前设置允许暴力操作，setAccessible(true)
