@@ -63,9 +63,15 @@
 
 二、注解
     1.注解
-        定义：ANNOTATIONS,注解将元信息与定义相关联
+        定义：ANNOTATIONS,注解的声明使用@interface关键字
 
-        作用：1.注解确保编码的正确性；2.影响代码生成的注释@inline；3.java注解依赖特定的name-value对来初始化他们的元素
+        作用：
+            1.提供信息给编译器，编译期可以通过注解探测错误和警告信息
+            2.编译阶段：注解可以用于生成代码、HTML文档等
+            3.运行阶段：可以通过反射获取注解和相关的类，做逻辑判断
+                可以通过 Class 对象的 isAnnotationPresent()方法判断它是否应用了
+                某个注解，再通过 getAnnotation()方法获取 Annotation 对象
+
         声明：
             java中所有的注解，默认实现Annotation接口
                 package java.lang.annotation;
@@ -96,7 +102,7 @@
                 ElementType.TYPE 可以应用于类的任何元素
                 ElementType.PARAMETER 可以应用于参数的注解(可以替换枚举节省内存)
 
-            @Retention:保留的范围，默认值为CLASS,可选值有三种：
+            @Retention:保留的范围(存活的时间)，默认值为CLASS,可选值有三种：
                 RetentionPolicy.SOURCE,只在源码中可用；
                 RetentionPolicy.CLASS，会保留在class文件中，但是会被虚拟机忽略(即无法在运行期反射获取注解),在源码和字节码中可用；
                 RetentionPolicy.RUNTIME,标记的注解由JVM保留，在源码、字节码、运行时都可以使用它
